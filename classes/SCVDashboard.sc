@@ -15,8 +15,8 @@ SCVDashboardView {
 	var <isFrozen = false;
 	var <isClosed = false;
 
-	var txtTitle, lblTheme, lblTarget;
-	var themeMenu, freezeBtn, targetMenu, txtBrokerStatus;
+	var txtTitle, lblTheme, lblTarget, lblFont;
+	var themeMenu, freezeBtn, targetMenu, fontMenu, txtBrokerStatus;
 
 	*new { |server, parent, bounds, numIns=2, numOuts=2, busIndex=0, theme=\graphite, targetLUFS=(-23.0)|
 		^super.new.prInit(server, parent, bounds, numIns, numOuts, busIndex, theme, targetLUFS);
@@ -48,50 +48,65 @@ SCVDashboardView {
 		var rightW = (w - meterW - midW - 36).max(80);
 
 		// 1. Top Control Bar
-		txtTitle = StaticText(view, Rect(12, 6, 260, 20))
-			.string_("SCVisuals AUDIO ANALYSIS DASHBOARD")
-			.font_(Font.sansSerif(11).boldVariant)
+		txtTitle = StaticText(view, Rect(12, 6, 185, 20))
+			.string_("SCVisuals DASHBOARD")
+			.font_(theme.font(10, bold: true))
 			.stringColor_(theme.text);
 
 		// Global Theme Dropdown
-		lblTheme = StaticText(view, Rect(280, 6, 46, 20))
+		lblTheme = StaticText(view, Rect(204, 6, 42, 20))
 			.string_("Theme:")
-			.font_(Font.sansSerif(9).boldVariant)
+			.font_(theme.font(9, bold: true))
 			.stringColor_(theme.subtext);
 
-		themeMenu = PopUpMenu(view, Rect(330, 5, 110, 22))
+		themeMenu = PopUpMenu(view, Rect(248, 5, 96, 22))
 			.items_(["Graphite", "Phosphor", "Ice", "Amber", "Paper", "Monochrome"])
 			.value_(themes.indexOf(theme.name) ? 0)
-			.font_(Font.sansSerif(9))
+			.font_(theme.font(9))
 			.action_({ |m|
 				this.theme = themes[m.value];
 			});
 
 		// Target LUFS Selector
-		lblTarget = StaticText(view, Rect(455, 6, 46, 20))
+		lblTarget = StaticText(view, Rect(352, 6, 42, 20))
 			.string_("Target:")
-			.font_(Font.sansSerif(9).boldVariant)
+			.font_(theme.font(9, bold: true))
 			.stringColor_(theme.subtext);
 
-		targetMenu = PopUpMenu(view, Rect(505, 5, 130, 22))
-			.items_(["-23 LUFS (Broadcast)", "-14 LUFS (Streaming)"])
+		targetMenu = PopUpMenu(view, Rect(396, 5, 126, 22))
+			.items_(["-23 LUFS (EBU)", "-14 LUFS (Web)"])
 			.value_(if (targetLUFS == -14.0) { 1 } { 0 })
-			.font_(Font.sansSerif(9))
+			.font_(theme.font(9))
 			.action_({ |m|
 				var t = if (m.value == 0) { -23.0 } { -14.0 };
 				this.targetLUFS = t;
 			});
 
+		// Global Font Size Selector
+		lblFont = StaticText(view, Rect(530, 6, 32, 20))
+			.string_("Font:")
+			.font_(theme.font(9, bold: true))
+			.stringColor_(theme.subtext);
+
+		fontMenu = PopUpMenu(view, Rect(564, 5, 72, 22))
+			.items_(["100%", "115%", "125%", "140%", "150%"])
+			.value_(this.prFontScaleToIndex(theme.fontScale))
+			.font_(theme.font(9))
+			.action_({ |m|
+				var scales = [1.0, 1.15, 1.25, 1.4, 1.5];
+				this.fontScale = scales[m.value];
+			});
+
 		// Master Freeze Button
-		freezeBtn = Button(view, Rect(650, 5, 100, 22))
+		freezeBtn = Button(view, Rect(644, 5, 84, 22))
 			.states_([["Freeze All", theme.text, theme.panelBackground], ["Unfreeze All", theme.background, theme.signal]])
-			.font_(Font.sansSerif(9).boldVariant)
+			.font_(theme.font(9, bold: true))
 			.action_({ this.toggleFreeze });
 
 		// Broker Telemetry Label
-		txtBrokerStatus = StaticText(view, Rect(760, 6, (w - 770).max(60), 20))
+		txtBrokerStatus = StaticText(view, Rect(736, 6, (w - 746).max(60), 20))
 			.string_("Broker: 0 sources | 0 subs")
-			.font_(Font.monospace(8))
+			.font_(theme.font(8, mono: true))
 			.stringColor_(theme.subtext);
 
 		// 2. Embedded Panels Grid
@@ -128,7 +143,7 @@ SCVDashboardView {
 		if (isClosed.not) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			if (txtBrokerStatus.notNil) {
-				txtBrokerStatus.bounds = Rect(760, 6, (w - 770).max(60), 20);
+				txtBrokerStatus.bounds = Rect(736, 6, (w - 746).max(60), 20);
 			};
 			if (meterView.notNil and: { meterView.view.notNil }) {
 				meterView.view.bounds = Rect(10, topH + 8, meterW, h - topH - 16);
@@ -165,18 +180,61 @@ SCVDashboardView {
 		});
 	}
 
+	prFontScaleToIndex { |scale|
+		var scales = [1.0, 1.15, 1.25, 1.4, 1.5];
+		var idx = scales.detectIndex { |s| (s - scale).abs < 0.05 };
+		^idx ? 0;
+	}
+
+	fontScale {
+		^theme.fontScale;
+	}
+
+	fontScale_ { |scale|
+		this.theme = theme.withFontScale(scale);
+		if (fontMenu.notNil) {
+			fontMenu.value = this.prFontScaleToIndex(theme.fontScale);
+		};
+	}
+
 	theme_ { |newTheme|
 		theme = SCVTheme.get(newTheme);
 		view.background = theme.background;
-		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
-		if (lblTheme.notNil) { lblTheme.stringColor = theme.subtext };
-		if (lblTarget.notNil) { lblTarget.stringColor = theme.subtext };
-		if (txtBrokerStatus.notNil) { txtBrokerStatus.stringColor = theme.subtext };
+		if (txtTitle.notNil) {
+			txtTitle.stringColor = theme.text;
+			txtTitle.font = theme.font(10, bold: true);
+		};
+		if (lblTheme.notNil) {
+			lblTheme.stringColor = theme.subtext;
+			lblTheme.font = theme.font(9, bold: true);
+		};
+		if (themeMenu.notNil) {
+			themeMenu.font = theme.font(9);
+		};
+		if (lblTarget.notNil) {
+			lblTarget.stringColor = theme.subtext;
+			lblTarget.font = theme.font(9, bold: true);
+		};
+		if (targetMenu.notNil) {
+			targetMenu.font = theme.font(9);
+		};
+		if (lblFont.notNil) {
+			lblFont.stringColor = theme.subtext;
+			lblFont.font = theme.font(9, bold: true);
+		};
+		if (fontMenu.notNil) {
+			fontMenu.font = theme.font(9);
+		};
+		if (txtBrokerStatus.notNil) {
+			txtBrokerStatus.stringColor = theme.subtext;
+			txtBrokerStatus.font = theme.font(8, mono: true);
+		};
 		if (freezeBtn.notNil) {
 			freezeBtn.states = [
 				["Freeze All", theme.text, theme.panelBackground],
 				["Unfreeze All", theme.background, theme.signal]
 			];
+			freezeBtn.font = theme.font(9, bold: true);
 			freezeBtn.value = if (isFrozen) { 1 } { 0 };
 		};
 		if (meterView.notNil)       { meterView.theme = theme };
@@ -239,6 +297,15 @@ SCVDashboard {
 
 	theme_ { |aTheme|
 		dashboardView.theme = aTheme;
+		window.view.background = dashboardView.theme.background;
+	}
+
+	fontScale {
+		^dashboardView.fontScale;
+	}
+
+	fontScale_ { |aScale|
+		dashboardView.fontScale = aScale;
 		window.view.background = dashboardView.theme.background;
 	}
 

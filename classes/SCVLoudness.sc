@@ -57,17 +57,17 @@ SCVLoudnessView {
 		var readoutW = (w - meterW - 20).max(120);
 
 		// 1. Header
-		txtTitle = StaticText(view, Rect(12, 6, 260, 16))
+		txtTitle = StaticText(view, Rect(12, 6, (w - 140).max(100), 18))
 			.string_("LOUDNESS [ITU-R BS.1770 / EBU R128]")
-			.font_(Font.sansSerif(theme.fontSize).boldVariant)
+			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
 
 		// Target Toggle Button
-		btnTarget = Button(view, Rect(w - 120, 4, 108, 20))
+		btnTarget = Button(view, Rect(w - 112, 4, 102, 20))
 			.states_([
-				["Target: " ++ targetLUFS.round(1) ++ " LUFS", theme.text, theme.panelBackground]
+				["Ref: " ++ targetLUFS.round(1).asInteger ++ " LUFS", theme.text, theme.panelBackground]
 			])
-			.font_(Font.monospace(9))
+			.font_(theme.font(8.5, mono: true))
 			.action_({ this.toggleTarget });
 
 		// 2. Triple Meter View (M, S, I)
@@ -77,18 +77,18 @@ SCVLoudnessView {
 			var mw = uv.bounds.width;
 			var mh = uv.bounds.height - 24; // Leave room for M, S, I labels
 			var minLUFS = -54.0, maxLUFS = 0.0;
-			var colW = ((mw - 40 - 24) / 3).clip(16, 40);
+			var rulerW = (32 * (theme.fontScale ? 1.0)).max(32).round.asInteger;
+			var colW = ((mw - rulerW - 28) / 3).clip(16, 40);
 			var colGap = 8;
-			var rulerW = 32;
 			var startX = rulerW + 6;
 
 			// Draw Ruler on Left
-			Pen.font = Font.monospace(8);
+			Pen.font = theme.font(8, mono: true);
 			Pen.color = theme.subtext;
 			#[0, -6, -12, -18, -23, -30, -36, -42, -54].do { |val|
 				var normY = (val / minLUFS).clip(0.0, 1.0);
 				var y = normY * mh;
-				Pen.stringRightJustIn(val.asString, Rect(0, y - 5, rulerW - 4, 10));
+				Pen.stringRightJustIn(val.asString, Rect(0, y - 6, rulerW - 4, 12));
 				Pen.strokeColor = theme.grid.copy.alpha_(0.35);
 				Pen.width = 1.0;
 				Pen.line(Point(rulerW, y), Point(mw - 4, y));
@@ -138,7 +138,7 @@ SCVLoudnessView {
 				Pen.fillRect(Rect(x, barY, colW, barH));
 
 				// Column label
-				Pen.font = Font.sansSerif(10).boldVariant;
+				Pen.font = theme.font(10, bold: true);
 				Pen.color = theme.text;
 				Pen.stringCenteredIn(label, Rect(x, mh + 4, colW, 16));
 			};
@@ -160,19 +160,22 @@ SCVLoudnessView {
 	}
 
 	prBuildReadouts { |rw, rh|
-		var y = 10, rowH = 26;
+		var y = 8;
+		var rowH = ((rh - 42) / 6).floor.clip(18, 30);
+		var labelW = (rw * 0.44).clip(65, 110);
+		var valW = (rw - labelW - 18).max(30);
 
 		// Helper to create a readout row
 		var addRow = { |title, initialVal, isHighlight=false|
 			var tView, vView;
-			tView = StaticText(readoutView, Rect(12, y, 90, 20))
+			tView = StaticText(readoutView, Rect(8, y, labelW, rowH - 2))
 				.string_(title)
-				.font_(Font.sansSerif(10).boldVariant)
+				.font_(theme.font(8.5, bold: true))
 				.stringColor_(theme.subtext);
 
-			vView = StaticText(readoutView, Rect(104, y, rw - 116, 20))
+			vView = StaticText(readoutView, Rect(8 + labelW + 4, y, valW, rowH - 2))
 				.string_(initialVal)
-				.font_(Font.monospace(11).boldVariant)
+				.font_(theme.font(9.5, bold: true, mono: true))
 				.stringColor_(if (isHighlight) { theme.signal } { theme.text });
 
 			readoutLabels.add(tView);
@@ -182,37 +185,46 @@ SCVLoudnessView {
 			vView;
 		};
 
-		txtM     = addRow.value("Momentary (M):", "-inf LUFS");
-		txtS     = addRow.value("Short-Term (S):", "-inf LUFS");
-		txtI     = addRow.value("Integrated (I):", "-inf LUFS", true);
-		txtDelta = addRow.value("Target Delta:", "+0.0 LU");
-		txtLRA   = addRow.value("Loudness Range:", "0.0 LU");
+		txtM     = addRow.value("Mom (M):", "-inf LUFS");
+		txtS     = addRow.value("Short (S):", "-inf LUFS");
+		txtI     = addRow.value("Integ (I):", "-inf LUFS", true);
+		txtDelta = addRow.value("Delta:", "+0.0 LU");
+		txtLRA   = addRow.value("LRA:", "0.0 LU");
 		txtMaxPk = addRow.value("Max Peak:", "-inf dBFS");
 
 		// Reset Button
-		btnReset = Button(readoutView, Rect(12, rh - 34, rw - 24, 24))
-			.states_([["Reset Integrated / Peak ('r')", theme.text, theme.background]])
-			.font_(Font.sansSerif(9).boldVariant)
+		btnReset = Button(readoutView, Rect(8, rh - 30, rw - 16, 24))
+			.states_([["Reset ('r')", theme.text, theme.background]])
+			.font_(theme.font(8.5, bold: true))
 			.action_({ this.reset });
 	}
 
 	prHandleResize { |w, h|
-		var meterW = (w * 0.38).clip(130, 220);
-		var readoutW = (w - meterW - 20).max(120);
+		var meterW = (w * 0.38).clip(110, 200);
+		var readoutW = (w - meterW - 18).max(100);
 		var contentH = (h - 38).max(50);
+		var rowH = ((contentH - 42) / 6).floor.clip(18, 30);
+		var labelW = (readoutW * 0.44).clip(65, 110);
+		var valW = (readoutW - labelW - 18).max(30);
+
 		if (isClosed.not and: { meterView.notNil } and: { readoutView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			meterView.bounds = Rect(10, 28, meterW, contentH);
-			readoutView.bounds = Rect(meterW + 16, 28, readoutW, contentH);
+			readoutView.bounds = Rect(meterW + 14, 28, readoutW, contentH);
 			if (btnTarget.notNil) {
-				btnTarget.bounds = Rect(w - 120, 4, 108, 20);
+				btnTarget.bounds = Rect(w - 112, 4, 102, 20);
 			};
 			if (btnReset.notNil) {
-				btnReset.bounds = Rect(12, contentH - 34, readoutW - 24, 24);
+				btnReset.bounds = Rect(8, contentH - 30, readoutW - 16, 24);
+			};
+			if (readoutLabels.notNil) {
+				readoutLabels.do { |lbl, idx|
+					lbl.bounds = Rect(8, 8 + (idx * rowH), labelW, rowH - 2);
+				};
 			};
 			if (readoutValues.notNil) {
-				readoutValues.do { |valView|
-					valView.bounds = Rect(104, valView.bounds.top, (readoutW - 116).max(20), 20);
+				readoutValues.do { |valView, idx|
+					valView.bounds = Rect(8 + labelW + 4, 8 + (idx * rowH), valW, rowH - 2);
 				};
 			};
 			meterView.refresh;
@@ -305,21 +317,41 @@ SCVLoudnessView {
 		theme = SCVTheme.get(newTheme);
 		view.background = theme.background;
 		readoutView.background = theme.panelBackground;
-		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
+		if (txtTitle.notNil) {
+			txtTitle.stringColor = theme.text;
+			txtTitle.font = theme.font(theme.fontSize, bold: true);
+		};
 		if (readoutLabels.notNil) {
-			readoutLabels.do { |lbl| lbl.stringColor = theme.subtext };
+			readoutLabels.do { |lbl|
+				lbl.stringColor = theme.subtext;
+				lbl.font = theme.font(8.5, bold: true);
+			};
 		};
 		if (readoutValues.notNil) {
-			readoutValues.do { |v| v.stringColor = theme.text };
+			readoutValues.do { |v|
+				v.stringColor = theme.text;
+				v.font = theme.font(9.5, bold: true, mono: true);
+			};
 		};
 		if (txtI.notNil) { txtI.stringColor = theme.signal };
 		if (btnTarget.notNil) {
-			btnTarget.states = [["Target: " ++ targetLUFS.round(1) ++ " LUFS", theme.text, theme.panelBackground]];
+			btnTarget.states = [["Ref: " ++ targetLUFS.round(1).asInteger ++ " LUFS", theme.text, theme.panelBackground]];
+			btnTarget.font = theme.font(8.5, mono: true);
 		};
 		if (btnReset.notNil) {
-			btnReset.states = [["Reset Integrated / Peak ('r')", theme.text, theme.background]];
+			btnReset.states = [["Reset ('r')", theme.text, theme.background]];
+			btnReset.font = theme.font(8.5, bold: true);
 		};
 		meterView.refresh;
+	}
+
+	fontScale {
+		^theme.fontScale;
+	}
+
+	fontScale_ { |scale|
+		this.theme = theme.withFontScale(scale);
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	stop {
@@ -358,6 +390,15 @@ SCVLoudness {
 
 	theme_ { |aTheme|
 		loudnessView.theme = aTheme;
+		window.view.background = loudnessView.theme.background;
+	}
+
+	fontScale {
+		^loudnessView.fontScale;
+	}
+
+	fontScale_ { |aScale|
+		loudnessView.fontScale = aScale;
 		window.view.background = loudnessView.theme.background;
 	}
 

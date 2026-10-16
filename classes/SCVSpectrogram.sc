@@ -72,13 +72,13 @@ SCVSpectrogramView {
 			colorLUT[i] = Image.colorToPixel(c);
 		};
 	}
-
 	prBuildUI { |w, h|
-		var canvasW = (w - 48).max(50);
+		var rulerW = (32 * (theme.fontScale ? 1.0)).max(32).round.asInteger;
+		var canvasW = (w - rulerW - 16).max(50);
 		var canvasH = (h - 34).max(50);
 
 		// 1. Spectrogram UserView (Ring-buffer blit with horizontal stretch)
-		userView = UserView(view, Rect(40, 24, canvasW, canvasH));
+		userView = UserView(view, Rect(rulerW + 8, 24, canvasW, canvasH));
 		userView.canFocus = false;
 		userView.drawFunc = { |uv|
 			var part1W = rasterW - writeIdx;
@@ -95,22 +95,22 @@ SCVSpectrogramView {
 		};
 
 		// 2. Frequency Axis Ruler (Left)
-		axisView = UserView(view, Rect(6, 24, 32, canvasH));
+		axisView = UserView(view, Rect(6, 24, rulerW, canvasH));
 		axisView.canFocus = false;
 		axisView.drawFunc = { |uv|
 			var ch = uv.bounds.height;
-			Pen.font = Font.monospace(8);
+			Pen.font = theme.font(8, mono: true);
 			Pen.color = theme.subtext;
-			Pen.stringRightJustIn("18k", Rect(0, 0, 28, 10));
-			Pen.stringRightJustIn(" 5k", Rect(0, (ch * 0.3) - 5, 28, 10));
-			Pen.stringRightJustIn(" 1k", Rect(0, (ch * 0.6) - 5, 28, 10));
-			Pen.stringRightJustIn("40",  Rect(0, ch - 12, 28, 10));
+			Pen.stringRightJustIn("18k", Rect(0, 0, rulerW - 4, 12));
+			Pen.stringRightJustIn(" 5k", Rect(0, (ch * 0.3) - 6, rulerW - 4, 12));
+			Pen.stringRightJustIn(" 1k", Rect(0, (ch * 0.6) - 6, rulerW - 4, 12));
+			Pen.stringRightJustIn("40",  Rect(0, ch - 14, rulerW - 4, 12));
 		};
 
 		// 3. Header title
-		txtTitle = StaticText(view, Rect(10, 4, 260, 16))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
 			.string_("SPECTROGRAM [" ++ numBands ++ " BANDS]")
-			.font_(Font.sansSerif(theme.fontSize).boldVariant)
+			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
 
 		// Keyboard controls
@@ -122,12 +122,13 @@ SCVSpectrogramView {
 	}
 
 	prHandleResize { |w, h|
-		var canvasW = (w - 48).max(50);
+		var rulerW = (32 * (theme.fontScale ? 1.0)).max(32).round.asInteger;
+		var canvasW = (w - rulerW - 16).max(50);
 		var canvasH = (h - 34).max(50);
 		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			userView.bounds = Rect(40, 24, canvasW, canvasH);
-			axisView.bounds = Rect(6, 24, 32, canvasH);
+			userView.bounds = Rect(rulerW + 8, 24, canvasW, canvasH);
+			axisView.bounds = Rect(6, 24, rulerW, canvasH);
 			axisView.refresh;
 			userView.refresh;
 		};
@@ -161,9 +162,21 @@ SCVSpectrogramView {
 		theme = SCVTheme.get(newTheme);
 		view.background = theme.background;
 		this.prBuildLUT;
-		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
+		if (txtTitle.notNil) {
+			txtTitle.stringColor = theme.text;
+			txtTitle.font = theme.font(theme.fontSize, bold: true);
+		};
 		if (axisView.notNil) { axisView.refresh };
 		if (userView.notNil) { userView.refresh };
+	}
+
+	fontScale {
+		^theme.fontScale;
+	}
+
+	fontScale_ { |scale|
+		this.theme = theme.withFontScale(scale);
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	clear {
@@ -226,5 +239,14 @@ SCVSpectrogram {
 
 	toggleFreeze {
 		spectrogramView.toggleFreeze;
+	}
+
+	fontScale {
+		^spectrogramView.fontScale;
+	}
+
+	fontScale_ { |aScale|
+		spectrogramView.fontScale = aScale;
+		window.view.background = spectrogramView.theme.background;
 	}
 }

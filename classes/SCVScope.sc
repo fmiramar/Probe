@@ -93,7 +93,7 @@ SCVScopeView {
 			Pen.stroke;
 
 			// Axis text markings
-			Pen.font = Font.monospace(8);
+			Pen.font = theme.font(8, mono: true);
 			Pen.color = theme.subtext;
 			Pen.stringAtPoint("+1.0", Point(4, 2));
 			Pen.stringAtPoint(" 0.0", Point(4, (gh * 0.5) - 10));
@@ -101,9 +101,9 @@ SCVScopeView {
 		};
 
 		// 3. Header title and channel readout
-		txtTitle = StaticText(view, Rect(10, 4, 260, 16))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
 			.string_("OSCILLOSCOPE [" ++ numChannels ++ " CH]")
-			.font_(Font.sansSerif(theme.fontSize).boldVariant)
+			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
 
 		// Keyboard controls
@@ -156,7 +156,7 @@ SCVScopeView {
 			scopeView.bufnum = scopeBuf.index;
 		};
 
-		if (synth.notNil and: { synth.isPlaying }) {
+		if (synth.notNil) {
 			synth.free;
 			synth = nil;
 		};
@@ -177,7 +177,7 @@ SCVScopeView {
 				});
 			};
 
-			synth = sdef.play(RootNode(server), [\cycleFrames, cycle], \addToTail);
+			synth = sdef.play(RootNode(server), [\cycleFrames, cycle], \addToTail).register;
 		};
 
 		scopeView.start;
@@ -188,8 +188,19 @@ SCVScopeView {
 		view.background = theme.background;
 		scopeView.background = theme.panelBackground;
 		this.prUpdateWaveColors;
-		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
+		if (txtTitle.notNil) {
+			txtTitle.stringColor = theme.text;
+			txtTitle.font = theme.font(theme.fontSize, bold: true);
+		};
 		if (gridOverlay.notNil) { gridOverlay.refresh };
+	}
+
+	fontScale {
+		^theme.fontScale;
+	}
+
+	fontScale_ { |scale|
+		this.theme = theme.withFontScale(scale);
 	}
 
 	scopeStyle_ { |newStyle|
@@ -214,7 +225,7 @@ SCVScopeView {
 
 	cycle_ { |frames|
 		cycle = frames.asInteger.clip(64, bufSize);
-		if (synth.notNil and: { synth.isPlaying }) {
+		if (synth.notNil) {
 			synth.set(\cycleFrames, cycle);
 		};
 	}
@@ -246,7 +257,7 @@ SCVScopeView {
 			isClosed = true;
 			ServerQuit.remove(this, server);
 			ServerTree.remove(this, server);
-			if (synth.notNil and: { synth.isPlaying }) {
+			if (synth.notNil) {
 				synth.free;
 				synth = nil;
 			};
@@ -306,5 +317,14 @@ SCVScope {
 
 	toggleFreeze {
 		scopeView.toggleFreeze;
+	}
+
+	fontScale {
+		^scopeView.fontScale;
+	}
+
+	fontScale_ { |aScale|
+		scopeView.fontScale = aScale;
+		window.view.background = scopeView.theme.background;
 	}
 }

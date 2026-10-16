@@ -96,19 +96,19 @@ SCVVectorscopeView {
 			Pen.stroke;
 
 			// M/S and Polar Labels
-			Pen.font = Font.monospace(8);
+			Pen.font = theme.font(8, mono: true);
 			Pen.color = theme.subtext;
-			Pen.stringCenteredIn("+M", Rect(cx - 10, curScopeY + 2, 20, 10));
-			Pen.stringCenteredIn("-M", Rect(cx - 10, curScopeY + curScopeSize - 12, 20, 10));
-			Pen.stringLeftJustIn("+S", Rect(curScopeX + curScopeSize - 16, cy - 5, 20, 10));
-			Pen.stringRightJustIn("-S", Rect(curScopeX - 4, cy - 5, 20, 10));
+			Pen.stringCenteredIn("+M", Rect(cx - 12, curScopeY + 2, 24, 12));
+			Pen.stringCenteredIn("-M", Rect(cx - 12, curScopeY + curScopeSize - 14, 24, 12));
+			Pen.stringLeftJustIn("+S", Rect(curScopeX + curScopeSize - 18, cy - 6, 24, 12));
+			Pen.stringRightJustIn("-S", Rect(curScopeX - 6, cy - 6, 24, 12));
 
 			// Phase Correlation Bar Meter
-			Pen.font = Font.sansSerif(8).boldVariant;
+			Pen.font = theme.font(8, bold: true);
 			Pen.color = theme.subtext;
-			Pen.stringLeftJustIn("-1", Rect(corrX - 16, corrY - 2, 14, 12));
-			Pen.stringCenteredIn("0", Rect(cx - 6, corrY - 12, 12, 10));
-			Pen.stringRightJustIn("+1", Rect(corrX + corrW + 2, corrY - 2, 14, 12));
+			Pen.stringLeftJustIn("-1", Rect(corrX - 16, corrY - 2, 16, 12));
+			Pen.stringCenteredIn("0", Rect(cx - 8, corrY - 14, 16, 12));
+			Pen.stringRightJustIn("+1", Rect(corrX + corrW + 2, corrY - 2, 16, 12));
 
 			// Correlation Bar Background
 			Pen.fillColor = theme.panelBackground;
@@ -148,22 +148,22 @@ SCVVectorscopeView {
 			};
 
 			// Text Readout: Correlation & Balance
-			Pen.font = Font.monospace(8);
+			Pen.font = theme.font(8, mono: true);
 			Pen.color = theme.text;
 			Pen.stringLeftJustIn(
 				"CORR: " ++ (if (correlation >= 0) { "+" } { "" }) ++ correlation.round(0.01),
-				Rect(corrX, corrY + 12, 90, 12)
+				Rect(corrX, corrY + 12, 100, 14)
 			);
 			Pen.stringRightJustIn(
 				"BAL: " ++ (if (balance >= 0) { "+" } { "" }) ++ balance.round(0.01),
-				Rect(corrX + corrW - 80, corrY + 12, 80, 12)
+				Rect(corrX + corrW - 90, corrY + 12, 90, 14)
 			);
 		};
 
 		// Header title
-		txtTitle = StaticText(view, Rect(10, 4, 260, 16))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
 			.string_("VECTORSCOPE [LISSAJOUS / M-S]")
-			.font_(Font.sansSerif(theme.fontSize).boldVariant)
+			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
 
 		// Keyboard controls
@@ -196,7 +196,7 @@ SCVVectorscopeView {
 			scopeView.bufnum = scopeBuf.index;
 		};
 
-		if (synth.notNil and: { synth.isPlaying }) {
+		if (synth.notNil) {
 			synth.free;
 			synth = nil;
 		};
@@ -208,7 +208,7 @@ SCVVectorscopeView {
 				var in = In.ar(busIndex, 2);
 				ScopeOut2.ar(in, scopeBuf.index, 4096, cycleFrames);
 			});
-			synth = sdef.play(RootNode(server), [\cycleFrames, 1024], \addToTail);
+			synth = sdef.play(RootNode(server), [\cycleFrames, 1024], \addToTail).register;
 		};
 
 		scopeView.start;
@@ -234,8 +234,19 @@ SCVVectorscopeView {
 		view.background = theme.background;
 		scopeView.background = theme.panelBackground;
 		scopeView.waveColors = [theme.signal];
-		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
+		if (txtTitle.notNil) {
+			txtTitle.stringColor = theme.text;
+			txtTitle.font = theme.font(theme.fontSize, bold: true);
+		};
 		overlayView.refresh;
+	}
+
+	fontScale {
+		^theme.fontScale;
+	}
+
+	fontScale_ { |scale|
+		this.theme = theme.withFontScale(scale);
 	}
 
 	toggleFreeze {
@@ -314,5 +325,14 @@ SCVVectorscope {
 
 	toggleFreeze {
 		vectorscopeView.toggleFreeze;
+	}
+
+	fontScale {
+		^vectorscopeView.fontScale;
+	}
+
+	fontScale_ { |aScale|
+		vectorscopeView.fontScale = aScale;
+		window.view.background = vectorscopeView.theme.background;
 	}
 }

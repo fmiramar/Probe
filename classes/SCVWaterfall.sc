@@ -88,9 +88,9 @@ SCVWaterfallView {
 		};
 
 		// Header
-		txtTitle = StaticText(view, Rect(10, 4, 260, 16))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
 			.string_("WATERFALL [2.5D " ++ numLines ++ " LINES]")
-			.font_(Font.sansSerif(theme.fontSize).boldVariant)
+			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
 
 		// Keyboard controls
@@ -130,8 +130,19 @@ SCVWaterfallView {
 	theme_ { |newTheme|
 		theme = SCVTheme.get(newTheme);
 		view.background = theme.background;
-		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
+		if (txtTitle.notNil) {
+			txtTitle.stringColor = theme.text;
+			txtTitle.font = theme.font(theme.fontSize, bold: true);
+		};
 		if (userView.notNil) { userView.refresh };
+	}
+
+	fontScale {
+		^theme.fontScale;
+	}
+
+	fontScale_ { |scale|
+		this.theme = theme.withFontScale(scale);
 	}
 
 	toggleFreeze {
@@ -172,6 +183,16 @@ SCVWaterfall {
 
 	theme_ { |aTheme|
 		waterfallView.theme = aTheme;
+		window.view.background = waterfallView.theme.background;
+	}
+
+	fontScale {
+		^waterfallView.fontScale;
+	}
+
+	fontScale_ { |aScale|
+		waterfallView.fontScale = aScale;
+		window.view.background = waterfallView.theme.background;
 	}
 
 	toggleFreeze {

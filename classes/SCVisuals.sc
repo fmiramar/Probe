@@ -19,6 +19,17 @@ SCVisuals {
 		SCVTheme.current = SCVTheme.get(aTheme);
 	}
 
+	*fontScale {
+		^SCVTheme.defaultFontScale;
+	}
+
+	*fontScale_ { |scale|
+		var s = scale.asFloat.clip(0.6, 2.5);
+		SCVTheme.defaultFontScale = s;
+		SCVTheme.themes.do { |th| th.fontScale = s };
+		if (SCVTheme.current.notNil) { SCVTheme.current.fontScale = s };
+	}
+
 	*themes {
 		^SCVTheme.themes;
 	}

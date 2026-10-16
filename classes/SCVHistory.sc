@@ -49,7 +49,8 @@ SCVHistoryView {
 	}
 
 	prBuildUI { |w, h|
-		var canvasRect = Rect(36, 24, (w - 46).max(50), (h - 32).max(50));
+		var rulerW = (30 * (theme.fontScale ? 1.0)).max(30).round.asInteger;
+		var canvasRect = Rect(rulerW + 6, 24, (w - rulerW - 16).max(50), (h - 32).max(50));
 
 		userView = UserView(view, canvasRect);
 		userView.canFocus = false;
@@ -78,7 +79,7 @@ SCVHistoryView {
 				};
 
 				// Channel label
-				Pen.font = Font.monospace(8);
+				Pen.font = theme.font(8, mono: true);
 				Pen.color = theme.subtext;
 				Pen.stringLeftJustIn("CH " ++ (chIdx + 1), Rect(4, laneY + 2, 40, 12));
 
@@ -139,7 +140,7 @@ SCVHistoryView {
 		};
 
 		// Left Axis Ruler (dB ticks)
-		axisView = UserView(view, Rect(4, 24, 30, (h - 32).max(50)));
+		axisView = UserView(view, Rect(4, 24, rulerW, (h - 32).max(50)));
 		axisView.canFocus = false;
 		axisView.drawFunc = { |uv|
 			var laneH = uv.bounds.height / numChannels;
@@ -148,21 +149,21 @@ SCVHistoryView {
 
 			numChannels.do { |chIdx|
 				var laneY = chIdx * laneH;
-				Pen.font = Font.monospace(7);
+				Pen.font = theme.font(7, mono: true);
 				Pen.color = theme.subtext;
 
 				#[0, -6, -18, -36, -72].do { |dbVal|
 					var normY = (dbVal / minDb).clip(0.0, 1.0);
-					var y = laneY + (normY * laneInnerH) - 4;
-					Pen.stringRightJustIn(dbVal.asString, Rect(0, y, 26, 10));
+					var y = laneY + (normY * laneInnerH) - 5;
+					Pen.stringRightJustIn(dbVal.asString, Rect(0, y, rulerW - 4, 12));
 				};
 			};
 		};
 
 		// Header
-		txtTitle = StaticText(view, Rect(10, 4, 340, 16))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
 			.string_("LEVEL HISTORY [PEAK / RMS / CREST] — " ++ busType.asString.toUpper)
-			.font_(Font.sansSerif(theme.fontSize).boldVariant)
+			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
 
 		// Keyboard controls
@@ -174,10 +175,11 @@ SCVHistoryView {
 	}
 
 	prHandleResize { |w, h|
+		var rulerW = (30 * (theme.fontScale ? 1.0)).max(30).round.asInteger;
 		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			userView.bounds = Rect(36, 24, (w - 46).max(50), (h - 32).max(50));
-			axisView.bounds = Rect(4, 24, 30, (h - 32).max(50));
+			userView.bounds = Rect(rulerW + 6, 24, (w - rulerW - 16).max(50), (h - 32).max(50));
+			axisView.bounds = Rect(4, 24, rulerW, (h - 32).max(50));
 			axisView.refresh;
 			userView.refresh;
 		};
@@ -206,9 +208,21 @@ SCVHistoryView {
 	theme_ { |newTheme|
 		theme = SCVTheme.get(newTheme);
 		view.background = theme.background;
-		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
+		if (txtTitle.notNil) {
+			txtTitle.stringColor = theme.text;
+			txtTitle.font = theme.font(theme.fontSize, bold: true);
+		};
 		if (axisView.notNil) { axisView.refresh };
 		if (userView.notNil) { userView.refresh };
+	}
+
+	fontScale {
+		^theme.fontScale;
+	}
+
+	fontScale_ { |scale|
+		this.theme = theme.withFontScale(scale);
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	clear {
@@ -270,5 +284,14 @@ SCVHistory {
 
 	toggleFreeze {
 		historyView.toggleFreeze;
+	}
+
+	fontScale {
+		^historyView.fontScale;
+	}
+
+	fontScale_ { |aScale|
+		historyView.fontScale = aScale;
+		window.view.background = historyView.theme.background;
 	}
 }

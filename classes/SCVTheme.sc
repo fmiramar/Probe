@@ -7,6 +7,7 @@
 SCVTheme {
 	classvar <themes;
 	classvar <>current;
+	classvar <>defaultFontScale = 1.0;
 
 	var <name;
 	var <background, <panelBackground;
@@ -18,6 +19,7 @@ SCVTheme {
 	var <preset;        // \eco, \normal, \detailed
 	var <meterWidth, <gapWidth;
 	var <fontFamily, <fontSize;
+	var <fontScale;
 
 	*initClass {
 		themes = IdentityDictionary.new;
@@ -137,6 +139,7 @@ SCVTheme {
 		this.density_(dict[\density] ?? { \compact });
 		preset = dict[\preset] ?? { \normal };
 		fontFamily = dict[\fontFamily] ?? { Font.defaultSansFace };
+		fontScale = (dict[\fontScale] ?? { defaultFontScale }).asFloat.clip(0.6, 2.5);
 	}
 
 	density_ { |aDensity|
@@ -165,6 +168,25 @@ SCVTheme {
 		);
 	}
 
+	fontScale_ { |scale|
+		fontScale = scale.asFloat.clip(0.6, 2.5);
+	}
+
+	withFontScale { |newScale|
+		^this.copy((fontScale: newScale.asFloat.clip(0.6, 2.5)));
+	}
+
+	font { |baseSize=9, bold=false, mono=false|
+		var effectiveScale = fontScale ?? { defaultFontScale };
+		var size = (baseSize * effectiveScale).round.asInteger.max(6);
+		var f = if (mono) {
+			Font.monospace(size)
+		} {
+			Font.sansSerif(size)
+		};
+		^if (bold) { f.boldVariant } { f };
+	}
+
 	// Copy-on-write immutability
 	copy { |overrides|
 		var dict = IdentityDictionary.new;
@@ -180,6 +202,7 @@ SCVTheme {
 		dict.put(\density,           density);
 		dict.put(\preset,            preset);
 		dict.put(\fontFamily,        fontFamily);
+		dict.put(\fontScale,         fontScale);
 
 		if (overrides.notNil) {
 			overrides.keysValuesDo { |k, v| dict.put(k, v) };

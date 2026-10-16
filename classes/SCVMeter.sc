@@ -32,7 +32,7 @@ SCVMeterView {
 		var th = SCVTheme.get(theme);
 		var mw = th.meterWidth;
 		var gw = th.gapWidth;
-		var rulerW = 24;
+		var rulerW = (24 * (th.fontScale ? 1.0)).max(24).round.asInteger;
 		var pad = 16;
 		var divW = if ((numIns > 0) and: { numOuts > 0 }) { 12 } { 0 };
 		^(rulerW * 2) + pad + ((numIns + numOuts) * (mw + gw)) + divW;
@@ -68,7 +68,7 @@ SCVMeterView {
 		var mw = theme.meterWidth;
 		var gw = theme.gapWidth;
 		var fs = theme.fontSize;
-		var rulerW = 24;
+		var rulerW = (24 * (theme.fontScale ? 1.0)).max(24).round.asInteger;
 		var h = totalHeight ?? { view.bounds.height };
 		var meterH = (h - 55).max(40);
 		var curX = 6;
@@ -82,14 +82,14 @@ SCVMeterView {
 		dbRulerView.drawFunc = { |uv|
 			var curH = uv.bounds.height - 20;
 			var dBs = [0, -3, -6, -12, -18, -24, -36, -48, -60, -80];
-			Pen.font = Font.monospace(fs - 1);
+			Pen.font = theme.font(fs - 1, mono: true);
 			dBs.do { |db|
 				var normY = db.linlin(dBLow, 0, curH - 10, 0);
 				Pen.strokeColor = theme.grid;
 				Pen.line(Point(rulerW - 6, normY + 5), Point(rulerW, normY + 5));
 				Pen.stroke;
 				Pen.color = theme.text;
-				Pen.stringRightJustIn(db.asString, Rect(0, normY, rulerW - 8, 12));
+				Pen.stringRightJustIn(db.asString, Rect(0, normY - 1, rulerW - 7, 13));
 			};
 		};
 
@@ -99,7 +99,7 @@ SCVMeterView {
 		if (numIns > 0) {
 			inHeaderView = StaticText(view, Rect(curX, 4, (numIns * (mw + gw)).max(50), 16))
 				.string_("IN")
-				.font_(Font.sansSerif(fs).boldVariant)
+				.font_(theme.font(fs, bold: true))
 				.stringColor_(theme.text);
 
 			inComps  = Array.newClear(numIns);
@@ -121,7 +121,7 @@ SCVMeterView {
 					.criticalColor_(theme.critical);
 
 				var label = StaticText(comp, Rect(0, meterH + 2, mw, 14))
-					.font_(Font.sansSerif(fs - 1).boldVariant)
+					.font_(theme.font(fs - 1, bold: true))
 					.align_(\center)
 					.stringColor_(theme.subtext)
 					.string_((i + 1).asString);
@@ -151,7 +151,7 @@ SCVMeterView {
 		if (numOuts > 0) {
 			outHeaderView = StaticText(view, Rect(curX, 4, (numOuts * (mw + gw)).max(50), 16))
 				.string_("OUT")
-				.font_(Font.sansSerif(fs).boldVariant)
+				.font_(theme.font(fs, bold: true))
 				.stringColor_(theme.text);
 
 			outComps  = Array.newClear(numOuts);
@@ -173,7 +173,7 @@ SCVMeterView {
 					.criticalColor_(theme.critical);
 
 				var label = StaticText(comp, Rect(0, meterH + 2, mw, 14))
-					.font_(Font.sansSerif(fs - 1).boldVariant)
+					.font_(theme.font(fs - 1, bold: true))
 					.align_(\center)
 					.stringColor_(theme.subtext)
 					.string_((i + 1).asString);
@@ -193,14 +193,14 @@ SCVMeterView {
 		dbRulerViewRight.drawFunc = { |uv|
 			var curH = uv.bounds.height - 20;
 			var dBs = [0, -3, -6, -12, -18, -24, -36, -48, -60, -80];
-			Pen.font = Font.monospace(fs - 1);
+			Pen.font = theme.font(fs - 1, mono: true);
 			dBs.do { |db|
 				var normY = db.linlin(dBLow, 0, curH - 10, 0);
 				Pen.strokeColor = theme.grid;
 				Pen.line(Point(0, normY + 5), Point(6, normY + 5));
 				Pen.stroke;
 				Pen.color = theme.text;
-				Pen.stringLeftJustIn(db.asString, Rect(8, normY, rulerW - 8, 12));
+				Pen.stringLeftJustIn(db.asString, Rect(7, normY - 1, rulerW - 7, 13));
 			};
 		};
 
@@ -213,7 +213,7 @@ SCVMeterView {
 	}
 
 	prHandleResize { |w, h|
-		var rulerW = 24;
+		var rulerW = (24 * (theme.fontScale ? 1.0)).max(24).round.asInteger;
 		var pad = 16;
 		var gw = theme.gapWidth;
 		var divW = if ((numIns > 0) and: { numOuts > 0 }) { 12 } { 0 };
@@ -344,8 +344,14 @@ SCVMeterView {
 
 	prApplyTheme {
 		view.background = theme.background;
-		if (inHeaderView.notNil) { inHeaderView.stringColor = theme.text };
-		if (outHeaderView.notNil) { outHeaderView.stringColor = theme.text };
+		if (inHeaderView.notNil) {
+			inHeaderView.stringColor = theme.text;
+			inHeaderView.font = theme.font(theme.fontSize, bold: true);
+		};
+		if (outHeaderView.notNil) {
+			outHeaderView.stringColor = theme.text;
+			outHeaderView.font = theme.font(theme.fontSize, bold: true);
+		};
 		if (dbRulerView.notNil) { dbRulerView.refresh };
 		if (dbRulerViewRight.notNil) { dbRulerViewRight.refresh };
 		if (dividerView.notNil) { dividerView.refresh };
@@ -359,7 +365,10 @@ SCVMeterView {
 			};
 		};
 		if (inLabels.notNil) {
-			inLabels.do { |lbl| lbl.stringColor = theme.subtext };
+			inLabels.do { |lbl|
+				lbl.stringColor = theme.subtext;
+				lbl.font = theme.font(theme.fontSize - 1, bold: true);
+			};
 		};
 
 		if (outMeters.notNil) {
@@ -371,8 +380,20 @@ SCVMeterView {
 			};
 		};
 		if (outLabels.notNil) {
-			outLabels.do { |lbl| lbl.stringColor = theme.subtext };
+			outLabels.do { |lbl|
+				lbl.stringColor = theme.subtext;
+				lbl.font = theme.font(theme.fontSize - 1, bold: true);
+			};
 		};
+	}
+
+	fontScale {
+		^theme.fontScale;
+	}
+
+	fontScale_ { |scale|
+		this.theme = theme.withFontScale(scale);
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	stop {
@@ -425,6 +446,16 @@ SCVMeter {
 
 	meterStyle_ { |aStyle|
 		meterView.meterStyle = aStyle;
+	}
+
+	fontScale {
+		^meterView.fontScale;
+	}
+
+	fontScale_ { |aScale|
+		meterView.fontScale = aScale;
+		window.bounds = window.bounds.width_(SCVMeterView.getWidth(meterView.numIns, meterView.numOuts, meterView.theme));
+		window.view.background = meterView.theme.background;
 	}
 
 	resetPeakHold {

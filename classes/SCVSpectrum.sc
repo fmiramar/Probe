@@ -74,7 +74,8 @@ SCVSpectrumView {
 		gridOverlay = UserView(view, Rect(8, 24, w - 16, scopeH));
 		gridOverlay.canFocus = false;
 		gridOverlay.drawFunc = { |uv|
-			var curW = uv.bounds.width - 28, curH = uv.bounds.height, ox = 28;
+			var ox = (28 * (theme.fontScale ? 1.0)).max(28).round.asInteger;
+			var curW = uv.bounds.width - ox, curH = uv.bounds.height;
 			Pen.strokeColor = theme.grid;
 			Pen.width = 1;
 
@@ -85,9 +86,9 @@ SCVSpectrumView {
 				Pen.line(Point(ox, y), Point(ox + curW, y));
 				Pen.stroke;
 
-				Pen.font = Font.monospace(8);
+				Pen.font = theme.font(8, mono: true);
 				Pen.color = theme.subtext;
-				Pen.stringRightJustIn(db.asString, Rect(0, (y - 6).clip(0, curH - 12), 24, 12));
+				Pen.stringRightJustIn(db.asString, Rect(0, (y - 7).clip(0, curH - 14), ox - 4, 14));
 			};
 
 			// Vertical Frequency grid lines
@@ -101,11 +102,11 @@ SCVSpectrumView {
 					Pen.line(Point(x, 0), Point(x, curH));
 					Pen.stroke;
 
-					Pen.font = Font.monospace(8);
+					Pen.font = theme.font(8, mono: true);
 					Pen.color = theme.subtext;
 					Pen.stringCenteredIn(
 						if (freq >= 1000) { (freq / 1000).asInteger.asString ++ "k" } { freq.asString },
-						Rect(x - 14, curH - 12, 28, 10)
+						Rect(x - 16, curH - 14, 32, 12)
 					);
 				};
 			} {
@@ -117,23 +118,23 @@ SCVSpectrumView {
 					Pen.line(Point(x, 0), Point(x, curH));
 					Pen.stroke;
 
-					Pen.font = Font.monospace(8);
+					Pen.font = theme.font(8, mono: true);
 					Pen.color = theme.subtext;
-					Pen.stringCenteredIn(freqK.asString ++ "k", Rect(x - 14, curH - 12, 28, 10));
+					Pen.stringCenteredIn(freqK.asString ++ "k", Rect(x - 16, curH - 14, 32, 12));
 				};
 			};
 		};
 
 		// 3. Header title
-		txtTitle = StaticText(view, Rect(10, 4, 250, 16))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 110).max(100), 18))
 			.string_("SPECTRUM ANALYZER [FFT " ++ fftSize ++ "]")
-			.font_(Font.sansSerif(theme.fontSize).boldVariant)
+			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
 
 		// 4. Smoothing Dropdown Menu
 		smoothMenu = PopUpMenu(view, Rect(w - 95, 3, 85, 18))
 			.items_(["Smooth: Off", "Smooth: Lo", "Smooth: Med", "Smooth: Hi"])
-			.font_(Font.sansSerif(8))
+			.font_(theme.font(8))
 			.value_(this.prSmoothingToIndex(smoothing))
 			.action_({ |m|
 				var modes = [\none, \low, \med, \high];
@@ -163,14 +164,20 @@ SCVSpectrumView {
 		};
 	}
 
-	prSmoothingToBins { |smoothVal|
+	prSmoothingToCutoff { |smoothVal|
 		^switch(smoothVal.asSymbol,
-			\none, { 1 },
-			\off,  { 1 },
-			\low,  { 3 },
-			\med,  { 7 },
-			\high, { 15 },
-			{ smoothVal.asInteger.clip(1, 32) }
+			\none, { 20000 },
+			\off,  { 20000 },
+			\low,  { 800 },
+			\med,  { 250 },
+			\high, { 70 },
+			{
+				if (smoothVal.isNumber) {
+					smoothVal.asFloat.clip(20, 20000)
+				} {
+					20000
+				}
+			}
 		);
 	}
 
@@ -187,8 +194,8 @@ SCVSpectrumView {
 
 	smoothing_ { |smoothVal|
 		smoothing = smoothVal;
-		if (synth.notNil and: { synth.isPlaying }) {
-			synth.set(\smooth, this.prSmoothingToBins(smoothing));
+		if (synth.notNil) {
+			synth.set(\smoothCutoff, this.prSmoothingToCutoff(smoothing));
 		};
 		if (smoothMenu.notNil) {
 			smoothMenu.value = this.prSmoothingToIndex(smoothing);
@@ -220,7 +227,7 @@ SCVSpectrumView {
 			scopeView.bufnum = scopeBuf.index;
 		};
 
-		if (synth.notNil and: { synth.isPlaying }) {
+		if (synth.notNil) {
 			synth.free;
 			synth = nil;
 		};
@@ -231,33 +238,37 @@ SCVSpectrumView {
 			var sdef;
 			if (freqMode == 0) {
 				// Linear mode
-				sdef = SynthDef(synthDefName, { |in=0, scopebufnum=0, dbFactor=0.0208, smooth=1|
-					var sig, chain, phasor, mul = 0.00285;
+				sdef = SynthDef(synthDefName, { |in=0, scopebufnum=0, dbFactor=0.0208, smoothCutoff=20000|
+					var sig, phasor, mul = 0.00285;
 					var numSamples, phase;
 					var fftbuf = LocalBuf(fftSize, 1);
+					var rawMag, filteredMag;
 					phase = 1 - (rate * fftSize.reciprocal);
 					numSamples = (BufSamples.ir(fftbuf) - 2) * 0.5;
 					sig = In.ar(in, 1);
-					chain = FFT(fftbuf, sig, hop: 0.75, wintype: 1);
-					chain = PV_MagSmear(chain, smooth);
+					FFT(fftbuf, sig, hop: 0.75, wintype: 1);
 					phasor = LFSaw.ar(rate / BufDur.ir(fftbuf), phase, numSamples, numSamples + 2);
 					phasor = phasor.round(2);
-					ScopeOut2.ar(((BufRd.ar(1, fftbuf, phasor, 1, 1) * mul).ampdb * dbFactor) + 1, scopebufnum, fftSize / rate);
+					rawMag = BufRd.ar(1, fftbuf, phasor, 1, 1);
+					filteredMag = LPF.ar(rawMag, smoothCutoff.clip(20, 20000));
+					ScopeOut2.ar(((filteredMag * mul).ampdb * dbFactor) + 1, scopebufnum, fftSize / rate);
 				});
 			} {
 				// Logarithmic mode
-				sdef = SynthDef(synthDefName, { |in=0, scopebufnum=0, dbFactor=0.0208, smooth=1|
-					var sig, chain, phasor, mul = 0.00285;
+				sdef = SynthDef(synthDefName, { |in=0, scopebufnum=0, dbFactor=0.0208, smoothCutoff=20000|
+					var sig, phasor, mul = 0.00285;
 					var halfSamples, phase;
 					var fftbuf = LocalBuf(fftSize, 1);
+					var rawMag, filteredMag;
 					phase = 1 - (rate * fftSize.reciprocal);
 					halfSamples = BufSamples.ir(fftbuf) * 0.5;
 					sig = In.ar(in, 1);
-					chain = FFT(fftbuf, sig, hop: 0.75, wintype: 1);
-					chain = PV_MagSmear(chain, smooth);
+					FFT(fftbuf, sig, hop: 0.75, wintype: 1);
 					phasor = halfSamples.pow(LFSaw.ar(rate / BufDur.ir(fftbuf), phase, 0.5, 0.5)) * 2;
 					phasor = phasor.round(2);
-					ScopeOut2.ar(((BufRd.ar(1, fftbuf, phasor, 1, 1) * mul).ampdb * dbFactor) + 1, scopebufnum, fftSize / rate);
+					rawMag = BufRd.ar(1, fftbuf, phasor, 1, 1);
+					filteredMag = LPF.ar(rawMag, smoothCutoff.clip(20, 20000));
+					ScopeOut2.ar(((filteredMag * mul).ampdb * dbFactor) + 1, scopebufnum, fftSize / rate);
 				});
 			};
 
@@ -265,8 +276,8 @@ SCVSpectrumView {
 				\in, busIndex,
 				\scopebufnum, scopeBuf.index,
 				\dbFactor, 2 / dbRange,
-				\smooth, this.prSmoothingToBins(smoothing)
-			], \addToTail);
+				\smoothCutoff, this.prSmoothingToCutoff(smoothing)
+			], \addToTail).register;
 		};
 
 		scopeView.start;
@@ -277,8 +288,22 @@ SCVSpectrumView {
 		view.background = theme.background;
 		scopeView.background = theme.panelBackground;
 		scopeView.waveColors = [theme.signal];
-		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
+		if (txtTitle.notNil) {
+			txtTitle.stringColor = theme.text;
+			txtTitle.font = theme.font(theme.fontSize, bold: true);
+		};
+		if (smoothMenu.notNil) {
+			smoothMenu.font = theme.font(8);
+		};
 		if (gridOverlay.notNil) { gridOverlay.refresh };
+	}
+
+	fontScale {
+		^theme.fontScale;
+	}
+
+	fontScale_ { |scale|
+		this.theme = theme.withFontScale(scale);
 	}
 
 	freqMode_ { |newMode|
@@ -287,7 +312,7 @@ SCVSpectrumView {
 			\logarithmic, { 1 },
 			{ newMode.asInteger.clip(0, 1) }
 		);
-		if (synth.notNil and: { synth.isPlaying }) {
+		if (synth.notNil) {
 			synth.free;
 			synth = nil;
 		};
@@ -299,7 +324,7 @@ SCVSpectrumView {
 
 	dbRange_ { |range|
 		dbRange = range.asFloat.max(24.0);
-		if (synth.notNil and: { synth.isPlaying }) {
+		if (synth.notNil) {
 			synth.set(\dbFactor, 2 / dbRange);
 		};
 		if (gridOverlay.notNil) { gridOverlay.refresh };
@@ -332,7 +357,7 @@ SCVSpectrumView {
 			isClosed = true;
 			ServerQuit.remove(this, server);
 			ServerTree.remove(this, server);
-			if (synth.notNil and: { synth.isPlaying }) {
+			if (synth.notNil) {
 				synth.free;
 				synth = nil;
 			};
@@ -388,5 +413,14 @@ SCVSpectrum {
 
 	toggleFreeze {
 		spectrumView.toggleFreeze;
+	}
+
+	fontScale {
+		^spectrumView.fontScale;
+	}
+
+	fontScale_ { |aScale|
+		spectrumView.fontScale = aScale;
+		window.view.background = spectrumView.theme.background;
 	}
 }
