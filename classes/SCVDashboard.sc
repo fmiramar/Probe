@@ -41,25 +41,27 @@ SCVDashboardView {
 
 	prBuildUI { |w, h, numIns, numOuts, busIndex|
 		var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome];
-		var topH = 32;
+		var fs = theme.fontScale ? 1.0;
+		var btnH = (26 * fs).max(24).min(38).round.asInteger;
+		var topH = btnH + 12;
 		var panelH = ((h - topH - 24) / 2).floor;
-		var meterW = (w * 0.17).clip(120, 240);
+		var meterW = (w * 0.17).clip((130 * fs).max(120), (260 * fs).max(240));
 		var midW = (((w - meterW - 36) / 2).floor).max(80);
 		var rightW = (w - meterW - midW - 36).max(80);
 
-		// 1. Top Control Bar
-		txtTitle = StaticText(view, Rect(12, 6, 185, 20))
+		// 1. Top Control Bar (bounds will be set in prHandleResize)
+		txtTitle = StaticText(view, Rect(0, 0, 10, 10))
 			.string_("SCVisuals DASHBOARD")
 			.font_(theme.font(10, bold: true))
 			.stringColor_(theme.text);
 
 		// Global Theme Dropdown
-		lblTheme = StaticText(view, Rect(204, 6, 42, 20))
+		lblTheme = StaticText(view, Rect(0, 0, 10, 10))
 			.string_("Theme:")
 			.font_(theme.font(9, bold: true))
 			.stringColor_(theme.subtext);
 
-		themeMenu = PopUpMenu(view, Rect(248, 5, 96, 22))
+		themeMenu = PopUpMenu(view, Rect(0, 0, 10, 10))
 			.items_(["Graphite", "Phosphor", "Ice", "Amber", "Paper", "Monochrome"])
 			.value_(themes.indexOf(theme.name) ? 0)
 			.font_(theme.font(9))
@@ -68,12 +70,12 @@ SCVDashboardView {
 			});
 
 		// Target LUFS Selector
-		lblTarget = StaticText(view, Rect(352, 6, 42, 20))
+		lblTarget = StaticText(view, Rect(0, 0, 10, 10))
 			.string_("Target:")
 			.font_(theme.font(9, bold: true))
 			.stringColor_(theme.subtext);
 
-		targetMenu = PopUpMenu(view, Rect(396, 5, 126, 22))
+		targetMenu = PopUpMenu(view, Rect(0, 0, 10, 10))
 			.items_(["-23 LUFS (EBU)", "-14 LUFS (Web)"])
 			.value_(if (targetLUFS == -14.0) { 1 } { 0 })
 			.font_(theme.font(9))
@@ -83,12 +85,12 @@ SCVDashboardView {
 			});
 
 		// Global Font Size Selector
-		lblFont = StaticText(view, Rect(530, 6, 32, 20))
+		lblFont = StaticText(view, Rect(0, 0, 10, 10))
 			.string_("Font:")
 			.font_(theme.font(9, bold: true))
 			.stringColor_(theme.subtext);
 
-		fontMenu = PopUpMenu(view, Rect(564, 5, 72, 22))
+		fontMenu = PopUpMenu(view, Rect(0, 0, 10, 10))
 			.items_(["100%", "115%", "125%", "140%", "150%"])
 			.value_(this.prFontScaleToIndex(theme.fontScale))
 			.font_(theme.font(9))
@@ -98,13 +100,13 @@ SCVDashboardView {
 			});
 
 		// Master Freeze Button
-		freezeBtn = Button(view, Rect(644, 5, 84, 22))
+		freezeBtn = Button(view, Rect(0, 0, 10, 10))
 			.states_([["Freeze All", theme.text, theme.panelBackground], ["Unfreeze All", theme.background, theme.signal]])
 			.font_(theme.font(9, bold: true))
 			.action_({ this.toggleFreeze });
 
 		// Broker Telemetry Label
-		txtBrokerStatus = StaticText(view, Rect(736, 6, (w - 746).max(60), 20))
+		txtBrokerStatus = StaticText(view, Rect(0, 0, 10, 10))
 			.string_("Broker: 0 sources | 0 subs")
 			.font_(theme.font(8, mono: true))
 			.stringColor_(theme.subtext);
@@ -131,20 +133,70 @@ SCVDashboardView {
 				{ char === $  } { this.toggleFreeze }
 				{ char === $r } { loudnessView.reset };
 		};
+
+		this.prHandleResize(w, h);
 	}
 
 	prHandleResize { |w, h|
-		var topH = 32;
+		var fs = theme.fontScale ? 1.0;
+		var btnH = (26 * fs).max(24).min(38).round.asInteger;
+		var topH = btnH + 12;
+		var curY = ((topH - btnH) * 0.5).round.asInteger;
+		var curX = 10;
+
+		var titleW = (130 * fs).clip(130, 185).round.asInteger;
+		var lblThemeW = (38 * fs).clip(36, 46).round.asInteger;
+		var themeW = (92 * fs).clip(90, 118).round.asInteger;
+		var lblTargetW = (38 * fs).clip(36, 46).round.asInteger;
+		var targetW = (116 * fs).clip(114, 142).round.asInteger;
+		var lblFontW = (28 * fs).clip(26, 36).round.asInteger;
+		var fontW = (62 * fs).clip(60, 80).round.asInteger;
+		var freezeW = (86 * fs).clip(84, 106).round.asInteger;
+
 		var panelH = ((h - topH - 24) / 2).floor.max(60);
-		var meterW = (w * 0.17).clip(120, 240);
+		var meterW = (w * 0.17).clip((130 * fs).max(120), (260 * fs).max(240));
 		var midW = (((w - meterW - 36) / 2).floor).max(80);
 		var rightW = (w - meterW - midW - 36).max(80);
 
 		if (isClosed.not) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			if (txtBrokerStatus.notNil) {
-				txtBrokerStatus.bounds = Rect(736, 6, (w - 746).max(60), 20);
+
+			if (txtTitle.notNil) {
+				txtTitle.bounds = Rect(curX, curY, titleW, btnH);
+				curX = curX + titleW + 6;
 			};
+			if (lblTheme.notNil) {
+				lblTheme.bounds = Rect(curX, curY, lblThemeW, btnH);
+				curX = curX + lblThemeW + 3;
+			};
+			if (themeMenu.notNil) {
+				themeMenu.bounds = Rect(curX, curY, themeW, btnH);
+				curX = curX + themeW + 8;
+			};
+			if (lblTarget.notNil) {
+				lblTarget.bounds = Rect(curX, curY, lblTargetW, btnH);
+				curX = curX + lblTargetW + 3;
+			};
+			if (targetMenu.notNil) {
+				targetMenu.bounds = Rect(curX, curY, targetW, btnH);
+				curX = curX + targetW + 8;
+			};
+			if (lblFont.notNil) {
+				lblFont.bounds = Rect(curX, curY, lblFontW, btnH);
+				curX = curX + lblFontW + 3;
+			};
+			if (fontMenu.notNil) {
+				fontMenu.bounds = Rect(curX, curY, fontW, btnH);
+				curX = curX + fontW + 8;
+			};
+			if (freezeBtn.notNil) {
+				freezeBtn.bounds = Rect(curX, curY, freezeW, btnH);
+				curX = curX + freezeW + 10;
+			};
+			if (txtBrokerStatus.notNil) {
+				txtBrokerStatus.bounds = Rect(curX, curY, (w - curX - 10).max(60), btnH);
+			};
+
 			if (meterView.notNil and: { meterView.view.notNil }) {
 				meterView.view.bounds = Rect(10, topH + 8, meterW, h - topH - 16);
 				meterView.prHandleResize(meterW, h - topH - 16);
@@ -172,7 +224,7 @@ SCVDashboardView {
 		AppClock.sched(0.5, {
 			if (isClosed.not and: { txtBrokerStatus.notNil }) {
 				var b = SCVisuals.broker;
-				txtBrokerStatus.string = "Broker: " ++ b.sourceCount ++ " sources | " ++ b.totalSubscriberCount ++ " subs";
+				txtBrokerStatus.string = "Broker: " ++ b.sourceCount ++ " src | " ++ b.totalSubscriberCount ++ " sub";
 				0.5;
 			} {
 				nil;
@@ -195,6 +247,12 @@ SCVDashboardView {
 		if (fontMenu.notNil) {
 			fontMenu.value = this.prFontScaleToIndex(theme.fontScale);
 		};
+		if (meterView.notNil)       { meterView.fontScale = scale };
+		if (scopeView.notNil)       { scopeView.fontScale = scale };
+		if (spectrumView.notNil)    { spectrumView.fontScale = scale };
+		if (loudnessView.notNil)    { loudnessView.fontScale = scale };
+		if (vectorscopeView.notNil) { vectorscopeView.fontScale = scale };
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	theme_ { |newTheme|
@@ -242,6 +300,7 @@ SCVDashboardView {
 		if (spectrumView.notNil)    { spectrumView.theme = theme };
 		if (loudnessView.notNil)    { loudnessView.theme = theme };
 		if (vectorscopeView.notNil) { vectorscopeView.theme = theme };
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	targetLUFS_ { |val|
@@ -279,7 +338,7 @@ SCVDashboard {
 
 	prInit { |server, numIns, numOuts, busIndex, theme, targetLUFS|
 		var s = server ?? { Server.default };
-		var w = 980, h = 580;
+		var w = 1020, h = 600;
 
 		window = Window(s.name ++ " Unified Audio Analysis Dashboard — SCVisuals", Rect(100, 100, w, h));
 		dashboardView = SCVDashboardView(s, window, Rect(0, 0, w, h), numIns, numOuts, busIndex, theme, targetLUFS);

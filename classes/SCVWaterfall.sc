@@ -45,7 +45,10 @@ SCVWaterfallView {
 	}
 
 	prBuildUI { |w, h|
-		var canvasRect = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+		var canvasRect = Rect(10, topOffset, (w - 20).max(50), (h - topOffset - 10).max(50));
 
 		userView = UserView(view, canvasRect);
 		userView.canFocus = false;
@@ -88,7 +91,7 @@ SCVWaterfallView {
 		};
 
 		// Header
-		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), titleH))
 			.string_("WATERFALL [2.5D " ++ numLines ++ " LINES]")
 			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
@@ -101,9 +104,15 @@ SCVWaterfallView {
 	}
 
 	prHandleResize { |w, h|
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
 		if (isClosed.not and: { userView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			userView.bounds = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
+			if (txtTitle.notNil) {
+				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
+			};
+			userView.bounds = Rect(10, topOffset, (w - 20).max(50), (h - topOffset - 10).max(50));
 			userView.refresh;
 		};
 	}
@@ -135,6 +144,7 @@ SCVWaterfallView {
 			txtTitle.font = theme.font(theme.fontSize, bold: true);
 		};
 		if (userView.notNil) { userView.refresh };
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	fontScale {
@@ -143,6 +153,7 @@ SCVWaterfallView {
 
 	fontScale_ { |scale|
 		this.theme = theme.withFontScale(scale);
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	toggleFreeze {

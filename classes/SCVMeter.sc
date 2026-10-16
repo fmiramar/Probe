@@ -68,20 +68,28 @@ SCVMeterView {
 		var mw = theme.meterWidth;
 		var gw = theme.gapWidth;
 		var fs = theme.fontSize;
-		var rulerW = (24 * (theme.fontScale ? 1.0)).max(24).round.asInteger;
+		var fScale = theme.fontScale ? 1.0;
+		var rulerW = (24 * fScale).max(24).round.asInteger;
+		var headerH = (18 * fScale).max(18).round.asInteger;
+		var labelH = (16 * fScale).max(14).round.asInteger;
+		var topOffset = headerH + 6;
 		var h = totalHeight ?? { view.bounds.height };
-		var meterH = (h - 55).max(40);
+		var meterH = (h - topOffset - labelH - 8).max(40);
 		var curX = 6;
 
 		view.removeAll;
 		view.background = theme.background;
 
 		// 1. dB Ruler (Left side - facing inputs)
-		dbRulerView = UserView(view, Rect(curX, 24, rulerW, meterH + 20));
+		dbRulerView = UserView(view, Rect(curX, topOffset, rulerW, meterH + labelH + 4));
 		dbRulerView.canFocus = false;
 		dbRulerView.drawFunc = { |uv|
-			var curH = uv.bounds.height - 20;
-			var dBs = [0, -3, -6, -12, -18, -24, -36, -48, -60, -80];
+			var curH = meterH;
+			var dBs = if ((theme.fontScale ? 1.0) > 1.2) {
+				[0, -6, -12, -18, -24, -36, -48, -60, -80]
+			} {
+				[0, -3, -6, -12, -18, -24, -36, -48, -60, -80]
+			};
 			Pen.font = theme.font(fs - 1, mono: true);
 			dBs.do { |db|
 				var normY = db.linlin(dBLow, 0, curH - 10, 0);
@@ -97,7 +105,7 @@ SCVMeterView {
 
 		// 2. Inputs
 		if (numIns > 0) {
-			inHeaderView = StaticText(view, Rect(curX, 4, (numIns * (mw + gw)).max(50), 16))
+			inHeaderView = StaticText(view, Rect(curX, 4, (numIns * (mw + gw)).max(50), headerH))
 				.string_("IN")
 				.font_(theme.font(fs, bold: true))
 				.stringColor_(theme.text);
@@ -107,7 +115,7 @@ SCVMeterView {
 			inLabels = Array.newClear(numIns);
 
 			numIns.do { |i|
-				var comp = CompositeView(view, Rect(curX, 24, mw, meterH + 20));
+				var comp = CompositeView(view, Rect(curX, topOffset, mw, meterH + labelH + 4));
 				var meter = LevelIndicator(comp, Rect(0, 0, mw, meterH))
 					.warning_( -12.linlin(dBLow, 0, 0, 1) )
 					.critical_( -0.1.linlin(dBLow, 0, 0, 1) )
@@ -120,7 +128,7 @@ SCVMeterView {
 					.warningColor_(theme.warning)
 					.criticalColor_(theme.critical);
 
-				var label = StaticText(comp, Rect(0, meterH + 2, mw, 14))
+				var label = StaticText(comp, Rect(0, meterH + 2, mw, labelH))
 					.font_(theme.font(fs - 1, bold: true))
 					.align_(\center)
 					.stringColor_(theme.subtext)
@@ -137,7 +145,7 @@ SCVMeterView {
 
 		// 3. Divider
 		if ((numIns > 0) and: { numOuts > 0 }) {
-			dividerView = UserView(view, Rect(curX, 24, 12, meterH)).drawFunc_({ |uv|
+			dividerView = UserView(view, Rect(curX, topOffset, 12, meterH)).drawFunc_({ |uv|
 				var dh = uv.bounds.height;
 				Pen.strokeColor = theme.grid;
 				Pen.width = 1;
@@ -149,7 +157,7 @@ SCVMeterView {
 
 		// 4. Outputs
 		if (numOuts > 0) {
-			outHeaderView = StaticText(view, Rect(curX, 4, (numOuts * (mw + gw)).max(50), 16))
+			outHeaderView = StaticText(view, Rect(curX, 4, (numOuts * (mw + gw)).max(50), headerH))
 				.string_("OUT")
 				.font_(theme.font(fs, bold: true))
 				.stringColor_(theme.text);
@@ -159,7 +167,7 @@ SCVMeterView {
 			outLabels = Array.newClear(numOuts);
 
 			numOuts.do { |i|
-				var comp = CompositeView(view, Rect(curX, 24, mw, meterH + 20));
+				var comp = CompositeView(view, Rect(curX, topOffset, mw, meterH + labelH + 4));
 				var meter = LevelIndicator(comp, Rect(0, 0, mw, meterH))
 					.warning_( -12.linlin(dBLow, 0, 0, 1) )
 					.critical_( -0.1.linlin(dBLow, 0, 0, 1) )
@@ -172,7 +180,7 @@ SCVMeterView {
 					.warningColor_(theme.warning)
 					.criticalColor_(theme.critical);
 
-				var label = StaticText(comp, Rect(0, meterH + 2, mw, 14))
+				var label = StaticText(comp, Rect(0, meterH + 2, mw, labelH))
 					.font_(theme.font(fs - 1, bold: true))
 					.align_(\center)
 					.stringColor_(theme.subtext)
@@ -188,11 +196,15 @@ SCVMeterView {
 		};
 
 		// 5. dB Ruler (Right side - facing outputs)
-		dbRulerViewRight = UserView(view, Rect(curX + 2, 24, rulerW, meterH + 20));
+		dbRulerViewRight = UserView(view, Rect(curX + 2, topOffset, rulerW, meterH + labelH + 4));
 		dbRulerViewRight.canFocus = false;
 		dbRulerViewRight.drawFunc = { |uv|
-			var curH = uv.bounds.height - 20;
-			var dBs = [0, -3, -6, -12, -18, -24, -36, -48, -60, -80];
+			var curH = meterH;
+			var dBs = if ((theme.fontScale ? 1.0) > 1.2) {
+				[0, -6, -12, -18, -24, -36, -48, -60, -80]
+			} {
+				[0, -3, -6, -12, -18, -24, -36, -48, -60, -80]
+			};
 			Pen.font = theme.font(fs - 1, mono: true);
 			dBs.do { |db|
 				var normY = db.linlin(dBLow, 0, curH - 10, 0);
@@ -213,33 +225,37 @@ SCVMeterView {
 	}
 
 	prHandleResize { |w, h|
-		var rulerW = (24 * (theme.fontScale ? 1.0)).max(24).round.asInteger;
+		var fScale = theme.fontScale ? 1.0;
+		var rulerW = (24 * fScale).max(24).round.asInteger;
+		var headerH = (18 * fScale).max(18).round.asInteger;
+		var labelH = (16 * fScale).max(14).round.asInteger;
+		var topOffset = headerH + 6;
 		var pad = 16;
 		var gw = theme.gapWidth;
 		var divW = if ((numIns > 0) and: { numOuts > 0 }) { 12 } { 0 };
 		var availW = (w - (rulerW * 2) - divW - pad).max(20);
 		var totalCh = numIns + numOuts;
 		var mw = if (totalCh > 0) { ((availW / totalCh) - gw).clip(6, 120) } { 16 };
-		var meterH = (h - 55).max(40);
+		var meterH = (h - topOffset - labelH - 8).max(40);
 		var curX = 6;
 
 		if (isClosed.not and: { dbRulerView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			// 1. Left ruler
-			dbRulerView.bounds = Rect(curX, 24, rulerW, meterH + 20);
+			dbRulerView.bounds = Rect(curX, topOffset, rulerW, meterH + labelH + 4);
 			dbRulerView.refresh;
 			curX = curX + rulerW + 6;
 
 			// 2. Inputs
 			if (numIns > 0 and: { inMeters.notNil }) {
 				if (inHeaderView.notNil) {
-					inHeaderView.bounds = Rect(curX, 4, (numIns * (mw + gw)).max(50), 16);
+					inHeaderView.bounds = Rect(curX, 4, (numIns * (mw + gw)).max(50), headerH);
 				};
 				numIns.do { |i|
 					if (inComps[i].notNil) {
-						inComps[i].bounds = Rect(curX, 24, mw, meterH + 20);
+						inComps[i].bounds = Rect(curX, topOffset, mw, meterH + labelH + 4);
 						inMeters[i].bounds = Rect(0, 0, mw, meterH);
-						inLabels[i].bounds = Rect(0, meterH + 2, mw, 14);
+						inLabels[i].bounds = Rect(0, meterH + 2, mw, labelH);
 					};
 					curX = curX + mw + gw;
 				};
@@ -247,7 +263,7 @@ SCVMeterView {
 
 			// 3. Divider
 			if (numIns > 0 and: { numOuts > 0 } and: { dividerView.notNil }) {
-				dividerView.bounds = Rect(curX, 24, divW, meterH);
+				dividerView.bounds = Rect(curX, topOffset, divW, meterH);
 				dividerView.refresh;
 				curX = curX + divW;
 			};
@@ -255,13 +271,13 @@ SCVMeterView {
 			// 4. Outputs
 			if (numOuts > 0 and: { outMeters.notNil }) {
 				if (outHeaderView.notNil) {
-					outHeaderView.bounds = Rect(curX, 4, (numOuts * (mw + gw)).max(50), 16);
+					outHeaderView.bounds = Rect(curX, 4, (numOuts * (mw + gw)).max(50), headerH);
 				};
 				numOuts.do { |i|
 					if (outComps[i].notNil) {
-						outComps[i].bounds = Rect(curX, 24, mw, meterH + 20);
+						outComps[i].bounds = Rect(curX, topOffset, mw, meterH + labelH + 4);
 						outMeters[i].bounds = Rect(0, 0, mw, meterH);
-						outLabels[i].bounds = Rect(0, meterH + 2, mw, 14);
+						outLabels[i].bounds = Rect(0, meterH + 2, mw, labelH);
 					};
 					curX = curX + mw + gw;
 				};
@@ -269,7 +285,7 @@ SCVMeterView {
 
 			// 5. Right ruler
 			if (dbRulerViewRight.notNil) {
-				dbRulerViewRight.bounds = Rect(curX + 2, 24, rulerW, meterH + 20);
+				dbRulerViewRight.bounds = Rect(curX + 2, topOffset, rulerW, meterH + labelH + 4);
 				dbRulerViewRight.refresh;
 			};
 		};

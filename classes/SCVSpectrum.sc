@@ -57,8 +57,14 @@ SCVSpectrumView {
 	}
 
 	prBuildUI { |w, h|
-		var scopeW = (w - 48).max(50), scopeH = (h - 40).max(50);
-		var scopeRect = Rect(36, 24, scopeW, scopeH);
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+		var ox = (28 * fs).max(28).round.asInteger;
+		var scopeLeft = ox + 8;
+		var scopeW = (w - scopeLeft - 12).max(50);
+		var scopeH = (h - topOffset - 14).max(50);
+		var scopeRect = Rect(scopeLeft, topOffset, scopeW, scopeH);
 
 		// 1. Native ScopeView
 		scopeView = ScopeView(view, scopeRect);
@@ -71,11 +77,11 @@ SCVSpectrumView {
 		scopeView.yZoom = 1.0;
 
 		// 2. Transparent Grid & Frequency/dB Overlay
-		gridOverlay = UserView(view, Rect(8, 24, w - 16, scopeH));
+		gridOverlay = UserView(view, Rect(8, topOffset, w - 16, scopeH));
 		gridOverlay.canFocus = false;
 		gridOverlay.drawFunc = { |uv|
-			var ox = (28 * (theme.fontScale ? 1.0)).max(28).round.asInteger;
-			var curW = uv.bounds.width - ox, curH = uv.bounds.height;
+			var curOx = (28 * (theme.fontScale ? 1.0)).max(28).round.asInteger;
+			var curW = uv.bounds.width - curOx, curH = uv.bounds.height;
 			Pen.strokeColor = theme.grid;
 			Pen.width = 1;
 
@@ -83,12 +89,12 @@ SCVSpectrumView {
 			[0, -12, -24, -36, -48, -60, -72, -96].do { |db|
 				var y = db.linlin(dbRange.neg, 0, curH, 0);
 				Pen.strokeColor = theme.grid.copy.alpha_(0.35);
-				Pen.line(Point(ox, y), Point(ox + curW, y));
+				Pen.line(Point(curOx, y), Point(curOx + curW, y));
 				Pen.stroke;
 
 				Pen.font = theme.font(8, mono: true);
 				Pen.color = theme.subtext;
-				Pen.stringRightJustIn(db.asString, Rect(0, (y - 7).clip(0, curH - 14), ox - 4, 14));
+				Pen.stringRightJustIn(db.asString, Rect(0, (y - 7).clip(0, curH - 14), curOx - 4, 14));
 			};
 
 			// Vertical Frequency grid lines
@@ -97,7 +103,7 @@ SCVSpectrumView {
 				[100, 250, 500, 1000, 2500, 5000, 10000, 20000].do { |freq|
 					var nyq = server.sampleRate * 0.5;
 					var normX = (freq / 20.0).log / (nyq / 20.0).log;
-					var x = ox + (normX.clip(0, 1) * curW);
+					var x = curOx + (normX.clip(0, 1) * curW);
 					Pen.strokeColor = theme.grid.copy.alpha_(0.35);
 					Pen.line(Point(x, 0), Point(x, curH));
 					Pen.stroke;
@@ -112,7 +118,7 @@ SCVSpectrumView {
 			} {
 				// Linear
 				8.do { |i|
-					var x = ox + ((i + 1) * (curW / 8));
+					var x = curOx + ((i + 1) * (curW / 8));
 					var freqK = ((i + 1) * (server.sampleRate * 0.5 / 8000)).round(0.1);
 					Pen.strokeColor = theme.grid.copy.alpha_(0.35);
 					Pen.line(Point(x, 0), Point(x, curH));
@@ -126,91 +132,46 @@ SCVSpectrumView {
 		};
 
 		// 3. Header title
-		txtTitle = StaticText(view, Rect(10, 4, (w - 110).max(100), 18))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), titleH))
 			.string_("SPECTRUM ANALYZER [FFT " ++ fftSize ++ "]")
 			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
-
-		// 4. Smoothing Dropdown Menu
-		smoothMenu = PopUpMenu(view, Rect(w - 95, 3, 85, 18))
-			.items_(["Smooth: Off", "Smooth: Lo", "Smooth: Med", "Smooth: Hi"])
-			.font_(theme.font(8))
-			.value_(this.prSmoothingToIndex(smoothing))
-			.action_({ |m|
-				var modes = [\none, \low, \med, \high];
-				this.smoothing = modes[m.value];
-			});
 
 		// Keyboard controls
 		view.keyDownAction = { |v, char|
 			case
 				{ char === $m } { this.freqMode = (freqMode + 1) % 2 }
-				{ char === $s } { this.toggleSmoothing }
 				{ char === $  } { this.toggleFreeze };
 		};
 	}
 
 	prHandleResize { |w, h|
-		var scopeW = (w - 48).max(50), scopeH = (h - 40).max(50);
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+		var ox = (28 * fs).max(28).round.asInteger;
+		var scopeLeft = ox + 8;
+		var scopeW = (w - scopeLeft - 12).max(50);
+		var scopeH = (h - topOffset - 14).max(50);
+
 		if (isClosed.not and: { scopeView.notNil } and: { gridOverlay.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			scopeView.bounds = Rect(36, 24, scopeW, scopeH);
-			gridOverlay.bounds = Rect(8, 24, w - 16, scopeH);
-			scopeView.xZoom = (fftSize * 0.25) / scopeW;
-			if (smoothMenu.notNil) {
-				smoothMenu.bounds = Rect(w - 95, 3, 85, 18);
+			if (txtTitle.notNil) {
+				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
 			};
+			scopeView.bounds = Rect(scopeLeft, topOffset, scopeW, scopeH);
+			gridOverlay.bounds = Rect(8, topOffset, w - 16, scopeH);
+			scopeView.xZoom = (fftSize * 0.25) / scopeW;
 			gridOverlay.refresh;
 		};
 	}
 
-	prSmoothingToCutoff { |smoothVal|
-		^switch(smoothVal.asSymbol,
-			\none, { 20000 },
-			\off,  { 20000 },
-			\low,  { 800 },
-			\med,  { 250 },
-			\high, { 70 },
-			{
-				if (smoothVal.isNumber) {
-					smoothVal.asFloat.clip(20, 20000)
-				} {
-					20000
-				}
-			}
-		);
-	}
-
-	prSmoothingToIndex { |smoothVal|
-		^switch(smoothVal.asSymbol,
-			\none, { 0 },
-			\off,  { 0 },
-			\low,  { 1 },
-			\med,  { 2 },
-			\high, { 3 },
-			{ 0 }
-		);
-	}
-
 	smoothing_ { |smoothVal|
 		smoothing = smoothVal;
-		if (synth.notNil) {
-			synth.set(\smoothCutoff, this.prSmoothingToCutoff(smoothing));
-		};
-		if (smoothMenu.notNil) {
-			smoothMenu.value = this.prSmoothingToIndex(smoothing);
-		};
 	}
 
 	toggleSmoothing {
-		var nextMode = switch(smoothing.asSymbol,
-			\none, { \low },
-			\low,  { \med },
-			\med,  { \high },
-			\high, { \none },
-			{ \none }
-		);
-		this.smoothing = nextMode;
+		// Smoothing rolled back to unsmoothed raw FFT scan
 	}
 
 	prStartAnalysis {
@@ -237,12 +198,12 @@ SCVSpectrumView {
 		server.bind {
 			var sdef;
 			if (freqMode == 0) {
-				// Linear mode
-				sdef = SynthDef(synthDefName, { |in=0, scopebufnum=0, dbFactor=0.0208, smoothCutoff=20000|
+				// Linear mode — raw unsmoothed FFT magnitude scan
+				sdef = SynthDef(synthDefName, { |in=0, scopebufnum=0, dbFactor=0.0208|
 					var sig, phasor, mul = 0.00285;
 					var numSamples, phase;
 					var fftbuf = LocalBuf(fftSize, 1);
-					var rawMag, filteredMag;
+					var rawMag;
 					phase = 1 - (rate * fftSize.reciprocal);
 					numSamples = (BufSamples.ir(fftbuf) - 2) * 0.5;
 					sig = In.ar(in, 1);
@@ -250,16 +211,15 @@ SCVSpectrumView {
 					phasor = LFSaw.ar(rate / BufDur.ir(fftbuf), phase, numSamples, numSamples + 2);
 					phasor = phasor.round(2);
 					rawMag = BufRd.ar(1, fftbuf, phasor, 1, 1);
-					filteredMag = LPF.ar(rawMag, smoothCutoff.clip(20, 20000));
-					ScopeOut2.ar(((filteredMag * mul).ampdb * dbFactor) + 1, scopebufnum, fftSize / rate);
+					ScopeOut2.ar(((rawMag * mul).ampdb * dbFactor) + 1, scopebufnum, fftSize / rate);
 				});
 			} {
-				// Logarithmic mode
-				sdef = SynthDef(synthDefName, { |in=0, scopebufnum=0, dbFactor=0.0208, smoothCutoff=20000|
+				// Logarithmic mode — raw unsmoothed FFT magnitude scan
+				sdef = SynthDef(synthDefName, { |in=0, scopebufnum=0, dbFactor=0.0208|
 					var sig, phasor, mul = 0.00285;
 					var halfSamples, phase;
 					var fftbuf = LocalBuf(fftSize, 1);
-					var rawMag, filteredMag;
+					var rawMag;
 					phase = 1 - (rate * fftSize.reciprocal);
 					halfSamples = BufSamples.ir(fftbuf) * 0.5;
 					sig = In.ar(in, 1);
@@ -267,16 +227,14 @@ SCVSpectrumView {
 					phasor = halfSamples.pow(LFSaw.ar(rate / BufDur.ir(fftbuf), phase, 0.5, 0.5)) * 2;
 					phasor = phasor.round(2);
 					rawMag = BufRd.ar(1, fftbuf, phasor, 1, 1);
-					filteredMag = LPF.ar(rawMag, smoothCutoff.clip(20, 20000));
-					ScopeOut2.ar(((filteredMag * mul).ampdb * dbFactor) + 1, scopebufnum, fftSize / rate);
+					ScopeOut2.ar(((rawMag * mul).ampdb * dbFactor) + 1, scopebufnum, fftSize / rate);
 				});
 			};
 
 			synth = sdef.play(RootNode(server), [
 				\in, busIndex,
 				\scopebufnum, scopeBuf.index,
-				\dbFactor, 2 / dbRange,
-				\smoothCutoff, this.prSmoothingToCutoff(smoothing)
+				\dbFactor, 2 / dbRange
 			], \addToTail).register;
 		};
 
@@ -292,9 +250,6 @@ SCVSpectrumView {
 			txtTitle.stringColor = theme.text;
 			txtTitle.font = theme.font(theme.fontSize, bold: true);
 		};
-		if (smoothMenu.notNil) {
-			smoothMenu.font = theme.font(8);
-		};
 		if (gridOverlay.notNil) { gridOverlay.refresh };
 	}
 
@@ -304,6 +259,7 @@ SCVSpectrumView {
 
 	fontScale_ { |scale|
 		this.theme = theme.withFontScale(scale);
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	freqMode_ { |newMode|

@@ -56,7 +56,10 @@ SCVScopeView {
 	}
 
 	prBuildUI { |w, h|
-		var scopeRect = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+		var scopeRect = Rect(10, topOffset, (w - 20).max(50), (h - topOffset - 10).max(50));
 
 		// 1. Native ScopeView
 		scopeView = ScopeView(view, scopeRect);
@@ -101,7 +104,7 @@ SCVScopeView {
 		};
 
 		// 3. Header title and channel readout
-		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), titleH))
 			.string_("OSCILLOSCOPE [" ++ numChannels ++ " CH]")
 			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
@@ -117,9 +120,15 @@ SCVScopeView {
 	}
 
 	prHandleResize { |w, h|
-		var scopeRect = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+		var scopeRect = Rect(10, topOffset, (w - 20).max(50), (h - topOffset - 10).max(50));
 		if (isClosed.not and: { scopeView.notNil } and: { gridOverlay.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
+			if (txtTitle.notNil) {
+				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
+			};
 			scopeView.bounds = scopeRect;
 			gridOverlay.bounds = scopeRect;
 			gridOverlay.refresh;
@@ -193,6 +202,7 @@ SCVScopeView {
 			txtTitle.font = theme.font(theme.fontSize, bold: true);
 		};
 		if (gridOverlay.notNil) { gridOverlay.refresh };
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	fontScale {
@@ -201,6 +211,7 @@ SCVScopeView {
 
 	fontScale_ { |scale|
 		this.theme = theme.withFontScale(scale);
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	scopeStyle_ { |newStyle|

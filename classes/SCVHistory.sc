@@ -49,8 +49,11 @@ SCVHistoryView {
 	}
 
 	prBuildUI { |w, h|
-		var rulerW = (30 * (theme.fontScale ? 1.0)).max(30).round.asInteger;
-		var canvasRect = Rect(rulerW + 6, 24, (w - rulerW - 16).max(50), (h - 32).max(50));
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+		var rulerW = (30 * fs).max(30).round.asInteger;
+		var canvasRect = Rect(rulerW + 6, topOffset, (w - rulerW - 16).max(50), (h - topOffset - 10).max(50));
 
 		userView = UserView(view, canvasRect);
 		userView.canFocus = false;
@@ -140,7 +143,7 @@ SCVHistoryView {
 		};
 
 		// Left Axis Ruler (dB ticks)
-		axisView = UserView(view, Rect(4, 24, rulerW, (h - 32).max(50)));
+		axisView = UserView(view, Rect(4, topOffset, rulerW, (h - topOffset - 10).max(50)));
 		axisView.canFocus = false;
 		axisView.drawFunc = { |uv|
 			var laneH = uv.bounds.height / numChannels;
@@ -161,7 +164,7 @@ SCVHistoryView {
 		};
 
 		// Header
-		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), titleH))
 			.string_("LEVEL HISTORY [PEAK / RMS / CREST] — " ++ busType.asString.toUpper)
 			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
@@ -175,11 +178,17 @@ SCVHistoryView {
 	}
 
 	prHandleResize { |w, h|
-		var rulerW = (30 * (theme.fontScale ? 1.0)).max(30).round.asInteger;
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+		var rulerW = (30 * fs).max(30).round.asInteger;
 		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			userView.bounds = Rect(rulerW + 6, 24, (w - rulerW - 16).max(50), (h - 32).max(50));
-			axisView.bounds = Rect(4, 24, rulerW, (h - 32).max(50));
+			if (txtTitle.notNil) {
+				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
+			};
+			userView.bounds = Rect(rulerW + 6, topOffset, (w - rulerW - 16).max(50), (h - topOffset - 10).max(50));
+			axisView.bounds = Rect(4, topOffset, rulerW, (h - topOffset - 10).max(50));
 			axisView.refresh;
 			userView.refresh;
 		};
@@ -214,6 +223,7 @@ SCVHistoryView {
 		};
 		if (axisView.notNil) { axisView.refresh };
 		if (userView.notNil) { userView.refresh };
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	fontScale {

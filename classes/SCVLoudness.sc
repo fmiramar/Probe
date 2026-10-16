@@ -53,17 +53,21 @@ SCVLoudnessView {
 	}
 
 	prBuildUI { |w, h|
+		var fs = theme.fontScale ? 1.0;
+		var btnTargetH = (24 * fs).max(22).min(34).round.asInteger;
+		var btnTargetW = (120 * fs).max(104).round.asInteger;
+		var topOffset = (btnTargetH + 8).max(28).round.asInteger;
 		var meterW = (w * 0.38).clip(130, 220);
 		var readoutW = (w - meterW - 20).max(120);
 
 		// 1. Header
-		txtTitle = StaticText(view, Rect(12, 6, (w - 140).max(100), 18))
-			.string_("LOUDNESS [ITU-R BS.1770 / EBU R128]")
+		txtTitle = StaticText(view, Rect(12, 4, (w - btnTargetW - 20).max(80), btnTargetH))
+			.string_("LOUDNESS [BS.1770]")
 			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
 
 		// Target Toggle Button
-		btnTarget = Button(view, Rect(w - 112, 4, 102, 20))
+		btnTarget = Button(view, Rect(w - btnTargetW - 8, 4, btnTargetW, btnTargetH))
 			.states_([
 				["Ref: " ++ targetLUFS.round(1).asInteger ++ " LUFS", theme.text, theme.panelBackground]
 			])
@@ -71,7 +75,7 @@ SCVLoudnessView {
 			.action_({ this.toggleTarget });
 
 		// 2. Triple Meter View (M, S, I)
-		meterView = UserView(view, Rect(10, 28, meterW, h - 38));
+		meterView = UserView(view, Rect(10, topOffset, meterW, (h - topOffset - 10).max(50)));
 		meterView.canFocus = false;
 		meterView.drawFunc = { |uv|
 			var mw = uv.bounds.width;
@@ -160,9 +164,11 @@ SCVLoudnessView {
 	}
 
 	prBuildReadouts { |rw, rh|
-		var y = 8;
-		var rowH = ((rh - 42) / 6).floor.clip(18, 30);
-		var labelW = (rw * 0.44).clip(65, 110);
+		var fs = theme.fontScale ? 1.0;
+		var btnResetH = (24 * fs).max(22).min(36).round.asInteger;
+		var y = 6;
+		var rowH = ((rh - btnResetH - 16) / 6).floor.clip((18 * fs).max(18), (32 * fs).max(30));
+		var labelW = (rw * 0.44).clip((68 * fs).max(65), (120 * fs).max(110));
 		var valW = (rw - labelW - 18).max(30);
 
 		// Helper to create a readout row
@@ -193,38 +199,46 @@ SCVLoudnessView {
 		txtMaxPk = addRow.value("Max Peak:", "-inf dBFS");
 
 		// Reset Button
-		btnReset = Button(readoutView, Rect(8, rh - 30, rw - 16, 24))
+		btnReset = Button(readoutView, Rect(8, rh - btnResetH - 4, rw - 16, btnResetH))
 			.states_([["Reset ('r')", theme.text, theme.background]])
 			.font_(theme.font(8.5, bold: true))
 			.action_({ this.reset });
 	}
 
 	prHandleResize { |w, h|
+		var fs = theme.fontScale ? 1.0;
+		var btnTargetH = (24 * fs).max(22).min(34).round.asInteger;
+		var btnTargetW = (120 * fs).max(104).round.asInteger;
+		var topOffset = (btnTargetH + 8).max(28).round.asInteger;
+		var contentH = (h - topOffset - 10).max(50);
 		var meterW = (w * 0.38).clip(110, 200);
 		var readoutW = (w - meterW - 18).max(100);
-		var contentH = (h - 38).max(50);
-		var rowH = ((contentH - 42) / 6).floor.clip(18, 30);
-		var labelW = (readoutW * 0.44).clip(65, 110);
+		var btnResetH = (24 * fs).max(22).min(36).round.asInteger;
+		var rowH = ((contentH - btnResetH - 16) / 6).floor.clip((18 * fs).max(18), (32 * fs).max(30));
+		var labelW = (readoutW * 0.44).clip((68 * fs).max(65), (120 * fs).max(110));
 		var valW = (readoutW - labelW - 18).max(30);
 
 		if (isClosed.not and: { meterView.notNil } and: { readoutView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			meterView.bounds = Rect(10, 28, meterW, contentH);
-			readoutView.bounds = Rect(meterW + 14, 28, readoutW, contentH);
-			if (btnTarget.notNil) {
-				btnTarget.bounds = Rect(w - 112, 4, 102, 20);
+			if (txtTitle.notNil) {
+				txtTitle.bounds = Rect(12, 4, (w - btnTargetW - 20).max(80), btnTargetH);
 			};
+			if (btnTarget.notNil) {
+				btnTarget.bounds = Rect(w - btnTargetW - 8, 4, btnTargetW, btnTargetH);
+			};
+			meterView.bounds = Rect(10, topOffset, meterW, contentH);
+			readoutView.bounds = Rect(meterW + 14, topOffset, readoutW, contentH);
 			if (btnReset.notNil) {
-				btnReset.bounds = Rect(8, contentH - 30, readoutW - 16, 24);
+				btnReset.bounds = Rect(8, contentH - btnResetH - 4, readoutW - 16, btnResetH);
 			};
 			if (readoutLabels.notNil) {
 				readoutLabels.do { |lbl, idx|
-					lbl.bounds = Rect(8, 8 + (idx * rowH), labelW, rowH - 2);
+					lbl.bounds = Rect(8, 6 + (idx * rowH), labelW, rowH - 2);
 				};
 			};
 			if (readoutValues.notNil) {
 				readoutValues.do { |valView, idx|
-					valView.bounds = Rect(8 + labelW + 4, 8 + (idx * rowH), valW, rowH - 2);
+					valView.bounds = Rect(8 + labelW + 4, 6 + (idx * rowH), valW, rowH - 2);
 				};
 			};
 			meterView.refresh;
@@ -342,6 +356,7 @@ SCVLoudnessView {
 			btnReset.states = [["Reset ('r')", theme.text, theme.background]];
 			btnReset.font = theme.font(8.5, bold: true);
 		};
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 		meterView.refresh;
 	}
 

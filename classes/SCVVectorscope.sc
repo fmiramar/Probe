@@ -48,9 +48,13 @@ SCVVectorscopeView {
 	}
 
 	prBuildUI { |w, h|
-		scopeSize = (w.min(h - 48) - 16).max(80);
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+
+		scopeSize = (w.min(h - topOffset - 24) - 16).max(80);
 		scopeX = (w - scopeSize) / 2;
-		scopeY = 24;
+		scopeY = topOffset;
 
 		// 1. Native ScopeView for high-speed hardware Lissajous
 		scopeView = ScopeView(view, Rect(scopeX, scopeY, scopeSize, scopeSize));
@@ -65,9 +69,12 @@ SCVVectorscopeView {
 		overlayView.canFocus = false;
 		overlayView.drawFunc = { |uv|
 			var curW = uv.bounds.width, curH = uv.bounds.height;
-			var curScopeSize = (curW.min(curH - 48) - 16).max(80);
+			var curFs = theme.fontScale ? 1.0;
+			var curTitleH = (18 * curFs).max(18).round.asInteger;
+			var curTopOffset = curTitleH + 6;
+			var curScopeSize = (curW.min(curH - curTopOffset - 24) - 16).max(80);
 			var curScopeX = (curW - curScopeSize) / 2;
-			var curScopeY = 24;
+			var curScopeY = curTopOffset;
 			var cx = curScopeX + (curScopeSize / 2);
 			var cy = curScopeY + (curScopeSize / 2);
 			var radius = curScopeSize / 2;
@@ -161,7 +168,7 @@ SCVVectorscopeView {
 		};
 
 		// Header title
-		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), titleH))
 			.string_("VECTORSCOPE [LISSAJOUS / M-S]")
 			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
@@ -174,11 +181,17 @@ SCVVectorscopeView {
 	}
 
 	prHandleResize { |w, h|
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
 		if (isClosed.not and: { scopeView.notNil } and: { overlayView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			scopeSize = (w.min(h - 48) - 16).max(80);
+			if (txtTitle.notNil) {
+				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
+			};
+			scopeSize = (w.min(h - topOffset - 24) - 16).max(80);
 			scopeX = (w - scopeSize) / 2;
-			scopeY = 24;
+			scopeY = topOffset;
 			scopeView.bounds = Rect(scopeX, scopeY, scopeSize, scopeSize);
 			overlayView.bounds = Rect(0, 0, w, h);
 			overlayView.refresh;
@@ -239,6 +252,7 @@ SCVVectorscopeView {
 			txtTitle.font = theme.font(theme.fontSize, bold: true);
 		};
 		overlayView.refresh;
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	fontScale {
@@ -247,6 +261,7 @@ SCVVectorscopeView {
 
 	fontScale_ { |scale|
 		this.theme = theme.withFontScale(scale);
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	toggleFreeze {

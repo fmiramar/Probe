@@ -73,12 +73,15 @@ SCVSpectrogramView {
 		};
 	}
 	prBuildUI { |w, h|
-		var rulerW = (32 * (theme.fontScale ? 1.0)).max(32).round.asInteger;
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+		var rulerW = (32 * fs).max(32).round.asInteger;
 		var canvasW = (w - rulerW - 16).max(50);
-		var canvasH = (h - 34).max(50);
+		var canvasH = (h - topOffset - 10).max(50);
 
 		// 1. Spectrogram UserView (Ring-buffer blit with horizontal stretch)
-		userView = UserView(view, Rect(rulerW + 8, 24, canvasW, canvasH));
+		userView = UserView(view, Rect(rulerW + 8, topOffset, canvasW, canvasH));
 		userView.canFocus = false;
 		userView.drawFunc = { |uv|
 			var part1W = rasterW - writeIdx;
@@ -95,7 +98,7 @@ SCVSpectrogramView {
 		};
 
 		// 2. Frequency Axis Ruler (Left)
-		axisView = UserView(view, Rect(6, 24, rulerW, canvasH));
+		axisView = UserView(view, Rect(6, topOffset, rulerW, canvasH));
 		axisView.canFocus = false;
 		axisView.drawFunc = { |uv|
 			var ch = uv.bounds.height;
@@ -108,7 +111,7 @@ SCVSpectrogramView {
 		};
 
 		// 3. Header title
-		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), 18))
+		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), titleH))
 			.string_("SPECTROGRAM [" ++ numBands ++ " BANDS]")
 			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
@@ -122,13 +125,19 @@ SCVSpectrogramView {
 	}
 
 	prHandleResize { |w, h|
-		var rulerW = (32 * (theme.fontScale ? 1.0)).max(32).round.asInteger;
+		var fs = theme.fontScale ? 1.0;
+		var titleH = (18 * fs).max(18).round.asInteger;
+		var topOffset = titleH + 6;
+		var rulerW = (32 * fs).max(32).round.asInteger;
 		var canvasW = (w - rulerW - 16).max(50);
-		var canvasH = (h - 34).max(50);
+		var canvasH = (h - topOffset - 10).max(50);
 		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			userView.bounds = Rect(rulerW + 8, 24, canvasW, canvasH);
-			axisView.bounds = Rect(6, 24, rulerW, canvasH);
+			if (txtTitle.notNil) {
+				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
+			};
+			userView.bounds = Rect(rulerW + 8, topOffset, canvasW, canvasH);
+			axisView.bounds = Rect(6, topOffset, rulerW, canvasH);
 			axisView.refresh;
 			userView.refresh;
 		};
@@ -168,6 +177,7 @@ SCVSpectrogramView {
 		};
 		if (axisView.notNil) { axisView.refresh };
 		if (userView.notNil) { userView.refresh };
+		this.prHandleResize(view.bounds.width, view.bounds.height);
 	}
 
 	fontScale {
