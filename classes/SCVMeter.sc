@@ -55,6 +55,7 @@ SCVMeterView {
 
 		pt = if (point.isKindOf(Rect)) { point.origin } { point ? Point(0, 0) };
 		view = CompositeView(parent, Rect(pt.x, pt.y, totalWidth, defaultHeight));
+		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
 		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
@@ -218,11 +219,12 @@ SCVMeterView {
 		var divW = if ((numIns > 0) and: { numOuts > 0 }) { 12 } { 0 };
 		var availW = (w - (rulerW * 2) - divW - pad).max(20);
 		var totalCh = numIns + numOuts;
-		var mw = if (totalCh > 0) { ((availW / totalCh) - gw).clip(6, 40) } { 16 };
+		var mw = if (totalCh > 0) { ((availW / totalCh) - gw).clip(6, 120) } { 16 };
 		var meterH = (h - 55).max(40);
 		var curX = 6;
 
 		if (isClosed.not and: { dbRulerView.notNil }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			// 1. Left ruler
 			dbRulerView.bounds = Rect(curX, 24, rulerW, meterH + 20);
 			dbRulerView.refresh;
@@ -400,6 +402,7 @@ SCVMeter {
 		window = Window(s.name ++ " levels (dBFS) — SCVisuals", Rect(100, 200, width, SCVMeterView.defaultHeight));
 
 		meterView = SCVMeterView(s, window, 0@0, numIns, numOuts, theme, density, meterStyle);
+		window.view.background = meterView.theme.background;
 
 		window.view.onResize = { |v| meterView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { meterView.stop };
@@ -412,6 +415,7 @@ SCVMeter {
 
 	theme_ { |aTheme|
 		meterView.theme = aTheme;
+		window.view.background = meterView.theme.background;
 	}
 
 	density_ { |aDensity|

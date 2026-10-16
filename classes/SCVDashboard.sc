@@ -30,6 +30,7 @@ SCVDashboardView {
 		targetLUFS = argTargetLUFS.asFloat;
 
 		view = CompositeView(parent, rect);
+		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
 		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
@@ -125,6 +126,7 @@ SCVDashboardView {
 		var rightW = (w - meterW - midW - 36).max(80);
 
 		if (isClosed.not) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			if (txtBrokerStatus.notNil) {
 				txtBrokerStatus.bounds = Rect(760, 6, (w - 770).max(60), 20);
 			};
@@ -223,6 +225,7 @@ SCVDashboard {
 
 		window = Window(s.name ++ " Unified Audio Analysis Dashboard — SCVisuals", Rect(100, 100, w, h));
 		dashboardView = SCVDashboardView(s, window, Rect(0, 0, w, h), numIns, numOuts, busIndex, theme, targetLUFS);
+		window.view.background = dashboardView.theme.background;
 
 		window.view.onResize = { |v| dashboardView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { dashboardView.stop };
@@ -236,6 +239,7 @@ SCVDashboard {
 
 	theme_ { |aTheme|
 		dashboardView.theme = aTheme;
+		window.view.background = dashboardView.theme.background;
 	}
 
 	targetLUFS_ { |val|

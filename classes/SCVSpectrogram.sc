@@ -44,6 +44,7 @@ SCVSpectrogramView {
 		img.fill(theme.panelBackground);
 
 		view = CompositeView(parent, rect);
+		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
 		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
@@ -124,6 +125,7 @@ SCVSpectrogramView {
 		var canvasW = (w - 48).max(50);
 		var canvasH = (h - 34).max(50);
 		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			userView.bounds = Rect(40, 24, canvasW, canvasH);
 			axisView.bounds = Rect(6, 24, 32, canvasH);
 			axisView.refresh;
@@ -202,6 +204,7 @@ SCVSpectrogram {
 
 		window = Window(s.name ++ " Spectrogram — SCVisuals", Rect(300, 280, w, h));
 		spectrogramView = SCVSpectrogramView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq);
+		window.view.background = spectrogramView.theme.background;
 
 		window.view.onResize = { |v| spectrogramView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { spectrogramView.stop };
@@ -214,6 +217,7 @@ SCVSpectrogram {
 
 	theme_ { |aTheme|
 		spectrogramView.theme = aTheme;
+		window.view.background = spectrogramView.theme.background;
 	}
 
 	clear {

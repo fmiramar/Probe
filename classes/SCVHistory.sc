@@ -39,6 +39,7 @@ SCVHistoryView {
 		historyRMS   = Array.fill(maxPoints, { FloatArray.fill(numChannels, 0.0) });
 
 		view = CompositeView(parent, rect);
+		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
 		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
@@ -174,6 +175,7 @@ SCVHistoryView {
 
 	prHandleResize { |w, h|
 		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			userView.bounds = Rect(36, 24, (w - 46).max(50), (h - 32).max(50));
 			axisView.bounds = Rect(4, 24, 30, (h - 32).max(50));
 			axisView.refresh;
@@ -246,6 +248,7 @@ SCVHistory {
 
 		window = Window(s.name ++ " Level History — SCVisuals", Rect(320, 240, w, h));
 		historyView = SCVHistoryView(s, window, Rect(0, 0, w, h), busType, busIndex, numChannels, theme, updateFreq, maxPoints);
+		window.view.background = historyView.theme.background;
 
 		window.view.onResize = { |v| historyView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { historyView.stop };
@@ -258,6 +261,7 @@ SCVHistory {
 
 	theme_ { |aTheme|
 		historyView.theme = aTheme;
+		window.view.background = historyView.theme.background;
 	}
 
 	clear {

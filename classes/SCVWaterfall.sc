@@ -35,6 +35,7 @@ SCVWaterfallView {
 		history = Array.fill(numLines, { FloatArray.fill(numBands, 0.0) });
 
 		view = CompositeView(parent, rect);
+		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
 		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
@@ -101,6 +102,7 @@ SCVWaterfallView {
 
 	prHandleResize { |w, h|
 		if (isClosed.not and: { userView.notNil }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			userView.bounds = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
 			userView.refresh;
 		};

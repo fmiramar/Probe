@@ -34,6 +34,7 @@ SCVVectorscopeView {
 		updateFreq = argUpdateFreq.asInteger.clip(5, 30);
 
 		view = CompositeView(parent, rect);
+		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
 		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
@@ -174,6 +175,7 @@ SCVVectorscopeView {
 
 	prHandleResize { |w, h|
 		if (isClosed.not and: { scopeView.notNil } and: { overlayView.notNil }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			scopeSize = (w.min(h - 48) - 16).max(80);
 			scopeX = (w - scopeSize) / 2;
 			scopeY = 24;
@@ -293,6 +295,7 @@ SCVVectorscope {
 
 		window = Window(s.name ++ " Vectorscope — SCVisuals", Rect(340, 240, w, h));
 		vectorscopeView = SCVVectorscopeView(s, window, Rect(0, 0, w, h), busIndex, theme, updateFreq);
+		window.view.background = vectorscopeView.theme.background;
 
 		window.view.onResize = { |v| vectorscopeView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { vectorscopeView.stop };
@@ -306,6 +309,7 @@ SCVVectorscope {
 
 	theme_ { |aTheme|
 		vectorscopeView.theme = aTheme;
+		window.view.background = vectorscopeView.theme.background;
 	}
 
 	toggleFreeze {

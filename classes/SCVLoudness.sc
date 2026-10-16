@@ -43,6 +43,7 @@ SCVLoudnessView {
 		readoutValues = List.new;
 
 		view = CompositeView(parent, rect);
+		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
 		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
@@ -200,6 +201,7 @@ SCVLoudnessView {
 		var readoutW = (w - meterW - 20).max(120);
 		var contentH = (h - 38).max(50);
 		if (isClosed.not and: { meterView.notNil } and: { readoutView.notNil }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			meterView.bounds = Rect(10, 28, meterW, contentH);
 			readoutView.bounds = Rect(meterW + 16, 28, readoutW, contentH);
 			if (btnTarget.notNil) {
@@ -342,6 +344,7 @@ SCVLoudness {
 
 		window = Window(s.name ++ " Loudness Meter — SCVisuals", Rect(360, 240, w, h));
 		loudnessView = SCVLoudnessView(s, window, Rect(0, 0, w, h), busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
+		window.view.background = loudnessView.theme.background;
 
 		window.view.onResize = { |v| loudnessView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { loudnessView.stop };
@@ -355,6 +358,7 @@ SCVLoudness {
 
 	theme_ { |aTheme|
 		loudnessView.theme = aTheme;
+		window.view.background = loudnessView.theme.background;
 	}
 
 	targetLUFS_ { |val|

@@ -44,6 +44,7 @@ SCVSpectrumView {
 		);
 
 		view = CompositeView(parent, rect);
+		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
 		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
@@ -151,6 +152,7 @@ SCVSpectrumView {
 	prHandleResize { |w, h|
 		var scopeW = (w - 48).max(50), scopeH = (h - 40).max(50);
 		if (isClosed.not and: { scopeView.notNil } and: { gridOverlay.notNil }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			scopeView.bounds = Rect(36, 24, scopeW, scopeH);
 			gridOverlay.bounds = Rect(8, 24, w - 16, scopeH);
 			scopeView.xZoom = (fftSize * 0.25) / scopeW;
@@ -355,6 +357,7 @@ SCVSpectrum {
 
 		window = Window(s.name ++ " Spectrum Analyzer — SCVisuals", Rect(120, 200, w, h));
 		spectrumView = SCVSpectrumView(s, window, Rect(0, 0, w, h), busIndex, fftSize, theme, freqMode, dbRange, smoothing);
+		window.view.background = spectrumView.theme.background;
 
 		window.view.onResize = { |v| spectrumView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { spectrumView.stop };
@@ -368,6 +371,7 @@ SCVSpectrum {
 
 	theme_ { |aTheme|
 		spectrumView.theme = aTheme;
+		window.view.background = spectrumView.theme.background;
 	}
 
 	freqMode_ { |aMode|

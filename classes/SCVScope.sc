@@ -43,6 +43,7 @@ SCVScopeView {
 		);
 
 		view = CompositeView(parent, rect);
+		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
 		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
@@ -118,6 +119,7 @@ SCVScopeView {
 	prHandleResize { |w, h|
 		var scopeRect = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
 		if (isClosed.not and: { scopeView.notNil } and: { gridOverlay.notNil }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			scopeView.bounds = scopeRect;
 			gridOverlay.bounds = scopeRect;
 			gridOverlay.refresh;
@@ -269,6 +271,7 @@ SCVScope {
 
 		window = Window(s.name ++ " Scope — SCVisuals", Rect(120, 200, w, h));
 		scopeView = SCVScopeView(s, window, Rect(0, 0, w, h), busIndex, numChannels, theme, rate, style, bufSize);
+		window.view.background = scopeView.theme.background;
 
 		window.view.onResize = { |v| scopeView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { scopeView.stop };
@@ -282,6 +285,7 @@ SCVScope {
 
 	theme_ { |aTheme|
 		scopeView.theme = aTheme;
+		window.view.background = scopeView.theme.background;
 	}
 
 	scopeStyle_ { |aStyle|
