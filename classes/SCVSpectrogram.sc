@@ -1,0 +1,206 @@
+/*
+    SCVSpectrogram.sc
+    SCVisuals — Real-Time Scrolling Spectrogram
+    Preallocated 2D raster with circular ring-buffer blit, theme palette LUT mapping,
+    frequency axis markings, freeze/clear controls, and shared measurement broker integration.
+*/
+
+SCVSpectrogramView {
+	var <server;
+	var <view;
+	var <userView;
+	var <axisView;
+	var <busIndex, <numBands, <updateFreq;
+	var <rasterW = 320;
+	var <img;
+	var <source;
+	var <theme;
+	var <colorLUT;
+	var colPixels;
+	var writeIdx = 0;
+	var <isFrozen = false;
+	var <isClosed = false;
+
+	*new { |server, parent, bounds, busIndex=0, numBands=64, theme=\graphite, updateFreq=20|
+		^super.new.prInit(server, parent, bounds, busIndex, numBands, theme, updateFreq);
+	}
+
+	prInit { |argServer, parent, bounds, argBusIndex, argNumBands, argTheme, argUpdateFreq|
+		var rect = bounds ?? { Rect(0, 0, 420, 220) };
+
+		server      = argServer ?? { Server.default };
+		busIndex    = argBusIndex.asInteger;
+		numBands    = argNumBands.asInteger.clip(16, 128);
+		theme       = SCVTheme.get(argTheme);
+		updateFreq  = argUpdateFreq.asInteger.clip(5, 30);
+		rasterW     = rect.width - 50;
+
+		colPixels   = Int32Array.newClear(numBands);
+		this.prBuildLUT;
+
+		// Preallocate raster image
+		img = Image(rasterW, numBands);
+		img.fill(theme.panelBackground);
+
+		view = CompositeView(parent, rect);
+		view.background = theme.background;
+		view.onClose = { this.stop };
+
+		this.prBuildUI(rect.width, rect.height);
+		this.prSubscribeSource;
+	}
+
+	prBuildLUT {
+		var lutSize = 256;
+		colorLUT = Int32Array.newClear(lutSize);
+		lutSize.do { |i|
+			var norm = i / (lutSize - 1);
+			var c;
+			case
+				{ norm < 0.35 } {
+					c = theme.panelBackground.blend(theme.signal, norm.linlin(0, 0.35, 0, 0.6));
+				}
+				{ norm < 0.70 } {
+					c = theme.signal.blend(theme.warning, norm.linlin(0.35, 0.70, 0, 1));
+				}
+				{ true } {
+					c = theme.warning.blend(theme.critical, norm.linlin(0.70, 1.0, 0, 1));
+				};
+			colorLUT[i] = Image.colorToPixel(c);
+		};
+	}
+
+	prBuildUI { |w, h|
+		var canvasH = h - 34;
+
+		// 1. Spectrogram UserView (Ring-buffer blit)
+		userView = UserView(view, Rect(40, 24, rasterW, canvasH));
+		userView.canFocus = false;
+		userView.drawFunc = { |uv|
+			var part1W = rasterW - writeIdx;
+			var ch = uv.bounds.height;
+			// Draw older slice shifted left
+			Pen.drawImage(Rect(0, 0, part1W, ch), img, Rect(writeIdx, 0, part1W, numBands));
+			// Draw newer slice shifted right
+			if (writeIdx > 0) {
+				Pen.drawImage(Rect(part1W, 0, writeIdx, ch), img, Rect(0, 0, writeIdx, numBands));
+			};
+		};
+
+		// 2. Frequency Axis Ruler (Left)
+		axisView = UserView(view, Rect(6, 24, 32, canvasH));
+		axisView.canFocus = false;
+		axisView.drawFunc = {
+			Pen.font = Font.monospace(8);
+			Pen.color = theme.subtext;
+			Pen.stringRightJustIn("18k", Rect(0, 0, 28, 10));
+			Pen.stringRightJustIn(" 5k", Rect(0, (canvasH * 0.3) - 5, 28, 10));
+			Pen.stringRightJustIn(" 1k", Rect(0, (canvasH * 0.6) - 5, 28, 10));
+			Pen.stringRightJustIn("40",  Rect(0, canvasH - 12, 28, 10));
+		};
+
+		// 3. Header title
+		StaticText(view, Rect(10, 4, 260, 16))
+			.string_("SPECTROGRAM [" ++ numBands ++ " BANDS]")
+			.font_(Font.sansSerif(theme.fontSize).boldVariant)
+			.stringColor_(theme.text);
+
+		// Keyboard controls
+		view.keyDownAction = { |v, char|
+			case
+				{ char === $  } { this.toggleFreeze }
+				{ char === $c } { this.clear };
+		};
+	}
+
+	prSubscribeSource {
+		var broker = SCVisuals.broker;
+		source = broker.subscribeSpectrum(this, server, busIndex, numBands, updateFreq, { |bands|
+			this.prHandleBands(bands);
+		});
+	}
+
+	prHandleBands { |bands|
+		if (isClosed.not and: { isFrozen.not and: { img.notNil } }) {
+			numBands.do { |y|
+				var val = (bands[y] * 3.5).clip(0.0, 1.0); // Calibrate amplitude to [0, 1]
+				var lutIdx = (val * 255).round.asInteger;
+				// Invert Y so low frequencies are at the bottom
+				colPixels[numBands - 1 - y] = colorLUT[lutIdx];
+			};
+
+			// Blit column into Image at writeIdx (< 1 µs)
+			img.setPixels(colPixels, Rect(writeIdx, 0, 1, numBands));
+			writeIdx = (writeIdx + 1) % rasterW;
+
+			userView.refresh;
+		};
+	}
+
+	theme_ { |newTheme|
+		theme = SCVTheme.get(newTheme);
+		view.background = theme.background;
+		this.prBuildLUT;
+		if (axisView.notNil) { axisView.refresh };
+		if (userView.notNil) { userView.refresh };
+	}
+
+	clear {
+		if (img.notNil) {
+			img.fill(theme.panelBackground);
+			writeIdx = 0;
+			userView.refresh;
+		};
+	}
+
+	toggleFreeze {
+		isFrozen = isFrozen.not;
+	}
+
+	stop {
+		if (isClosed.not) {
+			isClosed = true;
+			SCVisuals.broker.unsubscribe(this, source.key);
+			source = nil;
+			if (img.notNil) {
+				img.free;
+				img = nil;
+			};
+		};
+	}
+}
+
+SCVSpectrogram {
+	var <window, <spectrogramView;
+
+	*new { |server, busIndex=0, numBands=64, theme=\graphite, updateFreq=20|
+		^super.new.prInit(server, busIndex, numBands, theme, updateFreq);
+	}
+
+	prInit { |server, busIndex, numBands, theme, updateFreq|
+		var s = server ?? { Server.default };
+		var w = 460, h = 240;
+
+		window = Window(s.name ++ " Spectrogram — SCVisuals", Rect(300, 280, w, h));
+		spectrogramView = SCVSpectrogramView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq);
+
+		window.onClose = { spectrogramView.stop };
+		window.front;
+	}
+
+	close {
+		window.close;
+	}
+
+	theme_ { |aTheme|
+		spectrogramView.theme = aTheme;
+	}
+
+	clear {
+		spectrogramView.clear;
+	}
+
+	toggleFreeze {
+		spectrogramView.toggleFreeze;
+	}
+}

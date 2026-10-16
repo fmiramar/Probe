@@ -1,0 +1,57 @@
+TITLE:: SCVSpectrogram
+summary:: Real-time scrolling audio spectrogram with ring-buffer blit
+categories:: GUI>Visuals
+related:: Classes/SCVisuals, Classes/SCVSpectrogramView, Classes/SCVWaterfall, Classes/SCVSpectrum
+
+DESCRIPTION::
+SCVSpectrogram provides a high-performance, real-time scrolling audio spectrogram.
+It utilizes a preallocated 2D raster with circular ring-buffer blit (via Pen.drawImage) to achieve sub-millisecond redraws without garbage collection overhead. Frequency bands are mapped through the active SCVTheme color palette LUT.
+
+list::
+## Subscribes to shared link::Classes/SCVSpectrumSource:: via link::Classes/SCVMeasurementBroker::
+## Frequency axis tick markings (40 Hz to 18 kHz)
+## Freeze (Space) and Clear ('c') keyboard controls
+## Dynamic palette theming across all 6 SCVTheme palettes
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+Creates and displays a new SCVSpectrogram window.
+
+ARGUMENT:: server
+The target link::Classes/Server:: (defaults to code::Server.default::).
+
+ARGUMENT:: busIndex
+Audio bus index to analyze (default 0).
+
+ARGUMENT:: numBands
+Number of logarithmic frequency bands (default 64, clipped 16..128).
+
+ARGUMENT:: theme
+Theme name symbol (e.g. code::\graphite::) or link::Classes/SCVTheme:: instance.
+
+ARGUMENT:: updateFreq
+Analysis update rate in Hz (default 20 Hz).
+
+INSTANCEMETHODS::
+
+METHOD:: theme
+Update active theme dynamically.
+
+METHOD:: toggleFreeze
+Toggle pause/unpause of the scrolling spectrogram.
+
+METHOD:: clear
+Clear the raster display buffer.
+
+METHOD:: close
+Close the window and release broker subscriptions.
+
+EXAMPLES::
+
+code::
+s.boot;
+x = { Saw.ar(SinOsc.kr(0.2).range(100, 3000)) * 0.2 }.play;
+v = SCVisuals.spectrogram(s, 0, 64, \graphite);
+::

@@ -1,0 +1,63 @@
+TITLE:: SCVHistory
+summary:: Real-time rolling timeline chart of Peak, RMS, and Crest Factor
+categories:: GUI>Visuals
+related:: Classes/SCVisuals, Classes/SCVHistoryView, Classes/SCVMeter, Classes/SCVLevelsSource
+
+DESCRIPTION::
+SCVHistory renders a multi-channel rolling timeline chart tracking Peak level, RMS energy, and Crest Factor headroom over time.
+
+list::
+## Subscribes to shared link::Classes/SCVLevelsSource:: via link::Classes/SCVMeasurementBroker::
+## Shaded Crest Factor area between RMS contour and Peak envelope
+## Multi-channel stacked lane layout with calibrated dB grid lines (0, -6, -18, -36 dB)
+## Bounded ring-buffer history memory (default 200 points)
+## Freeze (Space) and Clear ('c') keyboard shortcuts
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+Creates and displays a new SCVHistory window.
+
+ARGUMENT:: server
+The target link::Classes/Server:: (defaults to code::Server.default::).
+
+ARGUMENT:: busType
+Bus category to monitor: code::\outputs::, code::\inputs::, or code::\bus::.
+
+ARGUMENT:: busIndex
+Audio bus offset (default 0).
+
+ARGUMENT:: numChannels
+Number of channels to chart (default 2).
+
+ARGUMENT:: theme
+Theme name symbol or link::Classes/SCVTheme:: instance.
+
+ARGUMENT:: updateFreq
+Update frequency in Hz (default 20 Hz).
+
+ARGUMENT:: maxPoints
+Maximum number of historical timeline points (default 200).
+
+INSTANCEMETHODS::
+
+METHOD:: theme
+Update active theme dynamically.
+
+METHOD:: toggleFreeze
+Toggle pause/unpause of the rolling timeline.
+
+METHOD:: clear
+Clear the historical data buffer.
+
+METHOD:: close
+Close the window and release broker subscriptions.
+
+EXAMPLES::
+
+code::
+s.boot;
+x = { Dust.ar(20) * 0.5 }.play;
+h = SCVisuals.history(s, \outputs, 0, 2, \graphite);
+::

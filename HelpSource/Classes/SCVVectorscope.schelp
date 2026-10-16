@@ -1,0 +1,53 @@
+TITLE:: SCVVectorscope
+summary:: Real-time stereo vectorscope and phase correlation meter
+categories:: GUI>Visuals
+related:: Classes/SCVisuals, Classes/SCVVectorscopeView, Classes/SCVScope, Classes/SCVDashboard
+
+DESCRIPTION::
+SCVVectorscope provides a real-time stereo Lissajous vectorscope and phase correlation meter.
+It features native hardware-accelerated X/Y plotting via ScopeView overlaid with a 45-degree Mid/Side polar graticule,
+a real-time stereo phase correlation gauge [-1.0, +1.0], and stereo energy balance readout.
+
+list::
+## strong::Lissajous X/Y Display::: Left channel on X axis, Right channel on Y axis at audio rate via ScopeOut2.
+## strong::Mid/Side Overlay::: 45-degree rotated polar crosshairs showing Mono (+M) vs Stereo Side (+S).
+## strong::Phase Correlation Gauge::: Running correlation from +1.0 (pure mono) through 0.0 (wide stereo) to -1.0 (anti-phase cancellation warning).
+## strong::Stereo Balance Indicator::: Left/Right energy balance readout.
+## strong::Broker Subscription::: Shares analysis sources with other active visualizers.
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+Creates and displays a new SCVVectorscope window.
+
+ARGUMENT:: server
+The target link::Classes/Server:: (defaults to code::Server.default::).
+
+ARGUMENT:: busIndex
+Audio bus offset (default 0).
+
+ARGUMENT:: theme
+Theme name symbol (e.g. code::\graphite::) or link::Classes/SCVTheme:: instance.
+
+ARGUMENT:: updateFreq
+Telemetry update rate in Hz (default 15 Hz).
+
+INSTANCEMETHODS::
+
+METHOD:: theme
+Update active theme dynamically across the vectorscope display.
+
+METHOD:: toggleFreeze
+Toggle pause/unpause of the vectorscope.
+
+METHOD:: close
+Close window and release broker subscriptions.
+
+EXAMPLES::
+
+code::
+s.boot;
+x = { [SinOsc.ar(220) * 0.3, SinOsc.ar(222) * 0.3] }.play;
+v = SCVisuals.vectorscope(s, 0, \graphite);
+::

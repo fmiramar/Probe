@@ -1,0 +1,6 @@
+candidate,mean_avgCPU_pct,max_peakCPU_pct,num_synths,num_ugens
+01_Audio_Graph_Alone,0.38,0.51,2,25
+02_SendReply_64Bands_20Hz,4.93,5.51,3,159
+03_SendReply_128Bands_15Hz,9.57,10.07,3,284
+04_Buffer_getn_256Bins_15Hz,19.12,20.07,3,797
+05_Shared_Stream_Two_Subscribers,4.88,5.29,3,156

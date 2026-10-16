@@ -1,0 +1,52 @@
+TITLE:: SCVSpectrum
+summary:: Themed spectrum analyzer wrapping the FreqScope FFT pipeline
+categories:: GUI>Visuals
+related:: Classes/SCVisuals, Classes/SCVSpectrumView, Classes/FreqScope
+
+DESCRIPTION::
+SCVSpectrum provides a modern, theme-consistent real-time spectrum analyzer wrapping the verified FreqScope FFT pipeline (FFT size 2048, hop 0.75, Hann window, PV_MagSmear, phasor ScopeOut2).
+
+It features calibrated frequency markings (linear or logarithmic mode), dB level markers (0 to -96 dB), dynamic palette theming, and pause/freeze capability.
+
+CLASSMETHODS::
+
+METHOD:: new
+Opens and returns a new SCVSpectrum window.
+
+ARGUMENT:: server
+The target audio Server (must be a local server).
+
+ARGUMENT:: busIndex
+Audio bus to analyze.
+
+ARGUMENT:: fftSize
+FFT frame size (default: 2048).
+
+ARGUMENT:: theme
+Theme name symbol (e.g. code::\graphite::, code::\phosphor::, code::\ice::, etc.).
+
+ARGUMENT:: freqMode
+code::\logarithmic:: or code::\linear::.
+
+ARGUMENT:: dbRange
+Dynamic range in dB (default: 96 dB).
+
+INSTANCEMETHODS::
+
+METHOD:: theme
+Changes theme palette dynamically.
+
+METHOD:: freqMode
+Switches between code::\logarithmic:: and code::\linear:: frequency axes.
+
+METHOD:: dbRange
+Adjusts the vertical dB display range.
+
+METHOD:: close
+Closes window and frees ScopeBuffer and FFT analysis nodes.
+
+KEYBOARD SHORTCUTS::
+list::
+## strong::m::: Toggle between Logarithmic and Linear frequency display
+## strong::Spacebar::: Freeze / Resume spectral drawing
+::

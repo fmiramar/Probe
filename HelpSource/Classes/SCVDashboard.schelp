@@ -1,0 +1,62 @@
+TITLE:: SCVDashboard
+summary:: Unified multi-panel audio analysis dashboard
+categories:: GUI>Visuals
+related:: Classes/SCVisuals, Classes/SCVDashboardView, Classes/SCVMeter, Classes/SCVScope, Classes/SCVSpectrum, Classes/SCVLoudness, Classes/SCVVectorscope
+
+DESCRIPTION::
+SCVDashboard unifies all core SCVisuals instruments into a synchronized command center.
+It embeds link::Classes/SCVMeterView::, link::Classes/SCVScopeView::, link::Classes/SCVSpectrumView::, link::Classes/SCVLoudnessView::, and link::Classes/SCVVectorscopeView:: within a single resizable interface.
+
+All embedded panels subscribe through link::Classes/SCVMeasurementBroker::, guaranteeing zero duplicate audio-thread measurement synths.
+
+list::
+## strong::Unified Interface::: Simultaneous real-time level metering, waveform oscilloscope, FFT spectrum analyzer, ITU-R BS.1770 loudness, and stereo vectorscope.
+## strong::Global Theme Propagation::: Changing the dashboard theme propagates dynamically to all embedded panels.
+## strong::Master Freeze::: One-click or Spacebar freezing across all panels.
+## strong::Broker Telemetry::: Real-time counter of active broker sources and subscriber counts.
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+Creates and displays a new SCVDashboard window.
+
+ARGUMENT:: server
+The target link::Classes/Server:: (defaults to code::Server.default::).
+
+ARGUMENT:: numIns
+Number of server input channels to meter.
+
+ARGUMENT:: numOuts
+Number of server output channels to meter.
+
+ARGUMENT:: busIndex
+Audio bus offset for oscilloscope, spectrum, and vectorscope (default 0).
+
+ARGUMENT:: theme
+Theme name symbol (e.g. code::\graphite::) or link::Classes/SCVTheme:: instance.
+
+ARGUMENT:: targetLUFS
+Target loudness in LUFS (-23.0 broadcast or -14.0 streaming).
+
+INSTANCEMETHODS::
+
+METHOD:: theme
+Change active theme dynamically across the entire dashboard and all embedded panels.
+
+METHOD:: targetLUFS
+Update target loudness standard.
+
+METHOD:: toggleFreeze
+Toggle freeze across all panels.
+
+METHOD:: close
+Close window and cleanly release all broker subscriptions.
+
+EXAMPLES::
+
+code::
+s.boot;
+x = { Saw.ar([110, 110.5]) * 0.25 }.play;
+d = SCVisuals.dashboard(s, 2, 2, 0, \graphite);
+::

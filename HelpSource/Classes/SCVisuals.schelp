@@ -1,0 +1,43 @@
+TITLE:: SCVisuals
+summary:: Main namespace and facade for real-time audio visualization in SuperCollider
+categories:: GUI>Visuals
+related:: Classes/SCVTheme, Classes/SCVMeasurementBroker, Classes/SCVLevelsSource
+
+DESCRIPTION::
+SCVisuals is a cohesive, configurable, lightweight suite of real-time audio analysis visualizers for SuperCollider.
+It prioritizes audio-thread safety, predictable resource lifecycles, and modern, compact visual aesthetics without altering the core SuperCollider installation or introducing foreign C++ GUI dependencies.
+
+CLASSMETHODS::
+
+METHOD:: version
+Returns the current SCVisuals version string.
+
+METHOD:: broker
+Returns the default singleton link::Classes/SCVMeasurementBroker:: instance.
+
+METHOD:: theme
+Returns the current active link::Classes/SCVTheme::.
+
+METHOD:: theme
+Sets the current active link::Classes/SCVTheme:: by name or instance.
+
+METHOD:: themes
+Returns the dictionary of all registered themes.
+
+METHOD:: sources
+Returns the dictionary of all active measurement sources managed by the broker.
+
+METHOD:: freeAll
+Frees all active measurement sources, osc responders, and subscriptions.
+
+EXAMPLES::
+
+code::
+// Inspect version and active theme
+SCVisuals.version.postln;
+SCVisuals.theme.postln;
+
+// Switch theme
+SCVisuals.theme = \phosphor;
+SCVisuals.theme = \graphite;
+::

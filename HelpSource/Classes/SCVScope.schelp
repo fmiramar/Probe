@@ -1,0 +1,63 @@
+TITLE:: SCVScope
+summary:: Modernized oscilloscope wrapping native ScopeView with theme styling
+categories:: GUI>Visuals
+related:: Classes/SCVisuals, Classes/SCVScopeView, Classes/Stethoscope
+
+DESCRIPTION::
+SCVScope wraps SuperCollider's native ScopeView (powered by ScopeOut2 and shared-memory QcScopeShm) in an elegant, theme-consistent window with an overlaid transparent grid, multi-channel wave colors, and keyboard shortcuts.
+
+Audio thread safety is strictly preserved: rendering uses the native shared-memory buffer path, adding zero additional audio DSP overhead.
+
+CLASSMETHODS::
+
+METHOD:: new
+Opens and returns a new SCVScope window.
+
+ARGUMENT:: server
+The target audio Server (must be a local server for shared-memory scoping).
+
+ARGUMENT:: busIndex
+Audio or control bus index.
+
+ARGUMENT:: numChannels
+Number of channels to scope.
+
+ARGUMENT:: theme
+Theme name symbol (e.g. code::\graphite::, code::\phosphor::, code::\ice::, etc.).
+
+ARGUMENT:: rate
+code::\audio:: or code::\control::.
+
+ARGUMENT:: style
+Display mode: code::\overlay:: (superimposed), code::\tracks:: (stacked channels), or code::\xy:: (Lissajous stereo).
+
+ARGUMENT:: bufSize
+Buffer size in frames (default: 4096).
+
+INSTANCEMETHODS::
+
+METHOD:: theme
+Changes theme palette dynamically.
+
+METHOD:: scopeStyle
+Switches display mode: code::\overlay::, code::\tracks::, or code::\xy::.
+
+METHOD:: yZoom
+Adjusts vertical amplitude zoom.
+
+METHOD:: xZoom
+Adjusts horizontal time zoom.
+
+METHOD:: cycle
+Sets window frame cycle length.
+
+METHOD:: close
+Closes window and frees ScopeBuffer and analysis Synth.
+
+KEYBOARD SHORTCUTS::
+list::
+## strong::+ / =::: Zoom in vertically
+## strong::- / _::: Zoom out vertically
+## strong::s::: Cycle through display styles (Overlay -> Tracks -> X/Y)
+## strong::Spacebar::: Freeze / Resume waveform drawing
+::

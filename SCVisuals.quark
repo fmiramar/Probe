@@ -1,0 +1,9 @@
+(
+	name: "SCVisuals",
+	summary: "Cohesive, lightweight, real-time audio analysis visualizers for SuperCollider.",
+	version: "0.1.0",
+	schelp: "SCVisuals",
+	license: "GPL-3.0-or-later",
+	copyright: "2026 SCVisuals Contributors",
+	isCompatible: { Main.versionAtLeast(3, 11) }
+)

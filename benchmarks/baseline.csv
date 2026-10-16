@@ -1,0 +1,9 @@
+condition,mean_avgCPU_pct,max_peakCPU_pct,num_synths,num_ugens
+01_Audio_Graph_Alone,0.3,0.38,2,18
+02_Stock_ServerMeter,0.32,0.54,4,23
+03_Spike01_SCVMeter,0.32,0.38,4,23
+04_Stock_Stethoscope,0.3,0.38,3,26
+05_Spike02_SCVScope,0.29,0.39,3,20
+06_Stock_FreqScope,0.63,0.99,3,43
+07_Spike03_SCVSpectrum,0.47,0.73,3,36
+08_Spike04_SCVSpectrogram,0.27,0.39,2,18
