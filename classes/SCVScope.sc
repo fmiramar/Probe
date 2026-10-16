@@ -2,7 +2,7 @@
     SCVScope.sc
     SCVisuals — Themed Oscilloscope Wrapper
     Wraps native ScopeView / ScopeOut2 with theme palettes, transparent grid overlay,
-    multichannel color mapping, style modes (Tracks, Overlay, X/Y), and clean lifecycle.
+    multichannel color mapping, style modes (Tracks, Overlay, X/Y), dynamic window resizing, and clean lifecycle.
 */
 
 SCVScopeView {
@@ -18,6 +18,7 @@ SCVScopeView {
 	var <xZoom = 1.0, <yZoom = 1.0;
 	var <isFrozen = false;
 	var <isClosed = false;
+	var txtTitle;
 
 	*new { |server, parent, bounds, busIndex=0, numChannels=2, theme=\graphite, rate=\audio, style=\overlay, bufSize=4096|
 		^super.new.prInit(server, parent, bounds, busIndex, numChannels, theme, rate, style, bufSize);
@@ -44,6 +45,7 @@ SCVScopeView {
 		view = CompositeView(parent, rect);
 		view.background = theme.background;
 		view.onClose = { this.stop };
+		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prStartAnalysis;
@@ -53,7 +55,7 @@ SCVScopeView {
 	}
 
 	prBuildUI { |w, h|
-		var scopeRect = Rect(10, 24, w - 20, h - 34);
+		var scopeRect = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
 
 		// 1. Native ScopeView
 		scopeView = ScopeView(view, scopeRect);
@@ -70,7 +72,7 @@ SCVScopeView {
 		gridOverlay.canFocus = false;
 		gridOverlay.drawFunc = { |uv|
 			var gw = uv.bounds.width, gh = uv.bounds.height;
-			Pen.strokeColor = theme.grid;
+			Pen.strokeColor = theme.grid.copy.alpha_(0.35);
 			Pen.width = 1;
 
 			// Horizontal Center Axis
@@ -98,7 +100,7 @@ SCVScopeView {
 		};
 
 		// 3. Header title and channel readout
-		StaticText(view, Rect(10, 4, 200, 16))
+		txtTitle = StaticText(view, Rect(10, 4, 260, 16))
 			.string_("OSCILLOSCOPE [" ++ numChannels ++ " CH]")
 			.font_(Font.sansSerif(theme.fontSize).boldVariant)
 			.stringColor_(theme.text);
@@ -110,6 +112,15 @@ SCVScopeView {
 				{ char === $- or: { char === $_ } } { this.yZoom = (yZoom * 0.8).clip(0.1, 16.0) }
 				{ char === $s } { this.scopeStyle = (scopeStyle + 1) % 3 }
 				{ char === $  } { this.toggleFreeze };
+		};
+	}
+
+	prHandleResize { |w, h|
+		var scopeRect = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
+		if (isClosed.not and: { scopeView.notNil } and: { gridOverlay.notNil }) {
+			scopeView.bounds = scopeRect;
+			gridOverlay.bounds = scopeRect;
+			gridOverlay.refresh;
 		};
 	}
 
@@ -139,8 +150,13 @@ SCVScopeView {
 		};
 
 		if (scopeBuf.isNil) {
-			scopeBuf = ScopeBuffer.alloc(server);
+			scopeBuf = ScopeBuffer.alloc(server, numChannels);
 			scopeView.bufnum = scopeBuf.index;
+		};
+
+		if (synth.notNil and: { synth.isPlaying }) {
+			synth.free;
+			synth = nil;
 		};
 
 		synthDefName = ("scv_scope_" ++ rate ++ "_" ++ numChannels).asSymbol;
@@ -158,6 +174,7 @@ SCVScopeView {
 					ScopeOut2.ar(K2A.ar(in), scopeBuf.index, bufSize, cycleFrames);
 				});
 			};
+
 			synth = sdef.play(RootNode(server), [\cycleFrames, cycle], \addToTail);
 		};
 
@@ -169,6 +186,7 @@ SCVScopeView {
 		view.background = theme.background;
 		scopeView.background = theme.panelBackground;
 		this.prUpdateWaveColors;
+		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
 		if (gridOverlay.notNil) { gridOverlay.refresh };
 	}
 
@@ -182,19 +200,21 @@ SCVScopeView {
 		scopeView.style = scopeStyle;
 	}
 
-	yZoom_ { |val|
-		yZoom = val.asFloat;
-		scopeView.yZoom = yZoom;
+	xZoom_ { |val|
+		xZoom = val.asFloat.clip(0.1, 16.0);
+		scopeView.xZoom = xZoom;
 	}
 
-	xZoom_ { |val|
-		xZoom = val.asFloat;
-		scopeView.xZoom = xZoom;
+	yZoom_ { |val|
+		yZoom = val.asFloat.clip(0.1, 16.0);
+		scopeView.yZoom = yZoom;
 	}
 
 	cycle_ { |frames|
 		cycle = frames.asInteger.clip(64, bufSize);
-		if (synth.notNil) { synth.set(\cycleFrames, cycle) };
+		if (synth.notNil and: { synth.isPlaying }) {
+			synth.set(\cycleFrames, cycle);
+		};
 	}
 
 	toggleFreeze {
@@ -214,8 +234,7 @@ SCVScopeView {
 	}
 
 	doOnServerTree {
-		synth = nil;
-		if (isClosed.not and: { server.serverRunning }) {
+		if (server.serverRunning) {
 			this.prStartAnalysis;
 		};
 	}
@@ -223,14 +242,16 @@ SCVScopeView {
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
-			scopeView.stop;
-			if (synth.notNil) {
-				server.sendBundle(nil, ['/error', -1], [11, synth.nodeID], ['/error', -2]);
-				synth = nil;
-			};
-			if (scopeBuf.notNil) { scopeBuf.free; scopeBuf = nil };
 			ServerQuit.remove(this, server);
 			ServerTree.remove(this, server);
+			if (synth.notNil and: { synth.isPlaying }) {
+				synth.free;
+				synth = nil;
+			};
+			if (scopeBuf.notNil) {
+				scopeBuf.free;
+				scopeBuf = nil;
+			};
 		};
 	}
 }
@@ -244,16 +265,18 @@ SCVScope {
 
 	prInit { |server, busIndex, numChannels, theme, rate, style, bufSize|
 		var s = server ?? { Server.default };
-		var w = 400, h = 260;
+		var w = 400, h = 250;
 
-		window = Window(s.name ++ " Scope — SCVisuals", Rect(200, 300, w, h));
+		window = Window(s.name ++ " Scope — SCVisuals", Rect(120, 200, w, h));
 		scopeView = SCVScopeView(s, window, Rect(0, 0, w, h), busIndex, numChannels, theme, rate, style, bufSize);
 
+		window.view.onResize = { |v| scopeView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { scopeView.stop };
 		window.front;
 	}
 
 	close {
+		scopeView.stop;
 		window.close;
 	}
 
@@ -265,15 +288,19 @@ SCVScope {
 		scopeView.scopeStyle = aStyle;
 	}
 
-	yZoom_ { |val|
-		scopeView.yZoom = val;
-	}
-
 	xZoom_ { |val|
 		scopeView.xZoom = val;
 	}
 
-	cycle_ { |val|
-		scopeView.cycle = val;
+	yZoom_ { |val|
+		scopeView.yZoom = val;
+	}
+
+	cycle_ { |frames|
+		scopeView.cycle = frames;
+	}
+
+	toggleFreeze {
+		scopeView.toggleFreeze;
 	}
 }

@@ -1,8 +1,9 @@
 /*
     SCVMeter.sc
     SCVisuals — Compact Vertical Server Meter
-    Production visualizer featuring vertical channel strips, legible dB tick ruler,
-    stereo grouping, peak-hold reset, density modes, and measurement broker deduplication.
+    Production visualizer featuring vertical channel strips, dual-sided dB tick rulers
+    (inputs left, outputs right), dynamic resizing, stereo grouping, peak-hold reset,
+    density modes, and measurement broker deduplication.
 */
 
 SCVMeterView {
@@ -17,8 +18,9 @@ SCVMeterView {
 	var <meterStyle;     // \continuous or \led
 	var inMeters, outMeters;
 	var inLabels, outLabels;
+	var inComps, outComps;
 	var inSource, outSource;
-	var dbRulerView, dividerView;
+	var dbRulerView, dbRulerViewRight, dividerView;
 	var inHeaderView, outHeaderView;
 	var <isClosed = false;
 
@@ -30,10 +32,10 @@ SCVMeterView {
 		var th = SCVTheme.get(theme);
 		var mw = th.meterWidth;
 		var gw = th.gapWidth;
-		var rulerW = 26;
+		var rulerW = 24;
 		var pad = 16;
-		var divW = if ((numIns > 0) and: { numOuts > 0 }) { mw } { 0 };
-		^rulerW + pad + ((numIns + numOuts) * (mw + gw)) + divW;
+		var divW = if ((numIns > 0) and: { numOuts > 0 }) { 12 } { 0 };
+		^(rulerW * 2) + pad + ((numIns + numOuts) * (mw + gw)) + divW;
 	}
 
 	prInit { |argServer, parent, leftUp, argNumIns, argNumOuts, argTheme, argDensity, argStyle|
@@ -55,36 +57,38 @@ SCVMeterView {
 		view = CompositeView(parent, Rect(pt.x, pt.y, totalWidth, defaultHeight));
 		view.background = theme.background;
 		view.onClose = { this.stop };
+		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
 
-		this.prBuildUI(totalWidth);
+		this.prBuildUI(totalWidth, defaultHeight);
 		this.prSubscribeSources;
 	}
 
-	prBuildUI { |totalWidth|
+	prBuildUI { |totalWidth, totalHeight|
 		var mw = theme.meterWidth;
 		var gw = theme.gapWidth;
 		var fs = theme.fontSize;
 		var rulerW = 24;
-		var meterH = 175;
+		var h = totalHeight ?? { view.bounds.height };
+		var meterH = (h - 55).max(40);
 		var curX = 6;
-		var inStartX = 0, outStartX = 0;
 
 		view.removeAll;
 		view.background = theme.background;
 
-		// 1. dB Ruler (Left)
+		// 1. dB Ruler (Left side - facing inputs)
 		dbRulerView = UserView(view, Rect(curX, 24, rulerW, meterH + 20));
 		dbRulerView.canFocus = false;
-		dbRulerView.drawFunc = {
+		dbRulerView.drawFunc = { |uv|
+			var curH = uv.bounds.height - 20;
 			var dBs = [0, -3, -6, -12, -18, -24, -36, -48, -60, -80];
 			Pen.font = Font.monospace(fs - 1);
 			dBs.do { |db|
-				var normY = db.linlin(dBLow, 0, meterH - 10, 0);
+				var normY = db.linlin(dBLow, 0, curH - 10, 0);
 				Pen.strokeColor = theme.grid;
 				Pen.line(Point(rulerW - 6, normY + 5), Point(rulerW, normY + 5));
 				Pen.stroke;
 				Pen.color = theme.text;
-				Pen.stringRightJustIn(db.asString, Rect(0, normY, rulerW - 8, 10));
+				Pen.stringRightJustIn(db.asString, Rect(0, normY, rulerW - 8, 12));
 			};
 		};
 
@@ -92,12 +96,12 @@ SCVMeterView {
 
 		// 2. Inputs
 		if (numIns > 0) {
-			inStartX = curX;
 			inHeaderView = StaticText(view, Rect(curX, 4, (numIns * (mw + gw)).max(50), 16))
 				.string_("IN")
 				.font_(Font.sansSerif(fs).boldVariant)
 				.stringColor_(theme.text);
 
+			inComps  = Array.newClear(numIns);
 			inMeters = Array.newClear(numIns);
 			inLabels = Array.newClear(numIns);
 
@@ -121,9 +125,9 @@ SCVMeterView {
 					.stringColor_(theme.subtext)
 					.string_((i + 1).asString);
 
-				// Click to reset peak hold
 				meter.mouseDownAction = { this.resetPeakHold };
 
+				inComps[i]  = comp;
 				inMeters[i] = meter;
 				inLabels[i] = label;
 				curX = curX + mw + gw;
@@ -132,23 +136,24 @@ SCVMeterView {
 
 		// 3. Divider
 		if ((numIns > 0) and: { numOuts > 0 }) {
-			dividerView = UserView(view, Rect(curX, 24, mw, meterH)).drawFunc_({
+			dividerView = UserView(view, Rect(curX, 24, 12, meterH)).drawFunc_({ |uv|
+				var dh = uv.bounds.height;
 				Pen.strokeColor = theme.grid;
 				Pen.width = 1;
-				Pen.line(Point(mw * 0.5, 0), Point(mw * 0.5, meterH));
+				Pen.line(Point(6, 0), Point(6, dh));
 				Pen.stroke;
 			});
-			curX = curX + mw;
+			curX = curX + 12;
 		};
 
 		// 4. Outputs
 		if (numOuts > 0) {
-			outStartX = curX;
 			outHeaderView = StaticText(view, Rect(curX, 4, (numOuts * (mw + gw)).max(50), 16))
 				.string_("OUT")
 				.font_(Font.sansSerif(fs).boldVariant)
 				.stringColor_(theme.text);
 
+			outComps  = Array.newClear(numOuts);
 			outMeters = Array.newClear(numOuts);
 			outLabels = Array.newClear(numOuts);
 
@@ -172,12 +177,29 @@ SCVMeterView {
 					.stringColor_(theme.subtext)
 					.string_((i + 1).asString);
 
-				// Click to reset peak hold
 				meter.mouseDownAction = { this.resetPeakHold };
 
+				outComps[i]  = comp;
 				outMeters[i] = meter;
 				outLabels[i] = label;
 				curX = curX + mw + gw;
+			};
+		};
+
+		// 5. dB Ruler (Right side - facing outputs)
+		dbRulerViewRight = UserView(view, Rect(curX + 2, 24, rulerW, meterH + 20));
+		dbRulerViewRight.canFocus = false;
+		dbRulerViewRight.drawFunc = { |uv|
+			var curH = uv.bounds.height - 20;
+			var dBs = [0, -3, -6, -12, -18, -24, -36, -48, -60, -80];
+			Pen.font = Font.monospace(fs - 1);
+			dBs.do { |db|
+				var normY = db.linlin(dBLow, 0, curH - 10, 0);
+				Pen.strokeColor = theme.grid;
+				Pen.line(Point(0, normY + 5), Point(6, normY + 5));
+				Pen.stroke;
+				Pen.color = theme.text;
+				Pen.stringLeftJustIn(db.asString, Rect(8, normY, rulerW - 8, 12));
 			};
 		};
 
@@ -185,6 +207,68 @@ SCVMeterView {
 		view.keyDownAction = { |v, char|
 			if (char === $r or: { char === $  }) {
 				this.resetPeakHold;
+			};
+		};
+	}
+
+	prHandleResize { |w, h|
+		var rulerW = 24;
+		var pad = 16;
+		var gw = theme.gapWidth;
+		var divW = if ((numIns > 0) and: { numOuts > 0 }) { 12 } { 0 };
+		var availW = (w - (rulerW * 2) - divW - pad).max(20);
+		var totalCh = numIns + numOuts;
+		var mw = if (totalCh > 0) { ((availW / totalCh) - gw).clip(6, 40) } { 16 };
+		var meterH = (h - 55).max(40);
+		var curX = 6;
+
+		if (isClosed.not and: { dbRulerView.notNil }) {
+			// 1. Left ruler
+			dbRulerView.bounds = Rect(curX, 24, rulerW, meterH + 20);
+			dbRulerView.refresh;
+			curX = curX + rulerW + 6;
+
+			// 2. Inputs
+			if (numIns > 0 and: { inMeters.notNil }) {
+				if (inHeaderView.notNil) {
+					inHeaderView.bounds = Rect(curX, 4, (numIns * (mw + gw)).max(50), 16);
+				};
+				numIns.do { |i|
+					if (inComps[i].notNil) {
+						inComps[i].bounds = Rect(curX, 24, mw, meterH + 20);
+						inMeters[i].bounds = Rect(0, 0, mw, meterH);
+						inLabels[i].bounds = Rect(0, meterH + 2, mw, 14);
+					};
+					curX = curX + mw + gw;
+				};
+			};
+
+			// 3. Divider
+			if (numIns > 0 and: { numOuts > 0 } and: { dividerView.notNil }) {
+				dividerView.bounds = Rect(curX, 24, divW, meterH);
+				dividerView.refresh;
+				curX = curX + divW;
+			};
+
+			// 4. Outputs
+			if (numOuts > 0 and: { outMeters.notNil }) {
+				if (outHeaderView.notNil) {
+					outHeaderView.bounds = Rect(curX, 4, (numOuts * (mw + gw)).max(50), 16);
+				};
+				numOuts.do { |i|
+					if (outComps[i].notNil) {
+						outComps[i].bounds = Rect(curX, 24, mw, meterH + 20);
+						outMeters[i].bounds = Rect(0, 0, mw, meterH);
+						outLabels[i].bounds = Rect(0, meterH + 2, mw, 14);
+					};
+					curX = curX + mw + gw;
+				};
+			};
+
+			// 5. Right ruler
+			if (dbRulerViewRight.notNil) {
+				dbRulerViewRight.bounds = Rect(curX + 2, 24, rulerW, meterH + 20);
+				dbRulerViewRight.refresh;
 			};
 		};
 	}
@@ -243,7 +327,7 @@ SCVMeterView {
 	density_ { |newDensity|
 		density = newDensity.asSymbol;
 		theme = theme.withDensity(density);
-		this.prBuildUI(this.class.getWidth(numIns, numOuts, theme));
+		this.prBuildUI(this.class.getWidth(numIns, numOuts, theme), view.bounds.height);
 	}
 
 	meterStyle_ { |newStyle|
@@ -261,6 +345,7 @@ SCVMeterView {
 		if (inHeaderView.notNil) { inHeaderView.stringColor = theme.text };
 		if (outHeaderView.notNil) { outHeaderView.stringColor = theme.text };
 		if (dbRulerView.notNil) { dbRulerView.refresh };
+		if (dbRulerViewRight.notNil) { dbRulerViewRight.refresh };
 		if (dividerView.notNil) { dividerView.refresh };
 
 		if (inMeters.notNil) {
@@ -312,10 +397,11 @@ SCVMeter {
 		numOuts = numOuts ?? { s.options.numOutputBusChannels };
 
 		width = SCVMeterView.getWidth(numIns, numOuts, theme);
-		window = Window(s.name ++ " levels (dBFS) — SCVisuals", Rect(100, 200, width, SCVMeterView.defaultHeight), resizable: false);
+		window = Window(s.name ++ " levels (dBFS) — SCVisuals", Rect(100, 200, width, SCVMeterView.defaultHeight));
 
 		meterView = SCVMeterView(s, window, 0@0, numIns, numOuts, theme, density, meterStyle);
 
+		window.view.onResize = { |v| meterView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { meterView.stop };
 		window.front;
 	}

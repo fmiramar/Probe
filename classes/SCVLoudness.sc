@@ -3,7 +3,7 @@
     SCVisuals — ITU-R BS.1770 / EBU R128 Loudness Meter
     Comprehensive M (Momentary 400ms), S (Short-term 3s), and I (Integrated gated)
     loudness meters with LRA, Max Peak, target reference lines (-23 / -14 LUFS),
-    and shared measurement broker integration.
+    dynamic window resizing, theme contrast, and shared measurement broker integration.
 */
 
 SCVLoudnessView {
@@ -20,8 +20,9 @@ SCVLoudnessView {
 	// Current displayed values
 	var mLUFS = -99.0, sLUFS = -99.0, iLUFS = -99.0;
 	var lra = 0.0, maxPk = 0.0;
-	var txtM, txtS, txtI, txtDelta, txtLRA, txtMaxPk;
-	var btnTarget;
+	var txtTitle, txtM, txtS, txtI, txtDelta, txtLRA, txtMaxPk;
+	var btnTarget, btnReset;
+	var readoutLabels, readoutValues;
 
 	*new { |server, parent, bounds, busType=\outputs, busIndex=0, numChannels=2, theme=\graphite, targetLUFS=(-23.0), updateFreq=10|
 		^super.new.prInit(server, parent, bounds, busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
@@ -38,20 +39,24 @@ SCVLoudnessView {
 		targetLUFS   = argTargetLUFS.asFloat;
 		updateFreq   = argUpdateFreq.asInteger.clip(5, 30);
 
+		readoutLabels = List.new;
+		readoutValues = List.new;
+
 		view = CompositeView(parent, rect);
 		view.background = theme.background;
 		view.onClose = { this.stop };
+		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prSubscribeSource;
 	}
 
 	prBuildUI { |w, h|
-		var meterW = 160;
-		var readoutW = w - meterW - 20;
+		var meterW = (w * 0.38).clip(130, 220);
+		var readoutW = (w - meterW - 20).max(120);
 
 		// 1. Header
-		StaticText(view, Rect(12, 6, 260, 16))
+		txtTitle = StaticText(view, Rect(12, 6, 260, 16))
 			.string_("LOUDNESS [ITU-R BS.1770 / EBU R128]")
 			.font_(Font.sansSerif(theme.fontSize).boldVariant)
 			.stringColor_(theme.text);
@@ -71,9 +76,9 @@ SCVLoudnessView {
 			var mw = uv.bounds.width;
 			var mh = uv.bounds.height - 24; // Leave room for M, S, I labels
 			var minLUFS = -54.0, maxLUFS = 0.0;
-			var colW = 28;
-			var colGap = 12;
-			var rulerW = 34;
+			var colW = ((mw - 40 - 24) / 3).clip(16, 40);
+			var colGap = 8;
+			var rulerW = 32;
 			var startX = rulerW + 6;
 
 			// Draw Ruler on Left
@@ -169,6 +174,9 @@ SCVLoudnessView {
 				.font_(Font.monospace(11).boldVariant)
 				.stringColor_(if (isHighlight) { theme.signal } { theme.text });
 
+			readoutLabels.add(tView);
+			readoutValues.add(vView);
+
 			y = y + rowH;
 			vView;
 		};
@@ -181,10 +189,32 @@ SCVLoudnessView {
 		txtMaxPk = addRow.value("Max Peak:", "-inf dBFS");
 
 		// Reset Button
-		Button(readoutView, Rect(12, rh - 34, rw - 24, 24))
+		btnReset = Button(readoutView, Rect(12, rh - 34, rw - 24, 24))
 			.states_([["Reset Integrated / Peak ('r')", theme.text, theme.background]])
 			.font_(Font.sansSerif(9).boldVariant)
 			.action_({ this.reset });
+	}
+
+	prHandleResize { |w, h|
+		var meterW = (w * 0.38).clip(130, 220);
+		var readoutW = (w - meterW - 20).max(120);
+		var contentH = (h - 38).max(50);
+		if (isClosed.not and: { meterView.notNil } and: { readoutView.notNil }) {
+			meterView.bounds = Rect(10, 28, meterW, contentH);
+			readoutView.bounds = Rect(meterW + 16, 28, readoutW, contentH);
+			if (btnTarget.notNil) {
+				btnTarget.bounds = Rect(w - 120, 4, 108, 20);
+			};
+			if (btnReset.notNil) {
+				btnReset.bounds = Rect(12, contentH - 34, readoutW - 24, 24);
+			};
+			if (readoutValues.notNil) {
+				readoutValues.do { |valView|
+					valView.bounds = Rect(104, valView.bounds.top, (readoutW - 116).max(20), 20);
+				};
+			};
+			meterView.refresh;
+		};
 	}
 
 	prSubscribeSource {
@@ -273,7 +303,20 @@ SCVLoudnessView {
 		theme = SCVTheme.get(newTheme);
 		view.background = theme.background;
 		readoutView.background = theme.panelBackground;
-		btnTarget.states = [["Target: " ++ targetLUFS.round(1) ++ " LUFS", theme.text, theme.panelBackground]];
+		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
+		if (readoutLabels.notNil) {
+			readoutLabels.do { |lbl| lbl.stringColor = theme.subtext };
+		};
+		if (readoutValues.notNil) {
+			readoutValues.do { |v| v.stringColor = theme.text };
+		};
+		if (txtI.notNil) { txtI.stringColor = theme.signal };
+		if (btnTarget.notNil) {
+			btnTarget.states = [["Target: " ++ targetLUFS.round(1) ++ " LUFS", theme.text, theme.panelBackground]];
+		};
+		if (btnReset.notNil) {
+			btnReset.states = [["Reset Integrated / Peak ('r')", theme.text, theme.background]];
+		};
 		meterView.refresh;
 	}
 
@@ -300,6 +343,7 @@ SCVLoudness {
 		window = Window(s.name ++ " Loudness Meter — SCVisuals", Rect(360, 240, w, h));
 		loudnessView = SCVLoudnessView(s, window, Rect(0, 0, w, h), busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
 
+		window.view.onResize = { |v| loudnessView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { loudnessView.stop };
 		window.front;
 	}

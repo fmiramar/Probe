@@ -3,7 +3,7 @@
     SCVisuals — Unified Multi-Panel Audio Analysis Dashboard
     Composes Meter, Oscilloscope, Spectrum, Loudness, and Vectorscope into a single
     synchronized interface sharing measurement sources via SCVMeasurementBroker,
-    with master freeze, global theme propagation, and broker telemetry.
+    with master freeze, global theme propagation, dynamic responsive grid resizing, and broker telemetry.
 */
 
 SCVDashboardView {
@@ -15,6 +15,7 @@ SCVDashboardView {
 	var <isFrozen = false;
 	var <isClosed = false;
 
+	var txtTitle, lblTheme, lblTarget;
 	var themeMenu, freezeBtn, targetMenu, txtBrokerStatus;
 
 	*new { |server, parent, bounds, numIns=2, numOuts=2, busIndex=0, theme=\graphite, targetLUFS=(-23.0)|
@@ -31,6 +32,7 @@ SCVDashboardView {
 		view = CompositeView(parent, rect);
 		view.background = theme.background;
 		view.onClose = { this.stop };
+		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
 
 		this.prBuildUI(rect.width, rect.height, numIns, numOuts, busIndex);
 		this.prStartTelemetry;
@@ -40,18 +42,18 @@ SCVDashboardView {
 		var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome];
 		var topH = 32;
 		var panelH = ((h - topH - 24) / 2).floor;
-		var meterW = 160;
-		var midW = ((w - meterW - 36) / 2).floor;
-		var rightW = w - meterW - midW - 36;
+		var meterW = (w * 0.17).clip(120, 240);
+		var midW = (((w - meterW - 36) / 2).floor).max(80);
+		var rightW = (w - meterW - midW - 36).max(80);
 
 		// 1. Top Control Bar
-		StaticText(view, Rect(12, 6, 260, 20))
+		txtTitle = StaticText(view, Rect(12, 6, 260, 20))
 			.string_("SCVisuals AUDIO ANALYSIS DASHBOARD")
 			.font_(Font.sansSerif(11).boldVariant)
 			.stringColor_(theme.text);
 
 		// Global Theme Dropdown
-		StaticText(view, Rect(280, 6, 46, 20))
+		lblTheme = StaticText(view, Rect(280, 6, 46, 20))
 			.string_("Theme:")
 			.font_(Font.sansSerif(9).boldVariant)
 			.stringColor_(theme.subtext);
@@ -65,7 +67,7 @@ SCVDashboardView {
 			});
 
 		// Target LUFS Selector
-		StaticText(view, Rect(455, 6, 46, 20))
+		lblTarget = StaticText(view, Rect(455, 6, 46, 20))
 			.string_("Target:")
 			.font_(Font.sansSerif(9).boldVariant)
 			.stringColor_(theme.subtext);
@@ -86,7 +88,7 @@ SCVDashboardView {
 			.action_({ this.toggleFreeze });
 
 		// Broker Telemetry Label
-		txtBrokerStatus = StaticText(view, Rect(760, 6, w - 770, 20))
+		txtBrokerStatus = StaticText(view, Rect(760, 6, (w - 770).max(60), 20))
 			.string_("Broker: 0 sources | 0 subs")
 			.font_(Font.monospace(8))
 			.stringColor_(theme.subtext);
@@ -115,6 +117,40 @@ SCVDashboardView {
 		};
 	}
 
+	prHandleResize { |w, h|
+		var topH = 32;
+		var panelH = ((h - topH - 24) / 2).floor.max(60);
+		var meterW = (w * 0.17).clip(120, 240);
+		var midW = (((w - meterW - 36) / 2).floor).max(80);
+		var rightW = (w - meterW - midW - 36).max(80);
+
+		if (isClosed.not) {
+			if (txtBrokerStatus.notNil) {
+				txtBrokerStatus.bounds = Rect(760, 6, (w - 770).max(60), 20);
+			};
+			if (meterView.notNil and: { meterView.view.notNil }) {
+				meterView.view.bounds = Rect(10, topH + 8, meterW, h - topH - 16);
+				meterView.prHandleResize(meterW, h - topH - 16);
+			};
+			if (scopeView.notNil and: { scopeView.view.notNil }) {
+				scopeView.view.bounds = Rect(meterW + 18, topH + 8, midW, panelH);
+				scopeView.prHandleResize(midW, panelH);
+			};
+			if (spectrumView.notNil and: { spectrumView.view.notNil }) {
+				spectrumView.view.bounds = Rect(meterW + 18, topH + 16 + panelH, midW, panelH);
+				spectrumView.prHandleResize(midW, panelH);
+			};
+			if (loudnessView.notNil and: { loudnessView.view.notNil }) {
+				loudnessView.view.bounds = Rect(meterW + midW + 26, topH + 8, rightW, panelH);
+				loudnessView.prHandleResize(rightW, panelH);
+			};
+			if (vectorscopeView.notNil and: { vectorscopeView.view.notNil }) {
+				vectorscopeView.view.bounds = Rect(meterW + midW + 26, topH + 16 + panelH, rightW, panelH);
+				vectorscopeView.prHandleResize(rightW, panelH);
+			};
+		};
+	}
+
 	prStartTelemetry {
 		AppClock.sched(0.5, {
 			if (isClosed.not and: { txtBrokerStatus.notNil }) {
@@ -130,11 +166,22 @@ SCVDashboardView {
 	theme_ { |newTheme|
 		theme = SCVTheme.get(newTheme);
 		view.background = theme.background;
-		meterView.theme = theme;
-		scopeView.theme = theme;
-		spectrumView.theme = theme;
-		loudnessView.theme = theme;
-		vectorscopeView.theme = theme;
+		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
+		if (lblTheme.notNil) { lblTheme.stringColor = theme.subtext };
+		if (lblTarget.notNil) { lblTarget.stringColor = theme.subtext };
+		if (txtBrokerStatus.notNil) { txtBrokerStatus.stringColor = theme.subtext };
+		if (freezeBtn.notNil) {
+			freezeBtn.states = [
+				["Freeze All", theme.text, theme.panelBackground],
+				["Unfreeze All", theme.background, theme.signal]
+			];
+			freezeBtn.value = if (isFrozen) { 1 } { 0 };
+		};
+		if (meterView.notNil)       { meterView.theme = theme };
+		if (scopeView.notNil)       { scopeView.theme = theme };
+		if (spectrumView.notNil)    { spectrumView.theme = theme };
+		if (loudnessView.notNil)    { loudnessView.theme = theme };
+		if (vectorscopeView.notNil) { vectorscopeView.theme = theme };
 	}
 
 	targetLUFS_ { |val|
@@ -177,6 +224,7 @@ SCVDashboard {
 		window = Window(s.name ++ " Unified Audio Analysis Dashboard — SCVisuals", Rect(100, 100, w, h));
 		dashboardView = SCVDashboardView(s, window, Rect(0, 0, w, h), numIns, numOuts, busIndex, theme, targetLUFS);
 
+		window.view.onResize = { |v| dashboardView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { dashboardView.stop };
 		window.front;
 	}

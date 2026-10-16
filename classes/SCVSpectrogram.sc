@@ -2,7 +2,7 @@
     SCVSpectrogram.sc
     SCVisuals — Real-Time Scrolling Spectrogram
     Preallocated 2D raster with circular ring-buffer blit, theme palette LUT mapping,
-    frequency axis markings, freeze/clear controls, and shared measurement broker integration.
+    frequency axis markings, dynamic window resizing, freeze/clear controls, and shared measurement broker integration.
 */
 
 SCVSpectrogramView {
@@ -20,6 +20,7 @@ SCVSpectrogramView {
 	var writeIdx = 0;
 	var <isFrozen = false;
 	var <isClosed = false;
+	var txtTitle;
 
 	*new { |server, parent, bounds, busIndex=0, numBands=64, theme=\graphite, updateFreq=20|
 		^super.new.prInit(server, parent, bounds, busIndex, numBands, theme, updateFreq);
@@ -33,7 +34,7 @@ SCVSpectrogramView {
 		numBands    = argNumBands.asInteger.clip(16, 128);
 		theme       = SCVTheme.get(argTheme);
 		updateFreq  = argUpdateFreq.asInteger.clip(5, 30);
-		rasterW     = rect.width - 50;
+		rasterW     = (rect.width - 50).max(100);
 
 		colPixels   = Int32Array.newClear(numBands);
 		this.prBuildLUT;
@@ -45,6 +46,7 @@ SCVSpectrogramView {
 		view = CompositeView(parent, rect);
 		view.background = theme.background;
 		view.onClose = { this.stop };
+		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prSubscribeSource;
@@ -71,36 +73,41 @@ SCVSpectrogramView {
 	}
 
 	prBuildUI { |w, h|
-		var canvasH = h - 34;
+		var canvasW = (w - 48).max(50);
+		var canvasH = (h - 34).max(50);
 
-		// 1. Spectrogram UserView (Ring-buffer blit)
-		userView = UserView(view, Rect(40, 24, rasterW, canvasH));
+		// 1. Spectrogram UserView (Ring-buffer blit with horizontal stretch)
+		userView = UserView(view, Rect(40, 24, canvasW, canvasH));
 		userView.canFocus = false;
 		userView.drawFunc = { |uv|
 			var part1W = rasterW - writeIdx;
+			var cw = uv.bounds.width;
 			var ch = uv.bounds.height;
+			var scaleX = cw / rasterW;
+
 			// Draw older slice shifted left
-			Pen.drawImage(Rect(0, 0, part1W, ch), img, Rect(writeIdx, 0, part1W, numBands));
+			Pen.drawImage(Rect(0, 0, part1W * scaleX, ch), img, Rect(writeIdx, 0, part1W, numBands));
 			// Draw newer slice shifted right
 			if (writeIdx > 0) {
-				Pen.drawImage(Rect(part1W, 0, writeIdx, ch), img, Rect(0, 0, writeIdx, numBands));
+				Pen.drawImage(Rect(part1W * scaleX, 0, writeIdx * scaleX, ch), img, Rect(0, 0, writeIdx, numBands));
 			};
 		};
 
 		// 2. Frequency Axis Ruler (Left)
 		axisView = UserView(view, Rect(6, 24, 32, canvasH));
 		axisView.canFocus = false;
-		axisView.drawFunc = {
+		axisView.drawFunc = { |uv|
+			var ch = uv.bounds.height;
 			Pen.font = Font.monospace(8);
 			Pen.color = theme.subtext;
 			Pen.stringRightJustIn("18k", Rect(0, 0, 28, 10));
-			Pen.stringRightJustIn(" 5k", Rect(0, (canvasH * 0.3) - 5, 28, 10));
-			Pen.stringRightJustIn(" 1k", Rect(0, (canvasH * 0.6) - 5, 28, 10));
-			Pen.stringRightJustIn("40",  Rect(0, canvasH - 12, 28, 10));
+			Pen.stringRightJustIn(" 5k", Rect(0, (ch * 0.3) - 5, 28, 10));
+			Pen.stringRightJustIn(" 1k", Rect(0, (ch * 0.6) - 5, 28, 10));
+			Pen.stringRightJustIn("40",  Rect(0, ch - 12, 28, 10));
 		};
 
 		// 3. Header title
-		StaticText(view, Rect(10, 4, 260, 16))
+		txtTitle = StaticText(view, Rect(10, 4, 260, 16))
 			.string_("SPECTROGRAM [" ++ numBands ++ " BANDS]")
 			.font_(Font.sansSerif(theme.fontSize).boldVariant)
 			.stringColor_(theme.text);
@@ -110,6 +117,17 @@ SCVSpectrogramView {
 			case
 				{ char === $  } { this.toggleFreeze }
 				{ char === $c } { this.clear };
+		};
+	}
+
+	prHandleResize { |w, h|
+		var canvasW = (w - 48).max(50);
+		var canvasH = (h - 34).max(50);
+		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {
+			userView.bounds = Rect(40, 24, canvasW, canvasH);
+			axisView.bounds = Rect(6, 24, 32, canvasH);
+			axisView.refresh;
+			userView.refresh;
 		};
 	}
 
@@ -141,6 +159,7 @@ SCVSpectrogramView {
 		theme = SCVTheme.get(newTheme);
 		view.background = theme.background;
 		this.prBuildLUT;
+		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
 		if (axisView.notNil) { axisView.refresh };
 		if (userView.notNil) { userView.refresh };
 	}
@@ -184,6 +203,7 @@ SCVSpectrogram {
 		window = Window(s.name ++ " Spectrogram — SCVisuals", Rect(300, 280, w, h));
 		spectrogramView = SCVSpectrogramView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq);
 
+		window.view.onResize = { |v| spectrogramView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { spectrogramView.stop };
 		window.front;
 	}

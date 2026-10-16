@@ -11,13 +11,15 @@ SCVVectorscopeView {
 	var <view;
 	var <scopeView, <overlayView;
 	var <busIndex, <updateFreq;
-	var <scopeBuf;
+	var <scopeBuf, synth;
 	var <source;
 	var <theme;
 	var <correlation = 1.0;
 	var <balance = 0.0;
 	var <isFrozen = false;
 	var <isClosed = false;
+	var txtTitle;
+	var scopeSize, scopeX, scopeY;
 
 	*new { |server, parent, bounds, busIndex=0, theme=\graphite, updateFreq=15|
 		^super.new.prInit(server, parent, bounds, busIndex, theme, updateFreq);
@@ -34,19 +36,24 @@ SCVVectorscopeView {
 		view = CompositeView(parent, rect);
 		view.background = theme.background;
 		view.onClose = { this.stop };
+		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prInitScope;
 		this.prSubscribeSource;
+
+		ServerQuit.add(this, server);
+		ServerTree.add(this, server);
 	}
 
 	prBuildUI { |w, h|
-		var scopeSize = (w.min(h - 48) - 16).max(100);
-		var scopeX = (w - scopeSize) / 2;
-		var scopeY = 24;
+		scopeSize = (w.min(h - 48) - 16).max(80);
+		scopeX = (w - scopeSize) / 2;
+		scopeY = 24;
 
 		// 1. Native ScopeView for high-speed hardware Lissajous
 		scopeView = ScopeView(view, Rect(scopeX, scopeY, scopeSize, scopeSize));
+		scopeView.server = server;
 		scopeView.style = 2; // X/Y Lissajous mode
 		scopeView.canFocus = false;
 		scopeView.background = theme.panelBackground;
@@ -56,40 +63,44 @@ SCVVectorscopeView {
 		overlayView = UserView(view, Rect(0, 0, w, h));
 		overlayView.canFocus = false;
 		overlayView.drawFunc = { |uv|
-			var cx = scopeX + (scopeSize / 2);
-			var cy = scopeY + (scopeSize / 2);
-			var radius = scopeSize / 2;
-			var corrY = scopeY + scopeSize + 12;
-			var corrW = w - 60;
+			var curW = uv.bounds.width, curH = uv.bounds.height;
+			var curScopeSize = (curW.min(curH - 48) - 16).max(80);
+			var curScopeX = (curW - curScopeSize) / 2;
+			var curScopeY = 24;
+			var cx = curScopeX + (curScopeSize / 2);
+			var cy = curScopeY + (curScopeSize / 2);
+			var radius = curScopeSize / 2;
+			var corrY = curScopeY + curScopeSize + 12;
+			var corrW = (curW - 60).max(40);
 			var corrX = 30;
 
 			// Polar Concentric Rings
 			#[0.33, 0.66, 1.0].do { |rNorm|
 				var r = radius * rNorm;
-				Pen.strokeColor = theme.grid.copy.alpha_(0.35);
+				Pen.strokeColor = theme.grid.copy.alpha_(0.4);
 				Pen.width = 1.0;
 				Pen.strokeOval(Rect(cx - r, cy - r, r * 2, r * 2));
 			};
 
 			// Mid / Side 45-degree diagonal axes
-			Pen.strokeColor = theme.grid.copy.alpha_(0.45);
-			Pen.line(Point(scopeX, scopeY), Point(scopeX + scopeSize, scopeY + scopeSize)); // Left/Right
-			Pen.line(Point(scopeX, scopeY + scopeSize), Point(scopeX + scopeSize, scopeY)); // Mid/Side
+			Pen.strokeColor = theme.grid.copy.alpha_(0.5);
+			Pen.line(Point(curScopeX, curScopeY), Point(curScopeX + curScopeSize, curScopeY + curScopeSize)); // Left/Right
+			Pen.line(Point(curScopeX, curScopeY + curScopeSize), Point(curScopeX + curScopeSize, curScopeY)); // Mid/Side
 			Pen.stroke;
 
 			// Crosshairs
-			Pen.strokeColor = theme.grid.copy.alpha_(0.25);
-			Pen.line(Point(cx, scopeY), Point(cx, scopeY + scopeSize));
-			Pen.line(Point(scopeX, cy), Point(scopeX + scopeSize, cy));
+			Pen.strokeColor = theme.grid.copy.alpha_(0.3);
+			Pen.line(Point(cx, curScopeY), Point(cx, curScopeY + curScopeSize));
+			Pen.line(Point(curScopeX, cy), Point(curScopeX + curScopeSize, cy));
 			Pen.stroke;
 
 			// M/S and Polar Labels
 			Pen.font = Font.monospace(8);
 			Pen.color = theme.subtext;
-			Pen.stringCenteredIn("+M", Rect(cx - 10, scopeY + 2, 20, 10));
-			Pen.stringCenteredIn("-M", Rect(cx - 10, scopeY + scopeSize - 12, 20, 10));
-			Pen.stringLeftJustIn("+S", Rect(scopeX + scopeSize - 16, cy - 5, 20, 10));
-			Pen.stringRightJustIn("-S", Rect(scopeX - 4, cy - 5, 20, 10));
+			Pen.stringCenteredIn("+M", Rect(cx - 10, curScopeY + 2, 20, 10));
+			Pen.stringCenteredIn("-M", Rect(cx - 10, curScopeY + curScopeSize - 12, 20, 10));
+			Pen.stringLeftJustIn("+S", Rect(curScopeX + curScopeSize - 16, cy - 5, 20, 10));
+			Pen.stringRightJustIn("-S", Rect(curScopeX - 4, cy - 5, 20, 10));
 
 			// Phase Correlation Bar Meter
 			Pen.font = Font.sansSerif(8).boldVariant;
@@ -149,7 +160,7 @@ SCVVectorscopeView {
 		};
 
 		// Header title
-		StaticText(view, Rect(10, 4, 260, 16))
+		txtTitle = StaticText(view, Rect(10, 4, 260, 16))
 			.string_("VECTORSCOPE [LISSAJOUS / M-S]")
 			.font_(Font.sansSerif(theme.fontSize).boldVariant)
 			.stringColor_(theme.text);
@@ -161,6 +172,17 @@ SCVVectorscopeView {
 		};
 	}
 
+	prHandleResize { |w, h|
+		if (isClosed.not and: { scopeView.notNil } and: { overlayView.notNil }) {
+			scopeSize = (w.min(h - 48) - 16).max(80);
+			scopeX = (w - scopeSize) / 2;
+			scopeY = 24;
+			scopeView.bounds = Rect(scopeX, scopeY, scopeSize, scopeSize);
+			overlayView.bounds = Rect(0, 0, w, h);
+			overlayView.refresh;
+		};
+	}
+
 	prInitScope {
 		var synthDefName;
 
@@ -168,8 +190,13 @@ SCVVectorscopeView {
 		if (server.isLocal.not) { ^this };
 
 		if (scopeBuf.isNil) {
-			scopeBuf = ScopeBuffer.alloc(server);
+			scopeBuf = ScopeBuffer.alloc(server, 2);
 			scopeView.bufnum = scopeBuf.index;
+		};
+
+		if (synth.notNil and: { synth.isPlaying }) {
+			synth.free;
+			synth = nil;
 		};
 
 		synthDefName = ("scv_vecscope_" ++ busIndex).asSymbol;
@@ -177,9 +204,9 @@ SCVVectorscopeView {
 		server.bind {
 			var sdef = SynthDef(synthDefName, { |cycleFrames=1024|
 				var in = In.ar(busIndex, 2);
-				ScopeOut2.ar(in, scopeBuf.index, 2048, cycleFrames);
+				ScopeOut2.ar(in, scopeBuf.index, 4096, cycleFrames);
 			});
-			sdef.play(RootNode(server), [\cycleFrames, 1024], \addToTail);
+			synth = sdef.play(RootNode(server), [\cycleFrames, 1024], \addToTail);
 		};
 
 		scopeView.start;
@@ -205,6 +232,7 @@ SCVVectorscopeView {
 		view.background = theme.background;
 		scopeView.background = theme.panelBackground;
 		scopeView.waveColors = [theme.signal];
+		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
 		overlayView.refresh;
 	}
 
@@ -219,11 +247,31 @@ SCVVectorscopeView {
 		overlayView.refresh;
 	}
 
+	doOnServerTree {
+		if (server.serverRunning) {
+			this.prInitScope;
+		};
+	}
+
+	doOnServerQuit {
+		if (scopeBuf.notNil) {
+			scopeBuf.free;
+			scopeBuf = nil;
+		};
+		synth = nil;
+	}
+
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
+			ServerQuit.remove(this, server);
+			ServerTree.remove(this, server);
 			SCVisuals.broker.unsubscribe(this, source.key);
 			source = nil;
+			if (synth.notNil and: { synth.isPlaying }) {
+				synth.free;
+				synth = nil;
+			};
 			if (scopeBuf.notNil) {
 				scopeBuf.free;
 				scopeBuf = nil;
@@ -246,6 +294,7 @@ SCVVectorscope {
 		window = Window(s.name ++ " Vectorscope — SCVisuals", Rect(340, 240, w, h));
 		vectorscopeView = SCVVectorscopeView(s, window, Rect(0, 0, w, h), busIndex, theme, updateFreq);
 
+		window.view.onResize = { |v| vectorscopeView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { vectorscopeView.stop };
 		window.front;
 	}

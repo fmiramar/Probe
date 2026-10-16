@@ -2,7 +2,7 @@
     SCVWaterfall.sc
     SCVisuals — 2.5D Stacked Line Waterfall Spectrum
     Isometric 2.5D stacked line history, bounded line memory, theme gradient shading,
-    and shared measurement broker integration (shares SCVSpectrumSource with Spectrogram).
+    dynamic window resizing, and shared measurement broker integration (shares SCVSpectrumSource with Spectrogram).
 */
 
 SCVWaterfallView {
@@ -16,6 +16,7 @@ SCVWaterfallView {
 	var <theme;
 	var <isFrozen = false;
 	var <isClosed = false;
+	var txtTitle;
 
 	*new { |server, parent, bounds, busIndex=0, numBands=64, theme=\graphite, updateFreq=20, numLines=48|
 		^super.new.prInit(server, parent, bounds, busIndex, numBands, theme, updateFreq, numLines);
@@ -36,13 +37,14 @@ SCVWaterfallView {
 		view = CompositeView(parent, rect);
 		view.background = theme.background;
 		view.onClose = { this.stop };
+		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prSubscribeSource;
 	}
 
 	prBuildUI { |w, h|
-		var canvasRect = Rect(10, 24, w - 20, h - 34);
+		var canvasRect = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
 
 		userView = UserView(view, canvasRect);
 		userView.canFocus = false;
@@ -85,7 +87,7 @@ SCVWaterfallView {
 		};
 
 		// Header
-		StaticText(view, Rect(10, 4, 260, 16))
+		txtTitle = StaticText(view, Rect(10, 4, 260, 16))
 			.string_("WATERFALL [2.5D " ++ numLines ++ " LINES]")
 			.font_(Font.sansSerif(theme.fontSize).boldVariant)
 			.stringColor_(theme.text);
@@ -94,6 +96,13 @@ SCVWaterfallView {
 		view.keyDownAction = { |v, char|
 			case
 				{ char === $  } { this.toggleFreeze };
+		};
+	}
+
+	prHandleResize { |w, h|
+		if (isClosed.not and: { userView.notNil }) {
+			userView.bounds = Rect(10, 24, (w - 20).max(50), (h - 34).max(50));
+			userView.refresh;
 		};
 	}
 
@@ -119,6 +128,7 @@ SCVWaterfallView {
 	theme_ { |newTheme|
 		theme = SCVTheme.get(newTheme);
 		view.background = theme.background;
+		if (txtTitle.notNil) { txtTitle.stringColor = theme.text };
 		if (userView.notNil) { userView.refresh };
 	}
 
@@ -144,11 +154,12 @@ SCVWaterfall {
 
 	prInit { |server, busIndex, numBands, theme, updateFreq, numLines|
 		var s = server ?? { Server.default };
-		var w = 480, h = 280;
+		var w = 460, h = 280;
 
-		window = Window(s.name ++ " Waterfall — SCVisuals", Rect(350, 260, w, h));
+		window = Window(s.name ++ " Waterfall — SCVisuals", Rect(320, 260, w, h));
 		waterfallView = SCVWaterfallView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq, numLines);
 
+		window.view.onResize = { |v| waterfallView.prHandleResize(v.bounds.width, v.bounds.height) };
 		window.onClose = { waterfallView.stop };
 		window.front;
 	}

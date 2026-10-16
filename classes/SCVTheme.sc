@@ -86,9 +86,9 @@ SCVTheme {
 			secondarySignal:   Color.fromHexString("#3D918E"),
 			warning:           Color.fromHexString("#B47B35"),
 			critical:          Color.fromHexString("#AD4545"),
-			text:              Color.fromHexString("#1F2220"),
-			subtext:           Color.fromHexString("#606660"),
-			grid:              Color.fromHexString("#BFB9A8")
+			text:              Color.fromHexString("#111312"),
+			subtext:           Color.fromHexString("#3A403A"),
+			grid:              Color.fromHexString("#B5AFA0")
 		));
 
 		// 6. Monochrome
