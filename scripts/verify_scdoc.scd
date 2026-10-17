@@ -2,6 +2,7 @@
 "Verifying SCDoc documentation entries...".postln;
 SCDoc.indexAllDocuments;
 [
+	"Classes/Probe",
 	"Classes/SCVisuals",
 	"Classes/SCVDashboard",
 	"Classes/SCVLoudness",

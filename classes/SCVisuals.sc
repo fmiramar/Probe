@@ -5,7 +5,7 @@
 */
 
 SCVisuals {
-	classvar <version = "0.1.0";
+	classvar <version = "0.2.0";
 
 	*broker {
 		^SCVMeasurementBroker.default;

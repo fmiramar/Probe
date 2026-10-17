@@ -5,6 +5,10 @@
 */
 
 Probe {
+	*version {
+		^"0.2.0";
+	}
+
 	*meter { |server, numIns, numOuts, theme, density, meterStyle|
 		^SCVMeter(server, numIns: numIns, numOuts: numOuts, theme: theme, density: density, meterStyle: meterStyle);
 	}
