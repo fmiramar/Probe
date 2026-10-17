@@ -57,4 +57,12 @@
 	bandAnalyzer { |busIndex=0, theme|
 		^Probe.bandAnalyzer(this, busIndex, theme);
 	}
+
+	inspect { |synthDef, theme|
+		^Probe.inspect(synthDef, theme);
+	}
+
+	inspector { |synthDef, theme|
+		^Probe.inspect(synthDef, theme);
+	}
 }

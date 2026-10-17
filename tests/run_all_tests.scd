@@ -16,7 +16,8 @@ var testFiles = [
 	"tests/Probe_P1_unittest.scd",
 	"tests/Probe_P2_unittest.scd",
 	"tests/Probe_P3_unittest.scd",
-	"tests/Probe_P4_unittest.scd"
+	"tests/Probe_P4_unittest.scd",
+	"tests/Probe_P5_unittest.scd"
 ];
 
 var suitePassed = 0, suiteFailed = 0;
@@ -28,7 +29,7 @@ var basePath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/";
 
 testFiles.do { |relPath|
 	var fullPath = basePath ++ relPath;
-	var cmd = "sclang --include-path \"" ++ basePath ++ "classes\" \"" ++ fullPath ++ "\" > /tmp/scv_test_out.log 2>&1";
+	var cmd = "sclang -l \"" ++ basePath ++ "sclang_conf.yaml\" \"" ++ fullPath ++ "\" > /tmp/scv_test_out.log 2>&1; sleep 0.4";
 	var exitCode;
 
 	("--> Running Suite: " ++ relPath).postln;

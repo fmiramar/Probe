@@ -53,6 +53,14 @@ Probe {
 		^ProbeBandAnalyzer(server, busIndex: busIndex, theme: theme);
 	}
 
+	*inspect { |synthDef, theme|
+		^ProbeInspector(synthDef, theme);
+	}
+
+	*inspector { |synthDef, theme|
+		^this.inspect(synthDef, theme);
+	}
+
 	// Broker & Themes
 	*broker {
 		^SCVisuals.broker;
