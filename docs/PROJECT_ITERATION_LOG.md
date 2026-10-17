@@ -252,6 +252,34 @@ This document serves as the persistent historical record of all development iter
 
 ---
 
+### Iteration 17: Spectral Dashboard Empty Window Fix & Layout Propagation
+- **Focus:** Diagnosing and resolving the empty window display bug in `ProbeSpectralDashboard` (`s.spectralDashboard`) and ensuring robust multi-preset layout scaling and ServerTree lifecycle recovery.
+- **Root Cause Analysis:**
+  1. **Unprotected `server.sampleRate` in Qt `UserView:drawFunc`:**
+     - In `classes/SCVSpectrum.sc` (lines 112 & 130), `var nyq = server.sampleRate * 0.5;` failed with `ERROR: Message '*' not understood. RECEIVER: nil` if the server had not yet booted or if `sampleRate` was uninitialized when the GUI opened.
+     - In SuperCollider Qt, any unhandled error inside a `UserView:drawFunc` aborts painting and leaves the visualizer window blank.
+  2. **Missing Layout Propagation in Container Panels:**
+     - `ProbeSpectralDashboardView:prHandleResize` resized the outer `containerView` and panel backgrounds, but did not update inner visualizer bounds (`specOverview`, `bandView`, `descView`, `pitchView`, `chromaView`, `gramView`, `fallView`, `specCompare`, `compareView`) nor invoke their `.prHandleResize`.
+     - In addition, the descriptor views (`ProbeDescriptorsView`, `ProbePitchTrackerView`, `ProbeChromagramView`, `ProbeSpectralCompareView`) lacked explicit `prHandleResize(w, h)` methods.
+- **Key Fixes & Enhancements Applied:**
+  1. **Defensive SampleRate Fallbacks:**
+     - Updated `classes/SCVSpectrum.sc` to guard `(server.sampleRate ? 48000.0) * 0.5` across both logarithmic and linear frequency marking algorithms.
+  2. **Comprehensive Layout & Resize Propagation:**
+     - Updated `ProbeSpectralDashboardView:prHandleResize` to dynamically recalculate and reposition all top control buttons (`txtTitle`, `presetMenu`, `themeMenu`, `fontMenu`, `freezeBtn`, `txtStatus`) and all subviews across all 4 presets.
+     - Added `prHandleResize(w, h)` to all 4 classes in `classes/ProbeSpectralDescriptors.sc`.
+     - Called `this.prHandleResize(w, h)` at the conclusion of `prBuildUI` and on preset switches.
+  3. **Preset Synchronization & ServerTree Lifecycle:**
+     - Added programmatic synchronization for `presetMenu.value` in `preset_`.
+     - Registered `ProbeSpectralDashboardView` with `ServerTree` and `ServerQuit` for clean recovery across server restarts.
+     - Added dynamic broker telemetry polling in `txtStatus` (`"Bus: 0 | FFT: 2048 | Broker: X src / Y sub"`).
+- **Verification & Visual Evidence:**
+  - Tested live audio playback (`{ Saw.ar([220, 440]) * 0.15 }.play`) with active telemetry across all 4 presets.
+  - Captured live screenshots for Overview, Pitch & Chroma, Time-Frequency, Compare, and Resized 1100x680 views.
+  - Executed master test suite (`tests/run_all_tests.scd`): 12/12 suites passed cleanly (100%).
+- **Deliverables:** `classes/ProbeSpectralDashboard.sc`, `classes/ProbeSpectralDescriptors.sc`, `classes/SCVSpectrum.sc`, Commit `9ea0c1c`.
+
+---
+
 ## Decision Matrix & Invariant Log
 
 | Parameter / Feature | Chosen Design | Rationale | Invariant Status |
