@@ -95,6 +95,14 @@ ProbeDescriptorsView {
 		userView.refresh;
 	}
 
+	prHandleResize { |w, h|
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { userView.notNil } and: { userView.isClosed.not }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
+			userView.bounds = Rect(0, 0, w, h);
+			userView.refresh;
+		};
+	}
+
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
@@ -185,6 +193,14 @@ ProbePitchTrackerView {
 		userView.refresh;
 	}
 
+	prHandleResize { |w, h|
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { userView.notNil } and: { userView.isClosed.not }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
+			userView.bounds = Rect(0, 0, w, h);
+			userView.refresh;
+		};
+	}
+
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
@@ -263,6 +279,14 @@ ProbeChromagramView {
 		view.background = theme.background;
 		userView.background = theme.panelBackground;
 		userView.refresh;
+	}
+
+	prHandleResize { |w, h|
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { userView.notNil } and: { userView.isClosed.not }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
+			userView.bounds = Rect(0, 0, w, h);
+			userView.refresh;
+		};
 	}
 
 	stop {
@@ -362,6 +386,14 @@ ProbeSpectralCompareView {
 		view.background = theme.background;
 		userView.background = theme.panelBackground;
 		userView.refresh;
+	}
+
+	prHandleResize { |w, h|
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { userView.notNil } and: { userView.isClosed.not }) {
+			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
+			userView.bounds = Rect(0, 0, w, h);
+			userView.refresh;
+		};
 	}
 
 	stop {

@@ -23,7 +23,7 @@ ProbeSpectralDashboardView {
 	var pitchView, chromaView;
 	var gramView, fallView;
 	var specCompare, compareView;
-	var allSubViews;
+	var <allSubViews;
 
 	*new { |server, parent, bounds, busIndex=0, theme=\graphite|
 		^super.new.prInit(server, parent, bounds, busIndex, theme);
@@ -47,6 +47,10 @@ ProbeSpectralDashboardView {
 		};
 
 		this.prBuildUI(rect.width, rect.height);
+		this.prStartTelemetry;
+
+		ServerQuit.add(this, server);
+		ServerTree.add(this, server);
 	}
 
 	prBuildUI { |w, h|
@@ -157,15 +161,27 @@ ProbeSpectralDashboardView {
 			compareView = ProbeSpectralCompareView(server, panelCompare, Rect(0, halfH + 8, cw, halfH), busIndex, theme);
 			allSubViews.addAll([specCompare, compareView]);
 		}.value;
+
+		this.prHandleResize(w, h);
 	}
 
 	preset_ { |newPreset|
 		currentPreset = newPreset.asSymbol;
+		if (presetMenu.notNil and: { presetMenu.isClosed.not }) {
+			presetMenu.value = switch(currentPreset,
+				\overview, { 0 },
+				\pitch,    { 1 },
+				\timeFreq, { 2 },
+				\compare,  { 3 },
+				{ 0 }
+			);
+		};
 		if (containerView.notNil and: { containerView.isClosed.not }) {
 			panelOverview.visible = (currentPreset === \overview);
 			panelPitch.visible    = (currentPreset === \pitch);
 			panelTimeFreq.visible = (currentPreset === \timeFreq);
 			panelCompare.visible  = (currentPreset === \compare);
+			this.prHandleResize(view.bounds.width, view.bounds.height);
 		};
 	}
 
@@ -174,25 +190,128 @@ ProbeSpectralDashboardView {
 		var btnH = (22 * fs).max(22).min(28).round.asInteger;
 		var topH = btnH + 8;
 		var cw = w - 16, ch = h - topH - 8;
+		var curY = ((topH - btnH) * 0.5).round.asInteger;
+		var curX = 8;
+
+		var titleW = (180 * fs).clip(160, 220).round.asInteger;
+		var presetW = (130 * fs).clip(120, 160).round.asInteger;
+		var themeW = (95 * fs).clip(85, 115).round.asInteger;
+		var fontW = (60 * fs).clip(55, 75).round.asInteger;
+		var freezeW = (85 * fs).clip(80, 105).round.asInteger;
 
 		if (isClosed.not and: { view.notNil } and: { view.isClosed.not }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
+
+			if (txtTitle.notNil) {
+				txtTitle.bounds = Rect(curX, curY, titleW, btnH);
+				curX = curX + titleW + 4;
+			};
+			if (presetMenu.notNil) {
+				presetMenu.bounds = Rect(curX, curY, presetW, btnH);
+				curX = curX + presetW + 6;
+			};
+			if (themeMenu.notNil) {
+				themeMenu.bounds = Rect(curX, curY, themeW, btnH);
+				curX = curX + themeW + 6;
+			};
+			if (fontMenu.notNil) {
+				fontMenu.bounds = Rect(curX, curY, fontW, btnH);
+				curX = curX + fontW + 6;
+			};
+			if (freezeBtn.notNil) {
+				freezeBtn.bounds = Rect(curX, curY, freezeW, btnH);
+				curX = curX + freezeW + 8;
+			};
+			if (txtStatus.notNil) {
+				txtStatus.bounds = Rect(curX, curY, (w - curX - 8).max(80), btnH);
+			};
+
 			if (containerView.notNil and: { containerView.isClosed.not }) {
 				containerView.bounds = Rect(8, topH, cw, ch);
+
+				// Panel A: Overview
 				if (panelOverview.notNil and: { panelOverview.isClosed.not }) {
+					var halfW = ((cw - 8) * 0.5).floor;
+					var topPartH = (ch * 0.65).floor;
+					var botPartH = ch - topPartH - 8;
+
 					panelOverview.bounds = Rect(0, 0, cw, ch);
+
+					if (specOverview.notNil and: { specOverview.view.notNil }) {
+						specOverview.view.bounds = Rect(0, 0, halfW, topPartH);
+						specOverview.prHandleResize(halfW, topPartH);
+					};
+					if (bandView.notNil and: { bandView.view.notNil }) {
+						bandView.view.bounds = Rect(halfW + 8, 0, halfW, topPartH);
+						bandView.prHandleResize(halfW, topPartH);
+					};
+					if (descView.notNil and: { descView.view.notNil }) {
+						descView.view.bounds = Rect(0, topPartH + 8, cw, botPartH);
+						descView.prHandleResize(cw, botPartH);
+					};
 				};
+
+				// Panel B: Pitch & Chroma
 				if (panelPitch.notNil and: { panelPitch.isClosed.not }) {
+					var halfH = ((ch - 8) * 0.5).floor;
+
 					panelPitch.bounds = Rect(0, 0, cw, ch);
+
+					if (pitchView.notNil and: { pitchView.view.notNil }) {
+						pitchView.view.bounds = Rect(0, 0, cw, halfH);
+						pitchView.prHandleResize(cw, halfH);
+					};
+					if (chromaView.notNil and: { chromaView.view.notNil }) {
+						chromaView.view.bounds = Rect(0, halfH + 8, cw, halfH);
+						chromaView.prHandleResize(cw, halfH);
+					};
 				};
+
+				// Panel C: Time-Frequency
 				if (panelTimeFreq.notNil and: { panelTimeFreq.isClosed.not }) {
+					var halfH = ((ch - 8) * 0.5).floor;
+
 					panelTimeFreq.bounds = Rect(0, 0, cw, ch);
+
+					if (gramView.notNil and: { gramView.view.notNil }) {
+						gramView.view.bounds = Rect(0, 0, cw, halfH);
+						gramView.prHandleResize(cw, halfH);
+					};
+					if (fallView.notNil and: { fallView.view.notNil }) {
+						fallView.view.bounds = Rect(0, halfH + 8, cw, halfH);
+						fallView.prHandleResize(cw, halfH);
+					};
 				};
+
+				// Panel D: Compare
 				if (panelCompare.notNil and: { panelCompare.isClosed.not }) {
+					var halfH = ((ch - 8) * 0.5).floor;
+
 					panelCompare.bounds = Rect(0, 0, cw, ch);
+
+					if (specCompare.notNil and: { specCompare.view.notNil }) {
+						specCompare.view.bounds = Rect(0, 0, cw, halfH);
+						specCompare.prHandleResize(cw, halfH);
+					};
+					if (compareView.notNil and: { compareView.view.notNil }) {
+						compareView.view.bounds = Rect(0, halfH + 8, cw, halfH);
+						compareView.prHandleResize(cw, halfH);
+					};
 				};
 			};
 		};
+	}
+
+	prStartTelemetry {
+		AppClock.sched(0.5, {
+			if (isClosed.not and: { txtStatus.notNil and: { txtStatus.isClosed.not } }) {
+				var b = SCVisuals.broker;
+				txtStatus.string = "Bus: " ++ busIndex ++ " | FFT: 2048 | Broker: " ++ b.sourceCount ++ " src / " ++ b.totalSubscriberCount ++ " sub";
+				0.5;
+			} {
+				nil;
+			};
+		});
 	}
 
 	theme_ { |newTheme|
@@ -231,9 +350,25 @@ ProbeSpectralDashboardView {
 		};
 	}
 
+	doOnServerTree {
+		if (server.serverRunning and: { isClosed.not }) {
+			{
+				if (isClosed.not and: { view.notNil } and: { view.isClosed.not }) {
+					this.prHandleResize(view.bounds.width, view.bounds.height);
+				};
+			}.defer;
+		};
+	}
+
+	doOnServerQuit {
+		// Teardown handled by individual subviews
+	}
+
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
+			ServerTree.remove(this, server);
+			ServerQuit.remove(this, server);
 			allSubViews.do { |sv|
 				if (sv.respondsTo(\stop)) { sv.stop };
 			};

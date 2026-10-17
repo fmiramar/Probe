@@ -109,7 +109,7 @@ SCVSpectrumView {
 					[100, 250, 500, 1000, 2500, 5000, 10000, 20000]
 				};
 				freqs.do { |freq|
-					var nyq = server.sampleRate * 0.5;
+					var nyq = (server.sampleRate ? 48000.0) * 0.5;
 					var normX = (freq / 20.0).log / (nyq / 20.0).log;
 					var x = curOx + (normX.clip(0, 1) * curW);
 					Pen.strokeColor = theme.grid.copy.alpha_(0.35);
@@ -127,7 +127,7 @@ SCVSpectrumView {
 				// Linear
 				8.do { |i|
 					var x = curOx + ((i + 1) * (curW / 8));
-					var freqK = ((i + 1) * (server.sampleRate * 0.5 / 8000)).round(0.1);
+					var freqK = ((i + 1) * ((server.sampleRate ? 48000.0) * 0.5 / 8000)).round(0.1);
 					Pen.strokeColor = theme.grid.copy.alpha_(0.35);
 					Pen.line(Point(x, 0), Point(x, curH));
 					Pen.stroke;
