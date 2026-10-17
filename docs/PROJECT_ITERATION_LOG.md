@@ -280,6 +280,38 @@ This document serves as the persistent historical record of all development iter
 
 ---
 
+### Iteration 18: Stage P4 — Oscilloscope Tier A/B Trigger Stabilization and Unified FreqScope 3-Mode Switcher
+- **Focus:** Implementing oscilloscope calibration and stationary trigger stabilization (Stethoscope Tier A/B) and unified 3-mode visualization switching in FreqScope (`SCVSpectrum`).
+- **Key Enhancements Applied:**
+  1. **Oscilloscope Tier A (Calibration, Legibility & Ergonomics):**
+     - Horizontal time axis calibrated in milliseconds (`ms`), dynamically scaled by sample rate, buffer cycle frames, and zoom level.
+     - Vertical amplitude axis with calibrated linear peak levels and dBFS labels (`+1.0 (0 dBFS)`, `+0.5 (-6 dBFS)`, `0.0`, `-0.5`, `-1.0`).
+     - Channel chips legend (`[Ch 1]`, `[Ch 2]`) colored according to the active theme palette.
+     - Zoom reset and timebase stepping controls (`$r`, `$0`, `$[`, `$]`, `resetZoom`).
+  2. **Oscilloscope Tier B (Trigger Stabilization & Toolbar):**
+     - Trigger modes: `\free`, `\rising`, `\falling` edge locking with configurable threshold.
+     - DSP circular delay buffer (`LocalBuf` + `Phasor.ar` + `Latch.ar` + `BufRd.ar`) that phase-locks periodic signals at zero crossings into a completely stationary display trace. Direct 0-latency bypass when `triggerMode === \free`.
+     - Standalone compact toolbar (`Style`, `Timebase`, `Trigger Mode`, `Reset Zoom`, `Freeze`).
+  3. **Unified FreqScope (Section 5.4 3-Mode Switcher & Interactive Cursor):**
+     - 3-Mode visualization switcher in `SCVSpectrum`: `\line` (Precision Line FFT), `\bands` (16-Band Octave Analyzer via `ProbeBandAnalyzerView`), `\spectrogram` (Scrolling Waterfall Spectrogram via `SCVSpectrogramView`).
+     - Broker-based shared FFT pipeline reusing existing spectral analysis without redundant CPU overhead.
+     - Interactive cursor readout on `gridOverlay`: crosshair tracking + floating tooltip badge with exact frequency (Hz/kHz) and amplitude (dBFS).
+     - Standalone compact toolbar (`Title`, `Mode`, `Scale Linear/Log`, `Freeze`, `Theme`).
+  4. **Lifecycle & ScopeBuffer Management:**
+     - Explicit `scopeView.stop` invocation on window closing and view destruction, preventing shared memory buffer leaks and `ScopeOut2: Requested scope buffer unavailable!` errors.
+- **Verification & Visual Evidence:**
+  - Added unit test suite `tests/Probe_P4_unittest.scd` (33 assertions passed cleanly).
+  - Master test runner (`tests/run_all_tests.scd`): 13/13 suites passed cleanly (100%).
+  - Visual verification with live audio (`Saw.ar(110) + Pulse.ar(220)`) captured:
+    - `scope-tier-ab-rising.png`: Locked stationary waveform with `[▲]` badge.
+    - `scope-tier-ab-tracks.png`: Multi-lane track view.
+    - `spectrum-mode-line.png`: High-precision FFT line spectrum.
+    - `spectrum-mode-bands.png`: 16-band ISO octave analyzer with peak hold bars.
+    - `spectrum-mode-spectrogram.png`: Real-time waterfall spectrogram.
+- **Deliverables:** `classes/SCVScope.sc`, `classes/SCVSpectrum.sc`, `tests/Probe_P4_unittest.scd`, `docs/screenshots/*`, Commit `50efd4e`.
+
+---
+
 ## Decision Matrix & Invariant Log
 
 | Parameter / Feature | Chosen Design | Rationale | Invariant Status |
@@ -293,5 +325,7 @@ This document serves as the persistent historical record of all development iter
 | **Server Shortcuts** | `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard`, `s.spectralDashboard`, `s.bandAnalyzer` | Non-conflicting ergonomic shortcuts following SuperCollider numbering conventions. | Active Invariant |
 | **Signal Tracing** | Transparent `.trace` with Dual Transport | Sample-accurate waveforms for audio rate, low-bandwidth 20 Hz timeline HUD for control rate. | Active Invariant (Phase II) |
 | **Spectral Dashboard** | Persistent 4-Preset Architecture | Instantaneous preset switching (`\overview`, `\pitch`, `\timeFreq`, `\compare`) with zero ScopeBuffer reallocation. | Active Invariant (Phase II) |
+| **Oscilloscope Triggering** | DSP Zero-Crossing Latch Buffer | Guarantees drift-free stationary waveforms for periodic signals without external plugins. | Active Invariant (Phase II) |
+| **Unified FreqScope Modes** | Subview Visibility Switching | Seamless single-window transitions between Line, 16-Band, and Spectrogram modes. | Active Invariant (Phase II) |
 
 
