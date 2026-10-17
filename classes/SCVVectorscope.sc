@@ -48,7 +48,7 @@ SCVVectorscopeView {
 	}
 
 	prBuildUI { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
 
@@ -69,7 +69,7 @@ SCVVectorscopeView {
 		overlayView.canFocus = false;
 		overlayView.drawFunc = { |uv|
 			var curW = uv.bounds.width, curH = uv.bounds.height;
-			var curFs = theme.fontScale ? 1.0;
+			var curFs = theme.fontScale ? 1.25;
 			var curTitleH = (18 * curFs).max(18).round.asInteger;
 			var curTopOffset = curTitleH + 6;
 			var curScopeSize = (curW.min(curH - curTopOffset - 24) - 16).max(80);
@@ -181,7 +181,7 @@ SCVVectorscopeView {
 	}
 
 	prHandleResize { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
 		if (isClosed.not and: { scopeView.notNil } and: { overlayView.notNil }) {

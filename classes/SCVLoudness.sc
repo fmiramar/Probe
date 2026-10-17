@@ -53,10 +53,10 @@ SCVLoudnessView {
 	}
 
 	prBuildUI { |w, h|
-		var fs = theme.fontScale ? 1.0;
-		var btnTargetH = (24 * fs).max(22).min(34).round.asInteger;
-		var btnTargetW = (120 * fs).max(104).round.asInteger;
-		var topOffset = (btnTargetH + 8).max(28).round.asInteger;
+		var fs = theme.fontScale ? 1.25;
+		var btnTargetH = (20 * fs).max(20).min(26).round.asInteger;
+		var btnTargetW = (88 * fs).clip(88, 112).round.asInteger;
+		var topOffset = (btnTargetH + 6).max(26).round.asInteger;
 		var meterW = (w * 0.38).clip(130, 220);
 		var readoutW = (w - meterW - 20).max(120);
 
@@ -81,7 +81,7 @@ SCVLoudnessView {
 			var mw = uv.bounds.width;
 			var mh = uv.bounds.height - 24; // Leave room for M, S, I labels
 			var minLUFS = -54.0, maxLUFS = 0.0;
-			var rulerW = (32 * (theme.fontScale ? 1.0)).max(32).round.asInteger;
+			var rulerW = (28 * (theme.fontScale ? 1.25)).max(28).round.asInteger;
 			var colW = ((mw - rulerW - 28) / 3).clip(16, 40);
 			var colGap = 8;
 			var startX = rulerW + 6;
@@ -164,12 +164,12 @@ SCVLoudnessView {
 	}
 
 	prBuildReadouts { |rw, rh|
-		var fs = theme.fontScale ? 1.0;
-		var btnResetH = (24 * fs).max(22).min(36).round.asInteger;
+		var fs = theme.fontScale ? 1.25;
+		var btnResetH = (20 * fs).max(20).min(26).round.asInteger;
 		var y = 6;
-		var rowH = ((rh - btnResetH - 16) / 6).floor.clip((18 * fs).max(18), (32 * fs).max(30));
+		var rowH = ((rh - btnResetH - 12) / 6).floor.clip((16 * fs).max(16), (28 * fs).max(26));
 		var labelW = (rw * 0.44).clip((68 * fs).max(65), (120 * fs).max(110));
-		var valW = (rw - labelW - 18).max(30);
+		var valW = (rw - labelW - 14).max(30);
 
 		// Helper to create a readout row
 		var addRow = { |title, initialVal, isHighlight=false|
@@ -206,17 +206,17 @@ SCVLoudnessView {
 	}
 
 	prHandleResize { |w, h|
-		var fs = theme.fontScale ? 1.0;
-		var btnTargetH = (24 * fs).max(22).min(34).round.asInteger;
-		var btnTargetW = (120 * fs).max(104).round.asInteger;
-		var topOffset = (btnTargetH + 8).max(28).round.asInteger;
+		var fs = theme.fontScale ? 1.25;
+		var btnTargetH = (20 * fs).max(20).min(26).round.asInteger;
+		var btnTargetW = (88 * fs).clip(88, 112).round.asInteger;
+		var topOffset = (btnTargetH + 6).max(26).round.asInteger;
 		var contentH = (h - topOffset - 10).max(50);
 		var meterW = (w * 0.38).clip(110, 200);
 		var readoutW = (w - meterW - 18).max(100);
-		var btnResetH = (24 * fs).max(22).min(36).round.asInteger;
-		var rowH = ((contentH - btnResetH - 16) / 6).floor.clip((18 * fs).max(18), (32 * fs).max(30));
+		var btnResetH = (20 * fs).max(20).min(26).round.asInteger;
+		var rowH = ((contentH - btnResetH - 12) / 6).floor.clip((16 * fs).max(16), (28 * fs).max(26));
 		var labelW = (readoutW * 0.44).clip((68 * fs).max(65), (120 * fs).max(110));
-		var valW = (readoutW - labelW - 18).max(30);
+		var valW = (readoutW - labelW - 14).max(30);
 
 		if (isClosed.not and: { meterView.notNil } and: { readoutView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);

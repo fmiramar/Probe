@@ -32,7 +32,7 @@ SCVMeterView {
 		var th = SCVTheme.get(theme);
 		var mw = th.meterWidth;
 		var gw = th.gapWidth;
-		var rulerW = (24 * (th.fontScale ? 1.0)).max(24).round.asInteger;
+		var rulerW = (22 * (th.fontScale ? 1.25)).max(22).round.asInteger;
 		var pad = 16;
 		var divW = if ((numIns > 0) and: { numOuts > 0 }) { 12 } { 0 };
 		^(rulerW * 2) + pad + ((numIns + numOuts) * (mw + gw)) + divW;
@@ -68,11 +68,11 @@ SCVMeterView {
 		var mw = theme.meterWidth;
 		var gw = theme.gapWidth;
 		var fs = theme.fontSize;
-		var fScale = theme.fontScale ? 1.0;
-		var rulerW = (24 * fScale).max(24).round.asInteger;
-		var headerH = (18 * fScale).max(18).round.asInteger;
-		var labelH = (16 * fScale).max(14).round.asInteger;
-		var topOffset = headerH + 6;
+		var fScale = theme.fontScale ? 1.25;
+		var rulerW = (22 * fScale).max(22).round.asInteger;
+		var headerH = (16 * fScale).max(16).round.asInteger;
+		var labelH = (14 * fScale).max(14).round.asInteger;
+		var topOffset = headerH + 4;
 		var h = totalHeight ?? { view.bounds.height };
 		var meterH = (h - topOffset - labelH - 8).max(40);
 		var curX = 6;
@@ -225,11 +225,11 @@ SCVMeterView {
 	}
 
 	prHandleResize { |w, h|
-		var fScale = theme.fontScale ? 1.0;
-		var rulerW = (24 * fScale).max(24).round.asInteger;
-		var headerH = (18 * fScale).max(18).round.asInteger;
-		var labelH = (16 * fScale).max(14).round.asInteger;
-		var topOffset = headerH + 6;
+		var fScale = theme.fontScale ? 1.25;
+		var rulerW = (22 * fScale).max(22).round.asInteger;
+		var headerH = (16 * fScale).max(16).round.asInteger;
+		var labelH = (14 * fScale).max(14).round.asInteger;
+		var topOffset = headerH + 4;
 		var pad = 16;
 		var gw = theme.gapWidth;
 		var divW = if ((numIns > 0) and: { numOuts > 0 }) { 12 } { 0 };

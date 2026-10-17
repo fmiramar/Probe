@@ -41,13 +41,13 @@ SCVDashboardView {
 
 	prBuildUI { |w, h, numIns, numOuts, busIndex|
 		var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome];
-		var fs = theme.fontScale ? 1.0;
-		var btnH = (26 * fs).max(24).min(38).round.asInteger;
-		var topH = btnH + 12;
-		var panelH = ((h - topH - 24) / 2).floor;
+		var fs = theme.fontScale ? 1.25;
+		var btnH = (22 * fs).max(22).min(28).round.asInteger;
+		var topH = btnH + 8;
+		var panelH = ((h - topH - 20) / 2).floor;
 		var meterW = (w * 0.17).clip((130 * fs).max(120), (260 * fs).max(240));
-		var midW = (((w - meterW - 36) / 2).floor).max(80);
-		var rightW = (w - meterW - midW - 36).max(80);
+		var midW = (((w - meterW - 32) / 2).floor).max(80);
+		var rightW = (w - meterW - midW - 32).max(80);
 
 		// 1. Top Control Bar (bounds will be set in prHandleResize)
 		txtTitle = StaticText(view, Rect(0, 0, 10, 10))
@@ -138,83 +138,83 @@ SCVDashboardView {
 	}
 
 	prHandleResize { |w, h|
-		var fs = theme.fontScale ? 1.0;
-		var btnH = (26 * fs).max(24).min(38).round.asInteger;
-		var topH = btnH + 12;
+		var fs = theme.fontScale ? 1.25;
+		var btnH = (22 * fs).max(22).min(28).round.asInteger;
+		var topH = btnH + 8;
 		var curY = ((topH - btnH) * 0.5).round.asInteger;
 		var curX = 10;
 
-		var titleW = (130 * fs).clip(130, 185).round.asInteger;
-		var lblThemeW = (38 * fs).clip(36, 46).round.asInteger;
-		var themeW = (92 * fs).clip(90, 118).round.asInteger;
-		var lblTargetW = (38 * fs).clip(36, 46).round.asInteger;
-		var targetW = (116 * fs).clip(114, 142).round.asInteger;
-		var lblFontW = (28 * fs).clip(26, 36).round.asInteger;
-		var fontW = (62 * fs).clip(60, 80).round.asInteger;
-		var freezeW = (86 * fs).clip(84, 106).round.asInteger;
+		var titleW = (145 * fs).clip(145, 195).round.asInteger;
+		var lblThemeW = (32 * fs).clip(32, 42).round.asInteger;
+		var themeW = (76 * fs).clip(76, 96).round.asInteger;
+		var lblTargetW = (34 * fs).clip(34, 44).round.asInteger;
+		var targetW = (94 * fs).clip(94, 118).round.asInteger;
+		var lblFontW = (24 * fs).clip(24, 32).round.asInteger;
+		var fontW = (48 * fs).clip(48, 62).round.asInteger;
+		var freezeW = (72 * fs).clip(72, 90).round.asInteger;
 
-		var panelH = ((h - topH - 24) / 2).floor.max(60);
+		var panelH = ((h - topH - 20) / 2).floor.max(60);
 		var meterW = (w * 0.17).clip((130 * fs).max(120), (260 * fs).max(240));
-		var midW = (((w - meterW - 36) / 2).floor).max(80);
-		var rightW = (w - meterW - midW - 36).max(80);
+		var midW = (((w - meterW - 32) / 2).floor).max(80);
+		var rightW = (w - meterW - midW - 32).max(80);
 
 		if (isClosed.not) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 
 			if (txtTitle.notNil) {
 				txtTitle.bounds = Rect(curX, curY, titleW, btnH);
-				curX = curX + titleW + 6;
+				curX = curX + titleW + 5;
 			};
 			if (lblTheme.notNil) {
 				lblTheme.bounds = Rect(curX, curY, lblThemeW, btnH);
-				curX = curX + lblThemeW + 3;
+				curX = curX + lblThemeW + 2;
 			};
 			if (themeMenu.notNil) {
 				themeMenu.bounds = Rect(curX, curY, themeW, btnH);
-				curX = curX + themeW + 8;
+				curX = curX + themeW + 6;
 			};
 			if (lblTarget.notNil) {
 				lblTarget.bounds = Rect(curX, curY, lblTargetW, btnH);
-				curX = curX + lblTargetW + 3;
+				curX = curX + lblTargetW + 2;
 			};
 			if (targetMenu.notNil) {
 				targetMenu.bounds = Rect(curX, curY, targetW, btnH);
-				curX = curX + targetW + 8;
+				curX = curX + targetW + 6;
 			};
 			if (lblFont.notNil) {
 				lblFont.bounds = Rect(curX, curY, lblFontW, btnH);
-				curX = curX + lblFontW + 3;
+				curX = curX + lblFontW + 2;
 			};
 			if (fontMenu.notNil) {
 				fontMenu.bounds = Rect(curX, curY, fontW, btnH);
-				curX = curX + fontW + 8;
+				curX = curX + fontW + 6;
 			};
 			if (freezeBtn.notNil) {
 				freezeBtn.bounds = Rect(curX, curY, freezeW, btnH);
-				curX = curX + freezeW + 10;
+				curX = curX + freezeW + 8;
 			};
 			if (txtBrokerStatus.notNil) {
 				txtBrokerStatus.bounds = Rect(curX, curY, (w - curX - 10).max(60), btnH);
 			};
 
 			if (meterView.notNil and: { meterView.view.notNil }) {
-				meterView.view.bounds = Rect(10, topH + 8, meterW, h - topH - 16);
-				meterView.prHandleResize(meterW, h - topH - 16);
+				meterView.view.bounds = Rect(8, topH + 6, meterW, h - topH - 14);
+				meterView.prHandleResize(meterW, h - topH - 14);
 			};
 			if (scopeView.notNil and: { scopeView.view.notNil }) {
-				scopeView.view.bounds = Rect(meterW + 18, topH + 8, midW, panelH);
+				scopeView.view.bounds = Rect(meterW + 14, topH + 6, midW, panelH);
 				scopeView.prHandleResize(midW, panelH);
 			};
 			if (spectrumView.notNil and: { spectrumView.view.notNil }) {
-				spectrumView.view.bounds = Rect(meterW + 18, topH + 16 + panelH, midW, panelH);
+				spectrumView.view.bounds = Rect(meterW + 14, topH + 12 + panelH, midW, panelH);
 				spectrumView.prHandleResize(midW, panelH);
 			};
 			if (loudnessView.notNil and: { loudnessView.view.notNil }) {
-				loudnessView.view.bounds = Rect(meterW + midW + 26, topH + 8, rightW, panelH);
+				loudnessView.view.bounds = Rect(meterW + midW + 20, topH + 6, rightW, panelH);
 				loudnessView.prHandleResize(rightW, panelH);
 			};
 			if (vectorscopeView.notNil and: { vectorscopeView.view.notNil }) {
-				vectorscopeView.view.bounds = Rect(meterW + midW + 26, topH + 16 + panelH, rightW, panelH);
+				vectorscopeView.view.bounds = Rect(meterW + midW + 20, topH + 12 + panelH, rightW, panelH);
 				vectorscopeView.prHandleResize(rightW, panelH);
 			};
 		};

@@ -56,7 +56,7 @@ SCVScopeView {
 	}
 
 	prBuildUI { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
 		var scopeRect = Rect(10, topOffset, (w - 20).max(50), (h - topOffset - 10).max(50));
@@ -120,7 +120,7 @@ SCVScopeView {
 	}
 
 	prHandleResize { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
 		var scopeRect = Rect(10, topOffset, (w - 20).max(50), (h - topOffset - 10).max(50));

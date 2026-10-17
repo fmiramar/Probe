@@ -57,7 +57,7 @@ SCVSpectrumView {
 	}
 
 	prBuildUI { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
 		var ox = (28 * fs).max(28).round.asInteger;
@@ -80,7 +80,7 @@ SCVSpectrumView {
 		gridOverlay = UserView(view, Rect(8, topOffset, w - 16, scopeH));
 		gridOverlay.canFocus = false;
 		gridOverlay.drawFunc = { |uv|
-			var curOx = (28 * (theme.fontScale ? 1.0)).max(28).round.asInteger;
+			var curOx = (28 * (theme.fontScale ? 1.25)).max(28).round.asInteger;
 			var curW = uv.bounds.width - curOx, curH = uv.bounds.height;
 			Pen.strokeColor = theme.grid;
 			Pen.width = 1;
@@ -100,7 +100,12 @@ SCVSpectrumView {
 			// Vertical Frequency grid lines
 			if (freqMode == 1) {
 				// Logarithmic
-				[100, 250, 500, 1000, 2500, 5000, 10000, 20000].do { |freq|
+				var freqs = if ((theme.fontScale ? 1.0) > 1.2) {
+					[100, 500, 1000, 5000, 10000, 20000]
+				} {
+					[100, 250, 500, 1000, 2500, 5000, 10000, 20000]
+				};
+				freqs.do { |freq|
 					var nyq = server.sampleRate * 0.5;
 					var normX = (freq / 20.0).log / (nyq / 20.0).log;
 					var x = curOx + (normX.clip(0, 1) * curW);
@@ -146,7 +151,7 @@ SCVSpectrumView {
 	}
 
 	prHandleResize { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
 		var ox = (28 * fs).max(28).round.asInteger;

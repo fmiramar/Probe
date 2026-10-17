@@ -73,10 +73,10 @@ SCVSpectrogramView {
 		};
 	}
 	prBuildUI { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
-		var rulerW = (32 * fs).max(32).round.asInteger;
+		var rulerW = (28 * fs).max(28).round.asInteger;
 		var canvasW = (w - rulerW - 16).max(50);
 		var canvasH = (h - topOffset - 10).max(50);
 
@@ -125,10 +125,10 @@ SCVSpectrogramView {
 	}
 
 	prHandleResize { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
-		var rulerW = (32 * fs).max(32).round.asInteger;
+		var rulerW = (28 * fs).max(28).round.asInteger;
 		var canvasW = (w - rulerW - 16).max(50);
 		var canvasH = (h - topOffset - 10).max(50);
 		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {

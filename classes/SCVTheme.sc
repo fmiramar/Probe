@@ -7,7 +7,7 @@
 SCVTheme {
 	classvar <themes;
 	classvar <>current;
-	classvar <>defaultFontScale = 1.0;
+	classvar <>defaultFontScale = 1.25;
 
 	var <name;
 	var <background, <panelBackground;

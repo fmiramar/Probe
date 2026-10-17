@@ -49,10 +49,10 @@ SCVHistoryView {
 	}
 
 	prBuildUI { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
-		var rulerW = (30 * fs).max(30).round.asInteger;
+		var rulerW = (26 * fs).max(26).round.asInteger;
 		var canvasRect = Rect(rulerW + 6, topOffset, (w - rulerW - 16).max(50), (h - topOffset - 10).max(50));
 
 		userView = UserView(view, canvasRect);
@@ -178,10 +178,10 @@ SCVHistoryView {
 	}
 
 	prHandleResize { |w, h|
-		var fs = theme.fontScale ? 1.0;
+		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
-		var rulerW = (30 * fs).max(30).round.asInteger;
+		var rulerW = (26 * fs).max(26).round.asInteger;
 		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			if (txtTitle.notNil) {
