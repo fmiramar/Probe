@@ -1,0 +1,28 @@
+feature,implemented,existing_file,existing_API,backend,tests,performance,proposed_change,risk
+ServerMeter,implemented,classes/SCVMeter.sc,SCVisuals.meter,Broker SendReply.kr,tests/SCVMeter_unittest.scd,<0.3% CPU 15-30Hz,Add s.meter2 shortcut and Probe.meter facade,low
+Waveform Scope,implemented,classes/SCVScope.sc,SCVisuals.scope,ScopeOut2/ScopeView,tests/SCVScope_unittest.scd,<0.4% CPU 30fps,Add s.scope2 shortcut and Probe.scope facade,low
+Spectrum Analyzer,implemented,classes/SCVSpectrum.sc,SCVisuals.spectrum,FFT 2048 raw scan,tests/SCVSpectrum_unittest.scd,<0.5% CPU 30fps,Add s.spectrum / s.freqscope2 shortcut,low
+Spectrogram,implemented,classes/SCVSpectrogram.sc,SCVisuals.spectrogram,FFT ring-buffer Image,tests/SCVSpectrogram_unittest.scd,<0.5% CPU 25fps,Add s.spectrogram shortcut,low
+2.5D Waterfall,implemented,classes/SCVWaterfall.sc,SCVisuals.waterfall,FFT frame buffer UserView,manual visual tests,<0.6% CPU 25fps,Add s.waterfall shortcut,low
+BS.1770 Loudness Meter,implemented,classes/SCVLoudness.sc,SCVisuals.loudness,K-weighted filter SendReply.kr,tests/SCVLoudness_unittest.scd,<0.5% CPU 15Hz,Add s.loudness shortcut,low
+Lissajous Vectorscope,implemented,classes/SCVVectorscope.sc,SCVisuals.vectorscope,ScopeOut2 X/Y + phase correlation,tests/SCVDashboard_unittest.scd,<0.4% CPU 30fps,Add s.vectorscope shortcut,low
+Multi-Panel Dashboard,implemented,classes/SCVDashboard.sc,SCVisuals.dashboard,CompositeView 5-panel grid,tests/SCVDashboard_unittest.scd,<0.8% CPU total,Add s.dashboard shortcut,low
+Numerical History,implemented,classes/SCVHistory.sc,SCVisuals.history,Ring buffer UserView,manual visual tests,<0.4% CPU 25Hz,Integrate as kr trace engine,low
+Theme Engine,implemented,classes/SCVTheme.sc,SCVTheme.get,Immutable copy-on-write,tests/SCVTheme_unittest.scd,Zero DSP overhead,Add ProbeTheme alias,low
+Telemetry Broker,implemented,classes/SCVBroker.sc,SCVBroker.default,Singleton ref-counted synth transport,tests/SCVBroker_unittest.scd,Zero leak on release,Retain as core engine,low
+Probe Public Facade,missing,None,None,Delegates to SCV modules,None,Zero overhead,Introduce Probe class facade,low
+Server Shortcuts (s.meter2 etc),missing,None,None,Extension on Server,None,Zero overhead,Add +Server non-conflicting methods,low
+UGen.trace Audio Waveform,missing,None,None,Diagnostic bus + ScopeView,None,Measured per tap,Implement UGen:trace for ar signals,medium
+UGen.trace Control History,missing,None,None,SendReply.kr + HistoryView,None,Bounded 10-20Hz,Implement UGen:trace for kr signals,medium
+Spectral Band Analyzer,partial,classes/SCVSpectrum.sc,SCVisuals.spectrum,FFT 2048,tests/SCVSpectrum_unittest.scd,<0.5% CPU,Expose dedicated FFT-bin band mode,medium
+Advanced Spectral Dashboard,missing,None,None,Shared spectral broker,None,Demand-driven,New dashboard panel preset,medium
+Spectral Centroid History,missing,None,None,SpecCentroid or FFT bins,None,Scalar telemetry,Add to Advanced Spectral Dashboard,low
+Spectral Flatness History,missing,None,None,SpecFlatness or FFT bins,None,Scalar telemetry,Add to Advanced Spectral Dashboard,low
+Spectral Flux / Onset Timeline,missing,None,None,Successive FFT frame diff,None,Scalar telemetry,Add to Advanced Spectral Dashboard,medium
+Spectral Roll-off,missing,None,None,SpecPcile or FFT bins,None,Scalar telemetry,Add to Advanced Spectral Dashboard,low
+Chromagram (12-TET),missing,None,None,FFT-to-chroma bin mapping,None,Scalar vector,Add to Advanced Spectral Dashboard,medium
+Pitch & Harmonic Tracker,missing,None,None,Pitch.kr or Tartini,None,Scalar telemetry,Add to Advanced Spectral Dashboard,medium
+Multi-Resolution Spectrogram,missing,None,None,Dual FFT windows (512/2048),None,Bounded dual FFT,Add to Advanced Spectral Dashboard,medium
+Spectral Comparison / Difference,missing,None,None,Dual-bus FFT frame comparison,None,Dual FFT transport,Add to Advanced Spectral Dashboard,medium
+Scope Tier A Grids & Axes,implemented,classes/SCVScope.sc,SCVScope.new,Calibrated UserView overlay,tests/SCVScope_unittest.scd,Zero DSP overhead,Refine cursor readouts,low
+Scope Tier B Trigger & Persistence,missing,None,None,Native buffer scan / decaying traces,None,To be benchmarked,Implement trigger & persistence,medium
