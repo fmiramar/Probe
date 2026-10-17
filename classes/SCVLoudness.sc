@@ -46,7 +46,10 @@ SCVLoudnessView {
 		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
-		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
+		view.onResize = { |v|
+			var b = if (v.notNil and: { v.isClosed.not }) { v.bounds };
+			if (b.notNil and: { isClosed.not }) { this.prHandleResize(b.width, b.height) };
+		};
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prSubscribeSource;
@@ -218,7 +221,7 @@ SCVLoudnessView {
 		var labelW = (readoutW * 0.44).clip((68 * fs).max(65), (120 * fs).max(110));
 		var valW = (readoutW - labelW - 14).max(30);
 
-		if (isClosed.not and: { meterView.notNil } and: { readoutView.notNil }) {
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { meterView.notNil } and: { readoutView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			if (txtTitle.notNil) {
 				txtTitle.bounds = Rect(12, 4, (w - btnTargetW - 20).max(80), btnTargetH);
@@ -389,11 +392,15 @@ SCVLoudness {
 		var s = server ?? { Server.default };
 		var w = 440, h = 290;
 
-		window = Window(s.name ++ " Loudness Meter — SCVisuals", Rect(360, 240, w, h));
+		window = Window(s.name ++ " Loudness Meter — Probe", Rect(360, 240, w, h));
 		loudnessView = SCVLoudnessView(s, window, Rect(0, 0, w, h), busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
 		window.view.background = loudnessView.theme.background;
 
-		window.view.onResize = { |v| loudnessView.prHandleResize(v.bounds.width, v.bounds.height) };
+		window.view.onResize = { |v|
+			if (v.notNil and: { v.isClosed.not } and: { v.bounds.notNil } and: { loudnessView.notNil } and: { loudnessView.isClosed.not }) {
+				loudnessView.prHandleResize(v.bounds.width, v.bounds.height);
+			};
+		};
 		window.onClose = { loudnessView.stop };
 		window.front;
 	}

@@ -176,7 +176,38 @@ This document serves as the persistent historical record of all development iter
   4. **Phase II Roadmap Alignment:**
      - Suite transitioning to **Probe** branding per `Probe_Phase_II_Agentic_Implementation_Plan.md`.
      - Preserving existing stable classes while preparing non-conflicting Server shortcuts (`s.meter2`, `s.scope2`, `s.freqscope2`, `s.spectralDashboard`) and graph-time transparent `.trace`.
-- **Deliverables:** `docs/PROJECT_ITERATION_LOG.md`, `docs/phase-reports/P12-REPORT.md`, Commit pending.
+- **Deliverables:** `docs/PROJECT_ITERATION_LOG.md`, `docs/phase-reports/P12-REPORT.md`, Commit `74c2d3c`.
+
+---
+
+### Iteration 13: Phase II Gate G0 Discovery & Namespace Audit
+- **Focus:** Complete codebase inventory, symbol collision analysis, transport audit, and baseline benchmarking before initiating Phase II changes.
+- **Key Findings & Discoveries:**
+  1. **Namespace Clearance:** `Probe` is 100% free with 0 collisions. `Monitor` is a hard collision with JITLib core (`InBus.sc`) and is permanently rejected.
+  2. **Core Server Invariants:** `s.meter`, `s.scope`, and `s.freqscope` are core methods. Non-conflicting shortcuts `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard`, `s.spectralDashboard` are 100% free.
+  3. **Baseline Resource Usage:** Idle CPU is 0.00% (0 nodes). Full dashboard is 0.42% net audio CPU with 0 leaks across open/close cycles.
+  4. **Cleaned Stale Artifacts:** Purged stale cached help file `~/Library/Application Support/SuperCollider/Help/Classes/SCVisuals.html`. Verified no duplicates in `Extensions/` or `downloaded-quarks/`.
+- **Deliverables:** `docs/phase2/existing-state.md`, `docs/phase2/feature-inventory.csv`, `docs/phase2/namespace-audit.md`, `docs/phase2/architecture-and-transport.md`, `benchmarks/phase2-baseline/results.md`, `docs/phase2/compatibility-fixtures.md`, Commit `f8c7b93`.
+
+---
+
+### Iteration 14: Phase II Stage P1 — Public API, Probe Facade & Server Extensions
+- **Focus:** Establishing the `Probe` facade, non-conflicting `Server` convenience methods, and updating window titles while preserving vanilla SC methods.
+- **Key Decisions & Changes:**
+  1. **`Probe` Class Facade (`classes/Probe.sc`):**
+     - Single top-level entry point for all 9 visualizers, themes, broker, and font scaling (`Probe.meter`, `Probe.scope`, `Probe.freqscope`, `Probe.dashboard`, etc.).
+  2. **Server Class Extensions (`classes/extServerProbe.sc`):**
+     - Added `s.meter2`, `s.scope2`, `s.freqscope2`, `s.spectrum`, `s.spectrum2`, `s.spectrogram`, `s.waterfall`, `s.history`, `s.loudness`, `s.vectorscope`, `s.dashboard`, `s.spectralDashboard`, `s.bandAnalyzer`.
+     - Zero alterations to core vanilla `s.meter`, `s.scope`, `s.freqscope`.
+  3. **Branding & Window Titles:**
+     - Updated all visualizer window titles to `" ... — Probe"` and dashboard title to `"PROBE DASHBOARD"`.
+     - Created `Probe.quark` (v0.2.0) and updated `SCVisuals.quark`.
+  4. **Qt Teardown Hardening:**
+     - Added defensive `isClosed.not` and `bounds.notNil` checks in `view.onResize` across all visualizers, eliminating transient Qt teardown warnings.
+  5. **Verification & Tests:**
+     - Created `tests/Probe_P1_unittest.scd` (39 assertions passed cleanly).
+     - Executed full master test suite (`tests/run_all_tests.scd`): 10/10 suites passed cleanly.
+- **Deliverables:** `classes/Probe.sc`, `classes/extServerProbe.sc`, `Probe.quark`, `tests/Probe_P1_unittest.scd`, `examples/phase2/01_server_shortcuts.scd`, `reports/phase2/P1.md`.
 
 ---
 
@@ -184,9 +215,11 @@ This document serves as the persistent historical record of all development iter
 
 | Parameter / Feature | Chosen Design | Rationale | Invariant Status |
 |---|---|---|---|
-| **Suite Name** | `Probe` (migrating from `SCVisuals`) | Professional instrumentation terminology; avoids `SC` legacy namespace clutter and collision with core `Monitor`. | In Progress (Phase II) |
+| **Suite Name** | `Probe` (migrating from `SCVisuals`) | Professional instrumentation terminology; avoids `SC` legacy namespace clutter and collision with core `Monitor`. | Active Invariant (Phase II) |
 | **Default Font Scale** | `1.25` (125%) | Optimum balance of legibility on modern high-DPI retina displays without overflowing panels. | Active Invariant |
 | **Control Layout** | Tight (28px buttons at 1.25, 4–6px gaps) | Sleek laboratory instrument aesthetic; eliminates bloated dead space. | Active Invariant |
 | **FFT Smoothing** | Raw FFT scan (no PV smoothing) | PV smoothing introduced smearing and edge ripples; raw FFT preserves instant transient response. | Active Invariant |
 | **Telemetry Transport** | `SCVBroker` Reference-Counted Synths | Prevents duplicate FFT/peak-RMS synths on identical bus monitoring. | Active Invariant |
 | **Core SC Overrides** | Forbidden (`s.meter`, `s.scope`, `s.freqscope` unchanged) | Strict non-interference with vanilla SuperCollider workflows. | Permanent Invariant |
+| **Server Shortcuts** | `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard` | Non-conflicting ergonomic shortcuts following SuperCollider numbering conventions. | Active Invariant |
+

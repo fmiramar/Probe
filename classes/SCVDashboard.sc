@@ -33,7 +33,10 @@ SCVDashboardView {
 		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
-		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
+		view.onResize = { |v|
+			var b = if (v.notNil and: { v.isClosed.not }) { v.bounds };
+			if (b.notNil and: { isClosed.not }) { this.prHandleResize(b.width, b.height) };
+		};
 
 		this.prBuildUI(rect.width, rect.height, numIns, numOuts, busIndex);
 		this.prStartTelemetry;
@@ -51,7 +54,7 @@ SCVDashboardView {
 
 		// 1. Top Control Bar (bounds will be set in prHandleResize)
 		txtTitle = StaticText(view, Rect(0, 0, 10, 10))
-			.string_("SCVisuals DASHBOARD")
+			.string_("PROBE DASHBOARD")
 			.font_(theme.font(10, bold: true))
 			.stringColor_(theme.text);
 
@@ -158,7 +161,7 @@ SCVDashboardView {
 		var midW = (((w - meterW - 32) / 2).floor).max(80);
 		var rightW = (w - meterW - midW - 32).max(80);
 
-		if (isClosed.not) {
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 
 			if (txtTitle.notNil) {
@@ -340,11 +343,15 @@ SCVDashboard {
 		var s = server ?? { Server.default };
 		var w = 1020, h = 600;
 
-		window = Window(s.name ++ " Unified Audio Analysis Dashboard — SCVisuals", Rect(100, 100, w, h));
+		window = Window(s.name ++ " Unified Audio Analysis Dashboard — Probe", Rect(100, 100, w, h));
 		dashboardView = SCVDashboardView(s, window, Rect(0, 0, w, h), numIns, numOuts, busIndex, theme, targetLUFS);
 		window.view.background = dashboardView.theme.background;
 
-		window.view.onResize = { |v| dashboardView.prHandleResize(v.bounds.width, v.bounds.height) };
+		window.view.onResize = { |v|
+			if (v.notNil and: { v.isClosed.not } and: { v.bounds.notNil } and: { dashboardView.notNil } and: { dashboardView.isClosed.not }) {
+				dashboardView.prHandleResize(v.bounds.width, v.bounds.height);
+			};
+		};
 		window.onClose = { dashboardView.stop };
 		window.front;
 	}

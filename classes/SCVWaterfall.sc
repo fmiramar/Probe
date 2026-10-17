@@ -38,7 +38,10 @@ SCVWaterfallView {
 		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
-		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
+		view.onResize = { |v|
+			var b = if (v.notNil and: { v.isClosed.not }) { v.bounds };
+			if (b.notNil and: { isClosed.not }) { this.prHandleResize(b.width, b.height) };
+		};
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prSubscribeSource;
@@ -107,7 +110,7 @@ SCVWaterfallView {
 		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
-		if (isClosed.not and: { userView.notNil }) {
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { userView.notNil } and: { userView.isClosed.not }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			if (txtTitle.notNil) {
 				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
@@ -180,10 +183,14 @@ SCVWaterfall {
 		var s = server ?? { Server.default };
 		var w = 460, h = 280;
 
-		window = Window(s.name ++ " Waterfall — SCVisuals", Rect(320, 260, w, h));
+		window = Window(s.name ++ " Waterfall — Probe", Rect(320, 260, w, h));
 		waterfallView = SCVWaterfallView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq, numLines);
 
-		window.view.onResize = { |v| waterfallView.prHandleResize(v.bounds.width, v.bounds.height) };
+		window.view.onResize = { |v|
+			if (v.notNil and: { v.isClosed.not } and: { v.bounds.notNil } and: { waterfallView.notNil } and: { waterfallView.isClosed.not }) {
+				waterfallView.prHandleResize(v.bounds.width, v.bounds.height);
+			};
+		};
 		window.onClose = { waterfallView.stop };
 		window.front;
 	}

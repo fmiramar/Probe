@@ -47,7 +47,10 @@ SCVSpectrogramView {
 		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
-		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
+		view.onResize = { |v|
+			var b = if (v.notNil and: { v.isClosed.not }) { v.bounds };
+			if (b.notNil and: { isClosed.not }) { this.prHandleResize(b.width, b.height) };
+		};
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prSubscribeSource;
@@ -131,7 +134,7 @@ SCVSpectrogramView {
 		var rulerW = (28 * fs).max(28).round.asInteger;
 		var canvasW = (w - rulerW - 16).max(50);
 		var canvasH = (h - topOffset - 10).max(50);
-		if (isClosed.not and: { userView.notNil } and: { axisView.notNil }) {
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { userView.notNil } and: { userView.isClosed.not } and: { axisView.notNil } and: { axisView.isClosed.not }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			if (txtTitle.notNil) {
 				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
@@ -225,11 +228,15 @@ SCVSpectrogram {
 		var s = server ?? { Server.default };
 		var w = 460, h = 240;
 
-		window = Window(s.name ++ " Spectrogram — SCVisuals", Rect(300, 280, w, h));
+		window = Window(s.name ++ " Spectrogram — Probe", Rect(300, 280, w, h));
 		spectrogramView = SCVSpectrogramView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq);
 		window.view.background = spectrogramView.theme.background;
 
-		window.view.onResize = { |v| spectrogramView.prHandleResize(v.bounds.width, v.bounds.height) };
+		window.view.onResize = { |v|
+			if (v.notNil and: { v.isClosed.not } and: { v.bounds.notNil } and: { spectrogramView.notNil } and: { spectrogramView.isClosed.not }) {
+				spectrogramView.prHandleResize(v.bounds.width, v.bounds.height);
+			};
+		};
 		window.onClose = { spectrogramView.stop };
 		window.front;
 	}

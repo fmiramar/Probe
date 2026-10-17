@@ -46,7 +46,10 @@ SCVScopeView {
 		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
-		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
+		view.onResize = { |v|
+			var b = if (v.notNil and: { v.isClosed.not }) { v.bounds };
+			if (b.notNil and: { isClosed.not }) { this.prHandleResize(b.width, b.height) };
+		};
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prStartAnalysis;
@@ -124,7 +127,7 @@ SCVScopeView {
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
 		var scopeRect = Rect(10, topOffset, (w - 20).max(50), (h - topOffset - 10).max(50));
-		if (isClosed.not and: { scopeView.notNil } and: { gridOverlay.notNil }) {
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { scopeView.notNil } and: { scopeView.isClosed.not } and: { gridOverlay.notNil } and: { gridOverlay.isClosed.not }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			if (txtTitle.notNil) {
 				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
@@ -291,11 +294,15 @@ SCVScope {
 		var s = server ?? { Server.default };
 		var w = 400, h = 250;
 
-		window = Window(s.name ++ " Scope — SCVisuals", Rect(120, 200, w, h));
+		window = Window(s.name ++ " Scope — Probe", Rect(120, 200, w, h));
 		scopeView = SCVScopeView(s, window, Rect(0, 0, w, h), busIndex, numChannels, theme, rate, style, bufSize);
 		window.view.background = scopeView.theme.background;
 
-		window.view.onResize = { |v| scopeView.prHandleResize(v.bounds.width, v.bounds.height) };
+		window.view.onResize = { |v|
+			if (v.notNil and: { v.isClosed.not } and: { v.bounds.notNil } and: { scopeView.notNil } and: { scopeView.isClosed.not }) {
+				scopeView.prHandleResize(v.bounds.width, v.bounds.height);
+			};
+		};
 		window.onClose = { scopeView.stop };
 		window.front;
 	}

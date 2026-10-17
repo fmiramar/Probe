@@ -58,7 +58,10 @@ SCVMeterView {
 		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
-		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
+		view.onResize = { |v|
+			var b = if (v.notNil and: { v.isClosed.not }) { v.bounds };
+			if (b.notNil and: { isClosed.not }) { this.prHandleResize(b.width, b.height) };
+		};
 
 		this.prBuildUI(totalWidth, defaultHeight);
 		this.prSubscribeSources;
@@ -239,7 +242,7 @@ SCVMeterView {
 		var meterH = (h - topOffset - labelH - 8).max(40);
 		var curX = 6;
 
-		if (isClosed.not and: { dbRulerView.notNil }) {
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { dbRulerView.notNil }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			// 1. Left ruler
 			dbRulerView.bounds = Rect(curX, topOffset, rulerW, meterH + labelH + 4);
@@ -436,12 +439,16 @@ SCVMeter {
 		numOuts = numOuts ?? { s.options.numOutputBusChannels };
 
 		width = SCVMeterView.getWidth(numIns, numOuts, theme);
-		window = Window(s.name ++ " levels (dBFS) — SCVisuals", Rect(100, 200, width, SCVMeterView.defaultHeight));
+		window = Window(s.name ++ " levels (dBFS) — Probe", Rect(100, 200, width, SCVMeterView.defaultHeight));
 
 		meterView = SCVMeterView(s, window, 0@0, numIns, numOuts, theme, density, meterStyle);
 		window.view.background = meterView.theme.background;
 
-		window.view.onResize = { |v| meterView.prHandleResize(v.bounds.width, v.bounds.height) };
+		window.view.onResize = { |v|
+			if (v.notNil and: { v.isClosed.not } and: { v.bounds.notNil } and: { meterView.notNil } and: { meterView.isClosed.not }) {
+				meterView.prHandleResize(v.bounds.width, v.bounds.height);
+			};
+		};
 		window.onClose = { meterView.stop };
 		window.front;
 	}

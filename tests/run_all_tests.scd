@@ -12,7 +12,8 @@ var testFiles = [
 	"tests/SCVSpectrum_unittest.scd",
 	"tests/SCVSpectrogram_unittest.scd",
 	"tests/SCVLoudness_unittest.scd",
-	"tests/SCVDashboard_unittest.scd"
+	"tests/SCVDashboard_unittest.scd",
+	"tests/Probe_P1_unittest.scd"
 ];
 
 var suitePassed = 0, suiteFailed = 0;

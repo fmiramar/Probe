@@ -47,7 +47,10 @@ SCVSpectrumView {
 		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
-		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
+		view.onResize = { |v|
+			var b = if (v.notNil and: { v.isClosed.not }) { v.bounds };
+			if (b.notNil and: { isClosed.not }) { this.prHandleResize(b.width, b.height) };
+		};
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prStartAnalysis;
@@ -159,7 +162,7 @@ SCVSpectrumView {
 		var scopeW = (w - scopeLeft - 12).max(50);
 		var scopeH = (h - topOffset - 14).max(50);
 
-		if (isClosed.not and: { scopeView.notNil } and: { gridOverlay.notNil }) {
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { scopeView.notNil } and: { scopeView.isClosed.not } and: { gridOverlay.notNil } and: { gridOverlay.isClosed.not }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			if (txtTitle.notNil) {
 				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
@@ -341,11 +344,15 @@ SCVSpectrum {
 		var s = server ?? { Server.default };
 		var w = 480, h = 260;
 
-		window = Window(s.name ++ " Spectrum Analyzer — SCVisuals", Rect(120, 200, w, h));
+		window = Window(s.name ++ " Spectrum Analyzer — Probe", Rect(120, 200, w, h));
 		spectrumView = SCVSpectrumView(s, window, Rect(0, 0, w, h), busIndex, fftSize, theme, freqMode, dbRange, smoothing);
 		window.view.background = spectrumView.theme.background;
 
-		window.view.onResize = { |v| spectrumView.prHandleResize(v.bounds.width, v.bounds.height) };
+		window.view.onResize = { |v|
+			if (v.notNil and: { v.isClosed.not } and: { v.bounds.notNil } and: { spectrumView.notNil } and: { spectrumView.isClosed.not }) {
+				spectrumView.prHandleResize(v.bounds.width, v.bounds.height);
+			};
+		};
 		window.onClose = { spectrumView.stop };
 		window.front;
 	}

@@ -37,7 +37,10 @@ SCVVectorscopeView {
 		view.resize = 5;
 		view.background = theme.background;
 		view.onClose = { this.stop };
-		view.onResize = { |v| this.prHandleResize(v.bounds.width, v.bounds.height) };
+		view.onResize = { |v|
+			var b = if (v.notNil and: { v.isClosed.not }) { v.bounds };
+			if (b.notNil and: { isClosed.not }) { this.prHandleResize(b.width, b.height) };
+		};
 
 		this.prBuildUI(rect.width, rect.height);
 		this.prInitScope;
@@ -184,7 +187,7 @@ SCVVectorscopeView {
 		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var topOffset = titleH + 6;
-		if (isClosed.not and: { scopeView.notNil } and: { overlayView.notNil }) {
+		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { scopeView.notNil } and: { scopeView.isClosed.not } and: { overlayView.notNil } and: { overlayView.isClosed.not }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
 			if (txtTitle.notNil) {
 				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
@@ -319,11 +322,15 @@ SCVVectorscope {
 		var s = server ?? { Server.default };
 		var w = 340, h = 360;
 
-		window = Window(s.name ++ " Vectorscope — SCVisuals", Rect(340, 240, w, h));
+		window = Window(s.name ++ " Vectorscope — Probe", Rect(340, 240, w, h));
 		vectorscopeView = SCVVectorscopeView(s, window, Rect(0, 0, w, h), busIndex, theme, updateFreq);
 		window.view.background = vectorscopeView.theme.background;
 
-		window.view.onResize = { |v| vectorscopeView.prHandleResize(v.bounds.width, v.bounds.height) };
+		window.view.onResize = { |v|
+			if (v.notNil and: { v.isClosed.not } and: { v.bounds.notNil } and: { vectorscopeView.notNil } and: { vectorscopeView.isClosed.not }) {
+				vectorscopeView.prHandleResize(v.bounds.width, v.bounds.height);
+			};
+		};
 		window.onClose = { vectorscopeView.stop };
 		window.front;
 	}
