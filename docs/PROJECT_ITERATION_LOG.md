@@ -207,7 +207,29 @@ This document serves as the persistent historical record of all development iter
   5. **Verification & Tests:**
      - Created `tests/Probe_P1_unittest.scd` (39 assertions passed cleanly).
      - Executed full master test suite (`tests/run_all_tests.scd`): 10/10 suites passed cleanly.
-- **Deliverables:** `classes/Probe.sc`, `classes/extServerProbe.sc`, `Probe.quark`, `tests/Probe_P1_unittest.scd`, `examples/phase2/01_server_shortcuts.scd`, `reports/phase2/P1.md`.
+- **Deliverables:** `classes/Probe.sc`, `classes/extServerProbe.sc`, `Probe.quark`, `tests/Probe_P1_unittest.scd`, `examples/phase2/01_server_shortcuts.scd`, `reports/phase2/P1.md`, Commit `b0eed8f`.
+
+---
+
+### Iteration 15: Phase II Stage P2 — Transparent Internal-Signal Tracing (`.trace`)
+- **Focus:** Transparent diagnostic taps (`UGen:trace`, `Array:trace`), dual transport (ScopeOut2 for audio, SendReply for control), and automated GUI lifecycle.
+- **Key Decisions & Changes:**
+  1. **Dual Transport Architecture:**
+     - Audio rate (`\audio`): Defaults to `\scope`. Uses private diagnostic bus + hardware-accelerated `ScopeOut2` buffer. Zero network/OSC overhead, true sample-accurate waveform visualization.
+     - Control rate (`\control`): Defaults to `\history`. Uses `SendReply.kr` throttled at 20 Hz. Renders rolling numerical timeline HUD showing current, min, and max values.
+     - Explicit mode overrides supported: `\scope`, `\history`, `\meter`, `\spectrum`.
+  2. **Pass-Through Transparency:**
+     - Wrapped inside `SynthDef.wrap`, returns `this`. The original signal expression is passed to downstream UGens without modification (0 dB gain change, 0 phase shift).
+  3. **Multi-Tap Independence & Cascading:**
+     - Monotonic tap IDs prevent cross-talk.
+     - Window positions cascade dynamically (`+32@+32`), preventing overlap.
+  4. **Leak-Free Lifecycle:**
+     - Closing any trace window or calling `CmdPeriod` cleanly deallocates private buses, scope buffers, synths, and OSC responders.
+  5. **Verification & Benchmarks:**
+     - Conducted transport A/B benchmark (1, 8, 32 probes) comparing Route A and Route B.
+     - Created `tests/Probe_P2_unittest.scd` (22 assertions passed cleanly).
+     - Master test runner (`tests/run_all_tests.scd`): 11/11 suites passed cleanly.
+- **Deliverables:** `classes/ProbeTrace.sc`, `classes/extUGenProbe.sc`, `docs/phase2/trace-architecture.md`, `benchmarks/phase2-p2-transport/benchmark_transport.scd`, `benchmarks/phase2-p2-transport/results.md`, `tests/Probe_P2_unittest.scd`, `examples/phase2/02_ugen_trace_audio.scd`, `examples/phase2/03_ugen_trace_kr.scd`, `examples/phase2/04_ugen_trace_many.scd`, `reports/phase2/P2.md`.
 
 ---
 
@@ -222,4 +244,6 @@ This document serves as the persistent historical record of all development iter
 | **Telemetry Transport** | `SCVBroker` Reference-Counted Synths | Prevents duplicate FFT/peak-RMS synths on identical bus monitoring. | Active Invariant |
 | **Core SC Overrides** | Forbidden (`s.meter`, `s.scope`, `s.freqscope` unchanged) | Strict non-interference with vanilla SuperCollider workflows. | Permanent Invariant |
 | **Server Shortcuts** | `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard` | Non-conflicting ergonomic shortcuts following SuperCollider numbering conventions. | Active Invariant |
+| **Signal Tracing** | Transparent `.trace` with Dual Transport | Sample-accurate waveforms for audio rate, low-bandwidth 20 Hz timeline HUD for control rate. | Active Invariant (Phase II) |
+
 
