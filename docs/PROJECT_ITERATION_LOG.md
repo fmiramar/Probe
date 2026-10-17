@@ -335,6 +335,24 @@ This document serves as the persistent historical record of all development iter
   - Captured live screenshot `docs/screenshots/probe-graph-inspector.png` displaying a 16-UGen, 9-layer synthesis network.
 - **Deliverables:** `classes/ProbeInspector.sc`, `classes/Probe.sc`, `classes/extServerProbe.sc`, `tests/Probe_P5_unittest.scd`, `reports/phase2/P5.md`, Commit `356ca70`.
 
+
+---
+
+### Iteration 20: Stage P6 — Cross-Platform Release, Packaging, Documentation & Final Sign-Off
+- **Focus:** Finalizing packaging, Quark configuration, SuperCollider Help documentation, refreshed README, and completing the Phase II Release Definition of Done audit.
+- **Key Deliverables & Actions:**
+  1. **Documentation & HelpSource:**
+     - Created `HelpSource/Classes/Probe.schelp` detailing all instruments, methods, and signal tracing workflows.
+     - Updated `README.md` with full `Probe` branding, 12-instrument feature table, high-DPI screenshot gallery, quick start, broker architecture, and measurement standards.
+     - Created `examples/phase2/08_dsp_graph_inspector.scd` completing the Phase II example series (8 executable guides).
+  2. **Quark Packaging & Dual-Namespace Compatibility:**
+     - Configured `Probe.quark` and `SCVisuals.quark` at version `0.2.0`, ensuring smooth backwards compatibility for existing code.
+  3. **Master Test Suite Verification:**
+     - Executed all 14 test suites in `tests/run_all_tests.scd`: 14/14 suites passed cleanly (100%).
+  4. **Phase II Release Audit:**
+     - Completed comprehensive audit across all 10 release acceptance criteria in `reports/phase2/P6.md`. Zero regressions, zero memory leaks, and zero audio distortions.
+- **Deliverables:** `README.md`, `HelpSource/Classes/Probe.schelp`, `examples/phase2/08_dsp_graph_inspector.scd`, `reports/phase2/P6.md`, Commit pending.
+
 ---
 
 ## Decision Matrix & Invariant Log
@@ -353,5 +371,6 @@ This document serves as the persistent historical record of all development iter
 | **Oscilloscope Triggering** | DSP Zero-Crossing Latch Buffer | Guarantees drift-free stationary waveforms for periodic signals without external plugins. | Active Invariant (Phase II) |
 | **Unified FreqScope Modes** | Subview Visibility Switching | Seamless single-window transitions between Line, 16-Band, and Spectrogram modes. | Active Invariant (Phase II) |
 | **DSP Graph Inspector** | Static Topological DAG Parsing | Pure sclang evaluation; renders clear signal flow without server messaging overhead or audio thread interference. | Active Invariant (Phase II) |
+| **Packaging & Compatibility** | Dual-Quark Alias (`Probe` + `SCVisuals`) | Seamless migration path ensuring zero broken workflows for existing installations. | Active Invariant (Phase II) |
 
 

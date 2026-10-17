@@ -1,0 +1,95 @@
+TITLE:: Probe
+summary:: Real-time audio visualization, instrumentation, and signal tracing suite for SuperCollider
+categories:: GUI>Visuals
+related:: Classes/SCVisuals, Classes/ProbeSpectralDashboard, Classes/ProbeBandAnalyzer, Classes/ProbeInspector
+
+DESCRIPTION::
+Probe is a professional, high-performance real-time audio visualization and instrumentation suite for SuperCollider.
+It provides precision oscilloscopes with zero-crossing stationary trigger edge locking, logarithmic/linear FFT spectrum analyzers with multi-mode views, ITU-R BS.1770 loudness metering, transparent in-graph signal tracing (link::Classes/UGen#-trace::), multi-preset advanced spectral dashboards, and static DSP graph inspection.
+
+Probe maintains strict non-interference with vanilla SuperCollider core methods (link::Classes/Server#-meter::, link::Classes/Server#-scope::, link::Classes/Server#-freqscope:: are unchanged).
+
+CLASSMETHODS::
+
+METHOD:: meter
+Opens a vertical server meter.
+argument:: server
+The target server.
+argument:: numIns
+Number of input channels.
+argument:: numOuts
+Number of output channels.
+argument:: theme
+Theme symbol.
+
+METHOD:: scope
+Opens a precision oscilloscope with trigger edge stabilization.
+argument:: server
+Target server.
+argument:: busIndex
+Audio bus to monitor.
+argument:: numChannels
+Channel count.
+argument:: theme
+Visual theme.
+argument:: rate
+\audio or \control.
+argument:: style
+\overlay, \tracks, or \xy.
+
+METHOD:: spectrum
+Opens a precision FFT spectrum analyzer with 3-mode switching (\line, \bands, \spectrogram).
+argument:: server
+Target server.
+argument:: busIndex
+Audio bus.
+argument:: fftSize
+FFT size (default 2048).
+argument:: theme
+Visual theme.
+argument:: dbRange
+Decibel dynamic range (default 96).
+argument:: freqMode
+0 for linear, 1 for logarithmic.
+
+METHOD:: spectralDashboard
+Opens the 4-preset advanced spectral dashboard.
+argument:: server
+Target server.
+argument:: busIndex
+Audio bus.
+argument:: theme
+Visual theme.
+
+METHOD:: bandAnalyzer
+Opens the 16-band ISO octave analyzer.
+argument:: server
+Target server.
+argument:: busIndex
+Audio bus.
+
+METHOD:: inspect
+Opens the static DSP Graph Inspector for a SynthDef or audio Function.
+argument:: synthDef
+A SynthDef or Function.
+argument:: theme
+Visual theme.
+
+EXAMPLES::
+
+code::
+s.boot;
+
+// 1. Play test audio
+x = { Saw.ar([110, 220]) * 0.2 }.play;
+
+// 2. Open instruments via Probe facade or Server shortcuts
+Probe.scope(s, 0, 2);
+Probe.spectrum(s, 0);
+s.spectralDashboard(0);
+s.inspector({ |freq=440| RLPF.ar(Saw.ar(freq), 1200, 0.2) });
+
+// 3. Transparent Signal Tracing
+y = { SinOsc.ar(440, 0, 0.1).trace(\sineWave) }.play;
+y.free;
+::
