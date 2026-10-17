@@ -124,6 +124,28 @@ SCVMeasurementBroker {
 		^source;
 	}
 
+	// Subscribe to a Probe spectral telemetry source (descriptors, pitch, chroma, bands)
+	subscribeSpectral { |consumer, server, busIndex=0, updateFreq=15, onDataCallback|
+		var source, key;
+
+		server = server ?? { Server.default };
+		this.prEnsureServerMonitored(server);
+
+		key = (server.name ++ "_probespec_" ++ busIndex ++ "_" ++ updateFreq).asSymbol;
+
+		source = sources[key];
+		if (source.isNil) {
+			source = ProbeSpectralSource(server, busIndex, updateFreq);
+			sources.put(key, source);
+			subscriptions.put(key, Set.new);
+		};
+
+		subscriptions[key].add(consumer);
+		source.addConsumer(consumer, onDataCallback);
+
+		^source;
+	}
+
 	// Unsubscribe consumer from a specific source
 	unsubscribe { |consumer, sourceKey|
 		var source = sources[sourceKey.asSymbol];

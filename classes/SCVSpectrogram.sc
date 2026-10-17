@@ -34,13 +34,13 @@ SCVSpectrogramView {
 		numBands    = argNumBands.asInteger.clip(16, 128);
 		theme       = SCVTheme.get(argTheme);
 		updateFreq  = argUpdateFreq.asInteger.clip(5, 30);
-		rasterW     = (rect.width - 50).max(100);
+		rasterW     = (rect.width - 50).max(100).asInteger;
 
 		colPixels   = Int32Array.newClear(numBands);
 		this.prBuildLUT;
 
 		// Preallocate raster image
-		img = Image(rasterW, numBands);
+		img = Image(rasterW.asInteger, numBands.asInteger);
 		img.fill(theme.panelBackground);
 
 		view = CompositeView(parent, rect);

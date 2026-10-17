@@ -456,7 +456,7 @@ ProbeTraceSpectrumWindow {
 		theme = SCVTheme.get(argTheme);
 
 		window = Window(label ++ " [Spectrum] — Probe Trace", bounds);
-		spectrum = SCVSpectrumView(server, window, Rect(0, 0, bounds.width, bounds.height), bus.index, theme);
+		spectrum = SCVSpectrumView(server, window, Rect(0, 0, bounds.width, bounds.height), bus.index, 2048, theme);
 		window.view.background = theme.background;
 		window.onClose = { this.close };
 		window.front;

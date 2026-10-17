@@ -229,7 +229,26 @@ This document serves as the persistent historical record of all development iter
      - Conducted transport A/B benchmark (1, 8, 32 probes) comparing Route A and Route B.
      - Created `tests/Probe_P2_unittest.scd` (22 assertions passed cleanly).
      - Master test runner (`tests/run_all_tests.scd`): 11/11 suites passed cleanly.
-- **Deliverables:** `classes/ProbeTrace.sc`, `classes/extUGenProbe.sc`, `docs/phase2/trace-architecture.md`, `benchmarks/phase2-p2-transport/benchmark_transport.scd`, `benchmarks/phase2-p2-transport/results.md`, `tests/Probe_P2_unittest.scd`, `examples/phase2/02_ugen_trace_audio.scd`, `examples/phase2/03_ugen_trace_kr.scd`, `examples/phase2/04_ugen_trace_many.scd`, `reports/phase2/P2.md`.
+- **Deliverables:** `classes/ProbeTrace.sc`, `classes/extUGenProbe.sc`, `docs/phase2/trace-architecture.md`, `benchmarks/phase2-p2-transport/benchmark_transport.scd`, `benchmarks/phase2-p2-transport/results.md`, `tests/Probe_P2_unittest.scd`, `examples/phase2/02_ugen_trace_audio.scd`, `examples/phase2/03_ugen_trace_kr.scd`, `examples/phase2/04_ugen_trace_many.scd`, `reports/phase2/P2.md`, Commit `6fc56b7`.
+
+---
+
+### Iteration 16: Phase II Stage P3 — Advanced Spectral Dashboard & Spectral Band Analyzer
+- **Focus:** 16-band calibrated logarithmic band analyzer, shared spectral telemetry source, descriptor modules (Centroid, Flatness, Roll-off, Flux/Onsets, Pitch, Chroma), and multi-preset Advanced Spectral Dashboard.
+- **Key Decisions & Changes:**
+  1. **Unified Shared Spectral Source (`ProbeSpectralSource.sc`):**
+     - Single shared analysis synth per monitored bus computes 2048 FFT descriptors (`SpecCentroid.kr`, `SpecFlatness.kr`, `SpecPcile.kr`, `Onsets.kr`), pitch tracker (`Pitch.kr`), 16 ISO-spaced filterbank bands, and 12-tone chromagram.
+     - Reference-counted integration via `SCVMeasurementBroker:subscribeSpectral`.
+  2. **16-Band Spectral Band Analyzer (`ProbeBandAnalyzer.sc`):**
+     - Calibrated ISO frequency centers (31 Hz – 16 kHz), segmented vertical level bars (-80 to 0 dBFS), dynamic peak-hold indicators, and theme integration.
+  3. **Advanced Spectral Dashboard (`ProbeSpectralDashboard.sc`):**
+     - 4 instant-switch presets (`\overview`, `\pitch`, `\timeFreq`, `\compare`).
+     - Persistent panel architecture: views are created once and toggled via `visible = true/false`, eliminating ScopeBuffer reallocations, Qt teardown latency, and glitching.
+  4. **Scientific Telemetry & Test Verification:**
+     - Pure 1000 Hz sine verified: Centroid = 1002.0 Hz, Pitch = 1000.0 Hz, Confidence = 1.0.
+     - Created `tests/Probe_P3_unittest.scd` (28 assertions passed cleanly).
+     - Master test runner (`tests/run_all_tests.scd`): 12/12 suites passed cleanly.
+- **Deliverables:** `classes/ProbeBandAnalyzer.sc`, `classes/ProbeSpectralSource.sc`, `classes/ProbeSpectralDescriptors.sc`, `classes/ProbeSpectralDashboard.sc`, `tests/Probe_P3_unittest.scd`, `examples/phase2/05_spectral_dashboard.scd`, `examples/phase2/06_spectral_validation.scd`, `reports/phase2/P3.md`.
 
 ---
 
@@ -243,7 +262,8 @@ This document serves as the persistent historical record of all development iter
 | **FFT Smoothing** | Raw FFT scan (no PV smoothing) | PV smoothing introduced smearing and edge ripples; raw FFT preserves instant transient response. | Active Invariant |
 | **Telemetry Transport** | `SCVBroker` Reference-Counted Synths | Prevents duplicate FFT/peak-RMS synths on identical bus monitoring. | Active Invariant |
 | **Core SC Overrides** | Forbidden (`s.meter`, `s.scope`, `s.freqscope` unchanged) | Strict non-interference with vanilla SuperCollider workflows. | Permanent Invariant |
-| **Server Shortcuts** | `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard` | Non-conflicting ergonomic shortcuts following SuperCollider numbering conventions. | Active Invariant |
+| **Server Shortcuts** | `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard`, `s.spectralDashboard`, `s.bandAnalyzer` | Non-conflicting ergonomic shortcuts following SuperCollider numbering conventions. | Active Invariant |
 | **Signal Tracing** | Transparent `.trace` with Dual Transport | Sample-accurate waveforms for audio rate, low-bandwidth 20 Hz timeline HUD for control rate. | Active Invariant (Phase II) |
+| **Spectral Dashboard** | Persistent 4-Preset Architecture | Instantaneous preset switching (`\overview`, `\pitch`, `\timeFreq`, `\compare`) with zero ScopeBuffer reallocation. | Active Invariant (Phase II) |
 
 

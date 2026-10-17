@@ -46,13 +46,11 @@ Probe {
 	}
 
 	*spectralDashboard { |server, busIndex=0, theme|
-		// Forwarding entry point for P3 Advanced Spectral Dashboard
-		^this.dashboard(server, busIndex: busIndex, theme: theme);
+		^ProbeSpectralDashboard(server, busIndex: busIndex, theme: theme);
 	}
 
 	*bandAnalyzer { |server, busIndex=0, theme|
-		// Forwarding entry point for P3 Spectral Band Analyzer
-		^this.spectrum(server, busIndex: busIndex, theme: theme);
+		^ProbeBandAnalyzer(server, busIndex: busIndex, theme: theme);
 	}
 
 	// Broker & Themes

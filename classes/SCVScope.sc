@@ -255,7 +255,7 @@ SCVScopeView {
 	}
 
 	doOnServerQuit {
-		scopeView.stop;
+		{ if (scopeView.notNil and: { scopeView.isClosed.not }) { scopeView.stop }; }.defer;
 		synth = nil;
 		scopeBuf = nil;
 	}
