@@ -310,6 +310,31 @@ This document serves as the persistent historical record of all development iter
     - `spectrum-mode-spectrogram.png`: Real-time waterfall spectrogram.
 - **Deliverables:** `classes/SCVScope.sc`, `classes/SCVSpectrum.sc`, `tests/Probe_P4_unittest.scd`, `docs/screenshots/*`, Commit `50efd4e`.
 
+
+---
+
+### Iteration 19: Stage P5 — Static DSP Graph & Server Inspector Groundwork
+- **Focus:** Developing the static SynthDef signal flow Directed Acyclic Graph (DAG) inspector and researching live server inspection boundaries.
+- **Key Enhancements Applied:**
+  1. **Topological DAG Parsing & Layer Sorting:**
+     - Created `ProbeGraphView` in `classes/ProbeInspector.sc`, analyzing `synthDef.children` to compute execution dependencies and topological layer depth.
+     - Guaranteed ordering invariant: `Control` UGens in Layer 0, internal arithmetic and DSP in intermediate layers, and `Out` UGens in the terminating layer.
+  2. **Vector Rendering Engine:**
+     - Smooth curved bezier connection wires (`Pen.curveTo`) indicating signal flow between inputs and outputs.
+     - Color-coded rate distinction: Audio rate (`\audio` = Signal cyan), Control rate (`\control` = Warning amber), Scalar/initialization (`\scalar` = Subtext).
+     - Responsive box layout preventing overlap across arbitrary numbers of layers and nodes.
+  3. **Interactive Inspection:**
+     - Mouse-click node selection highlighting upstream inputs and downstream outputs.
+     - Footer inspector badge displaying exact UGen index, class name, rate, and connected inputs.
+  4. **Public Facade & Shortcuts:**
+     - Added `Probe.inspect(synthDef, theme)` and `s.inspect(synthDef, theme)` / `s.inspector(synthDef, theme)`.
+     - Supports direct inspection from open audio Functions (`s.inspect({ Saw.ar(220) * 0.15 })`).
+- **Verification & Visual Evidence:**
+  - Added unit test suite `tests/Probe_P5_unittest.scd` (18 assertions passing).
+  - Master test runner (`tests/run_all_tests.scd`): 14/14 suites passed cleanly (100%).
+  - Captured live screenshot `docs/screenshots/probe-graph-inspector.png` displaying a 16-UGen, 9-layer synthesis network.
+- **Deliverables:** `classes/ProbeInspector.sc`, `classes/Probe.sc`, `classes/extServerProbe.sc`, `tests/Probe_P5_unittest.scd`, `reports/phase2/P5.md`, Commit `356ca70`.
+
 ---
 
 ## Decision Matrix & Invariant Log
@@ -322,10 +347,11 @@ This document serves as the persistent historical record of all development iter
 | **FFT Smoothing** | Raw FFT scan (no PV smoothing) | PV smoothing introduced smearing and edge ripples; raw FFT preserves instant transient response. | Active Invariant |
 | **Telemetry Transport** | `SCVBroker` Reference-Counted Synths | Prevents duplicate FFT/peak-RMS synths on identical bus monitoring. | Active Invariant |
 | **Core SC Overrides** | Forbidden (`s.meter`, `s.scope`, `s.freqscope` unchanged) | Strict non-interference with vanilla SuperCollider workflows. | Permanent Invariant |
-| **Server Shortcuts** | `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard`, `s.spectralDashboard`, `s.bandAnalyzer` | Non-conflicting ergonomic shortcuts following SuperCollider numbering conventions. | Active Invariant |
+| **Server Shortcuts** | `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard`, `s.spectralDashboard`, `s.bandAnalyzer`, `s.inspector` | Non-conflicting ergonomic shortcuts following SuperCollider numbering conventions. | Active Invariant |
 | **Signal Tracing** | Transparent `.trace` with Dual Transport | Sample-accurate waveforms for audio rate, low-bandwidth 20 Hz timeline HUD for control rate. | Active Invariant (Phase II) |
 | **Spectral Dashboard** | Persistent 4-Preset Architecture | Instantaneous preset switching (`\overview`, `\pitch`, `\timeFreq`, `\compare`) with zero ScopeBuffer reallocation. | Active Invariant (Phase II) |
 | **Oscilloscope Triggering** | DSP Zero-Crossing Latch Buffer | Guarantees drift-free stationary waveforms for periodic signals without external plugins. | Active Invariant (Phase II) |
 | **Unified FreqScope Modes** | Subview Visibility Switching | Seamless single-window transitions between Line, 16-Band, and Spectrogram modes. | Active Invariant (Phase II) |
+| **DSP Graph Inspector** | Static Topological DAG Parsing | Pure sclang evaluation; renders clear signal flow without server messaging overhead or audio thread interference. | Active Invariant (Phase II) |
 
 
