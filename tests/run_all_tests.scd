@@ -15,7 +15,8 @@ var testFiles = [
 	"tests/SCVDashboard_unittest.scd",
 	"tests/Probe_P1_unittest.scd",
 	"tests/Probe_P2_unittest.scd",
-	"tests/Probe_P3_unittest.scd"
+	"tests/Probe_P3_unittest.scd",
+	"tests/Probe_P4_unittest.scd"
 ];
 
 var suitePassed = 0, suiteFailed = 0;
