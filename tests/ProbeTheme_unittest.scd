@@ -15,8 +15,8 @@ var assert = { |cond, name|
 
 "--- Testing ProbeTheme ---".postln;
 
-// 1. Verify all 6 themes exist and have non-nil colors
-[\graphite, \phosphor, \ice, \amber, \paper, \monochrome].do { |name|
+// 1. Verify all 7 themes exist and have non-nil colors
+[\graphite, \phosphor, \ice, \amber, \paper, \monochrome, \puredata].do { |name|
 	var theme = ProbeTheme.get(name);
 	assert.value(theme.notNil, "Theme " ++ name ++ " exists");
 	assert.value(theme.background.isKindOf(Color), name ++ " background is Color");
@@ -26,7 +26,17 @@ var assert = { |cond, name|
 	assert.value(theme.critical.isKindOf(Color), name ++ " critical is Color");
 	assert.value(theme.text.isKindOf(Color), name ++ " text is Color");
 	assert.value(theme.grid.isKindOf(Color), name ++ " grid is Color");
+	assert.value(theme.border.isKindOf(Color), name ++ " border is Color");
 };
+
+// 1b. Verify Pure Data theme specific characteristics
+{
+	var pd = ProbeTheme.get(\puredata);
+	assert.value(pd.background.red == 1.0 and: { pd.background.green == 1.0 } and: { pd.background.blue == 1.0 }, "puredata background is pure white (#FFFFFF)");
+	assert.value(pd.signal.red == 0.0 and: { pd.signal.green == 0.0 } and: { pd.signal.blue == 0.0 }, "puredata signal is pure black (#000000)");
+	assert.value(pd.text.red == 0.0 and: { pd.text.green == 0.0 } and: { pd.text.blue == 0.0 }, "puredata text is pure black (#000000)");
+	assert.value(pd.font(9).isKindOf(Font), "puredata produces valid Font instance");
+}.value;
 
 // 2. Default theme is graphite
 assert.value(ProbeTheme.current.name === \graphite, "Default theme is graphite");

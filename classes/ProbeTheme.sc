@@ -14,7 +14,7 @@ ProbeTheme {
 	var <signal, <secondarySignal;
 	var <warning, <critical;
 	var <text, <subtext;
-	var <grid;
+	var <grid, <border;
 	var <density;       // \micro, \compact, \extended
 	var <preset;        // \eco, \normal, \detailed
 	var <meterWidth, <gapWidth;
@@ -103,7 +103,22 @@ ProbeTheme {
 			critical:          Color.fromHexString("#FFFFFF"),
 			text:              Color.fromHexString("#F0F0F0"),
 			subtext:           Color.fromHexString("#888888"),
-			grid:              Color.fromHexString("#444444")
+			grid:              Color.fromHexString("#444444"),
+			border:            Color.fromHexString("#555555")
+		));
+
+		// 7. Pure Data (Minimalist Black & White Low-Res Aesthetic)
+		this.register(\puredata, (
+			background:        Color.fromHexString("#FFFFFF"),
+			panelBackground:   Color.fromHexString("#FFFFFF"),
+			signal:            Color.fromHexString("#000000"),
+			secondarySignal:   Color.fromHexString("#333333"),
+			warning:           Color.fromHexString("#666666"),
+			critical:          Color.fromHexString("#000000"),
+			text:              Color.fromHexString("#000000"),
+			subtext:           Color.fromHexString("#555555"),
+			grid:              Color.fromHexString("#D0D0D0"),
+			border:            Color.fromHexString("#000000")
 		));
 	}
 
@@ -135,6 +150,7 @@ ProbeTheme {
 		text            = dict[\text]            ?? { Color.white };
 		subtext         = dict[\subtext]         ?? { Color.gray(0.6) };
 		grid            = dict[\grid]            ?? { Color.gray(0.25) };
+		border          = dict[\border]          ?? { grid };
 
 		this.density_(dict[\density] ?? { \compact });
 		preset = dict[\preset] ?? { \normal };
@@ -179,7 +195,7 @@ ProbeTheme {
 	font { |baseSize=9, bold=false, mono=false|
 		var effectiveScale = fontScale ?? { defaultFontScale };
 		var size = (baseSize * effectiveScale).round.asInteger.max(6);
-		var f = if (mono) {
+		var f = if (mono or: { name === \puredata }) {
 			Font.monospace(size)
 		} {
 			Font.sansSerif(size)
@@ -199,6 +215,7 @@ ProbeTheme {
 		dict.put(\text,              text);
 		dict.put(\subtext,           subtext);
 		dict.put(\grid,              grid);
+		dict.put(\border,            border);
 		dict.put(\density,           density);
 		dict.put(\preset,            preset);
 		dict.put(\fontFamily,        fontFamily);

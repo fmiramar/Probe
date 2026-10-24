@@ -45,7 +45,7 @@ s.waitForBoot({
 	// 3. Theme changes (must succeed without error and without new server nodes)
 	{
 		var synthsBefore = s.numSynths;
-		[\phosphor, \ice, \amber, \paper, \monochrome, \graphite].do { |thName|
+		[\phosphor, \ice, \amber, \paper, \monochrome, \puredata, \graphite].do { |thName|
 			meter.theme = thName;
 			assert.value(meter.meterView.theme.name === thName, "Theme updated to " ++ thName);
 		};

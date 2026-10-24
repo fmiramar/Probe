@@ -153,6 +153,9 @@ assert.value(UGen.findMethod(\trace).notNil, "UGen:trace extension registered");
 assert.value(Probe.version == "0.4.0", "Probe.version is 0.4.0");
 assert.value(SCVisuals.version == "0.4.0", "SCVisuals.version is 0.4.0");
 assert.value(Probe.theme.name === \graphite, "Probe default theme is \\graphite");
+assert.value(ProbeTheme.get(\puredata).notNil, "ProbeTheme puredata palette registered");
+assert.value(ProbeTheme.get(\puredata).background.red == 1.0, "puredata background is pure white (#FFFFFF)");
+assert.value(ProbeTheme.get(\puredata).signal.red == 0.0, "puredata signal is pure black (#000000)");
 assert.value(Probe.fontScale == 1.25, "Probe default fontScale is 1.25");
 
 "========================================================================".postln;

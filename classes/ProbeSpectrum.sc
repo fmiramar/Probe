@@ -65,7 +65,7 @@ PB_SpectrumView {
 	}
 
 	prBuildUI { |w, h|
-		var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome];
+		var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome, \puredata];
 		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
 		var btnH = (20 * fs).max(20).min(26).round.asInteger;
@@ -107,7 +107,8 @@ PB_SpectrumView {
 				.action_({ this.toggleFreeze });
 
 			themeMenu = PopUpMenu(view, Rect(364, 4, 85, btnH))
-				.items_(["Graphite", "Phosphor", "Ice", "Amber", "Paper", "Monochrome"])
+				.items_(["Graphite", "Phosphor", "Ice", "Amber", "Paper", "Monochrome", "Pure Data"])
+				.value_(themes.indexOf(theme.name) ? 0)
 				.font_(theme.font(8))
 				.action_({ |m| this.theme = themes[m.value] });
 		} {

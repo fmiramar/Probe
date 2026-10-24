@@ -14,7 +14,7 @@ The Server to monitor. Defaults to link::Classes/Server#*default::.
 argument:: busIndex
 The audio bus index to monitor. Default: 0.
 argument:: theme
-A theme name symbol (e.g. \graphite, \phosphor, \ice, \amber, \paper, \monochrome) or link::Classes/ProbeTheme:: instance. Default: \graphite.
+A theme name symbol (e.g. \graphite, \phosphor, \ice, \amber, \paper, \monochrome, \puredata) or link::Classes/ProbeTheme:: instance. Default: \graphite.
 returns:: A new ProbeSpectralDashboard instance.
 
 METHOD:: view

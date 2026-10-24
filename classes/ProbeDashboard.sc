@@ -43,7 +43,7 @@ PB_DashboardView {
 	}
 
 	prBuildUI { |w, h, numIns, numOuts, busIndex|
-		var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome];
+		var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome, \puredata];
 		var fs = theme.fontScale ? 1.25;
 		var btnH = (22 * fs).max(22).min(28).round.asInteger;
 		var topH = btnH + 8;
@@ -65,7 +65,7 @@ PB_DashboardView {
 			.stringColor_(theme.subtext);
 
 		themeMenu = PopUpMenu(view, Rect(0, 0, 10, 10))
-			.items_(["Graphite", "Phosphor", "Ice", "Amber", "Paper", "Monochrome"])
+			.items_(["Graphite", "Phosphor", "Ice", "Amber", "Paper", "Monochrome", "Pure Data"])
 			.value_(themes.indexOf(theme.name) ? 0)
 			.font_(theme.font(9))
 			.action_({ |m|

@@ -4,7 +4,7 @@
 
 (
 var win, themeTabs, currentTheme, mainLayout;
-var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome];
+var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome, \puredata];
 var densities = [\micro, \compact, \extended];
 var densityMenu, themeMenu;
 var renderGallery;

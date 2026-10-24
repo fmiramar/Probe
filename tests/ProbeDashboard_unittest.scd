@@ -61,7 +61,7 @@ s.waitForBoot({
 	assert.value(dash.dashboardView.vectorscopeView.notNil, "Panel 5: vectorscopeView embedded");
 
 	// 5. Global Theme Propagation Test
-	[\phosphor, \ice, \amber, \paper, \monochrome, \graphite].do { |thName|
+	[\phosphor, \ice, \amber, \paper, \monochrome, \puredata, \graphite].do { |thName|
 		dash.theme = thName;
 		assert.value(
 			(dash.dashboardView.theme.name === thName) and:

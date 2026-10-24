@@ -136,7 +136,7 @@ Multiple visualizers monitoring the same server bus automatically **share a sing
 
 ## Themes & Ergonomics
 
-Probe provides six immutable, scientifically calibrated palettes:
+Probe provides seven immutable, scientifically calibrated palettes:
 
 1. **Graphite** (Default): Sleek dark studio aesthetic (`#171A20`).
 2. **Phosphor**: Vintage green monochrome CRT glow (`#09140F`).
@@ -144,8 +144,9 @@ Probe provides six immutable, scientifically calibrated palettes:
 4. **Amber**: Warm vintage mastering console (`#1A1712`).
 5. **Paper**: High-contrast light mode for daytime work and publication printing (`#F1EDE2`).
 6. **Monochrome**: Minimalist grayscale (`#111111`).
+7. **Pure Data**: Stark black-and-white minimalist low-res aesthetic with monospace typography (`#FFFFFF` canvas with solid `#000000` signal traces and controls).
 
-All instruments support dynamic font scaling (`1.0` to `2.0`, default `1.25`) and dynamic theme switching via `.theme = \ice`.
+All instruments support dynamic font scaling (`1.0` to `2.0`, default `1.25`) and dynamic theme switching via `.theme = \puredata`.
 
 ---
 

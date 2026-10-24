@@ -6,7 +6,7 @@ related:: Classes/Probe, Classes/ProbeBroker
 DESCRIPTION::
 ProbeTheme defines the color palettes, densities, and performance presets for Probe instruments. Themes are treated as pure data: changing themes or densities never reallocates audio synths, buffers, or FFT chains.
 
-Six default themes are provided:
+Seven default themes are provided:
 list::
 ## strong::\graphite:: (default dark slate theme)
 ## strong::\phosphor:: (classic terminal / vintage green theme)
@@ -14,6 +14,7 @@ list::
 ## strong::\amber:: (warm CRT glow theme)
 ## strong::\paper:: (light background studio drafting theme)
 ## strong::\monochrome:: (grayscale minimalist theme)
+## strong::\puredata:: (Miller Puckette Pure Data stark black-on-white minimalist low-res aesthetic with monospace typography)
 ::
 
 CLASSMETHODS::
@@ -52,6 +53,9 @@ INSTANCEMETHODS::
 
 METHOD:: name
 Returns the theme's symbolic name.
+
+METHOD:: border
+Returns the border link::Classes/Color:: for panels and node boxes.
 
 METHOD:: density
 Get or set the density preset (code::\micro::, code::\compact::, or code::\extended::).
