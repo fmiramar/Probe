@@ -12,7 +12,7 @@
 		^Probe.meter(this, numIns, numOuts, theme, density, meterStyle);
 	}
 
-	scopePb { |busIndex=0, numChannels=2, theme, rate=\audio, style=\overlay, bufSize=4096|
+	scopePb { |busIndex=0, numChannels=2, theme, rate=\audio, style=\tracks, bufSize=4096|
 		^Probe.scope(this, busIndex, numChannels, theme, rate, style, bufSize);
 	}
 
@@ -52,8 +52,8 @@
 		^Probe.spectralDashboard(this, busIndex, theme);
 	}
 
-	bandAnalyzerPb { |busIndex=0, theme|
-		^Probe.bandAnalyzer(this, busIndex, theme);
+	bandAnalyzerPb { |busIndex=0, theme, smooth=0.7|
+		^Probe.bandAnalyzer(this, busIndex, theme, smooth);
 	}
 
 	inspectPb { |synthDef, theme|
@@ -70,7 +70,7 @@
 		^this.meterPb(numIns, numOuts, theme, density, meterStyle);
 	}
 
-	scope2 { |busIndex=0, numChannels=2, theme, rate=\audio, style=\overlay, bufSize=4096|
+	scope2 { |busIndex=0, numChannels=2, theme, rate=\audio, style=\tracks, bufSize=4096|
 		^this.scopePb(busIndex, numChannels, theme, rate, style, bufSize);
 	}
 
@@ -114,8 +114,8 @@
 		^this.spectralDashboardPb(busIndex, theme);
 	}
 
-	bandAnalyzer { |busIndex=0, theme|
-		^this.bandAnalyzerPb(busIndex, theme);
+	bandAnalyzer { |busIndex=0, theme, smooth=0.7|
+		^this.bandAnalyzerPb(busIndex, theme, smooth);
 	}
 
 	inspect { |synthDef, theme|

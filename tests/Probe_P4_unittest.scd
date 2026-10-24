@@ -34,6 +34,7 @@ s.waitForBoot {
 
 	assert.value(scopeView.notNil, "ProbeScopeView instantiates cleanly");
 	assert.value(scopeView.showToolbar == true, "ProbeScopeView honors showToolbar=true flag");
+	assert.value(scopeView.scopeStyle == 0, "ProbeScopeView defaults to scopeStyle \\tracks (0)");
 	assert.value(scopeView.triggerMode === \free, "ProbeScopeView defaults to triggerMode \\free");
 	assert.value(scopeView.triggerThreshold == 0.0, "ProbeScopeView defaults to triggerThreshold 0.0");
 	assert.value(scopeView.xZoom == 1.0, "ProbeScopeView defaults to xZoom 1.0");

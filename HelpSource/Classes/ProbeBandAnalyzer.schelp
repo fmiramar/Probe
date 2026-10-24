@@ -15,6 +15,8 @@ argument:: busIndex
 The audio bus index to monitor. Default: 0.
 argument:: theme
 A theme name symbol (e.g. \graphite, \phosphor, \ice, \amber, \paper, \monochrome) or link::Classes/ProbeTheme:: instance. Default: \graphite.
+argument:: smooth
+A smoothing/lag factor between 0.0 (raw/instantaneous) and 0.98 (heavily smoothed). Default: 0.7.
 returns:: A new ProbeBandAnalyzer instance.
 
 METHOD:: view
@@ -29,6 +31,8 @@ argument:: busIndex
 The audio bus index to monitor. Default: 0.
 argument:: theme
 A theme name symbol or link::Classes/ProbeTheme:: instance. Default: \graphite.
+argument:: smooth
+A smoothing/lag factor between 0.0 and 0.98. Default: 0.7.
 returns:: A PB_BandAnalyzerView composite view.
 
 INSTANCEMETHODS::
@@ -38,6 +42,19 @@ returns:: The underlying PB_BandAnalyzerView composite view.
 
 METHOD:: window
 returns:: The link::Classes/Window:: containing the analyzer.
+
+METHOD:: smooth
+Get or set the one-pole smoothing factor (0.0 to 0.98) used for fluid visual ballistics without rapid blinking.
+argument:: val
+A Float smoothing factor.
+
+METHOD:: lag
+Get or set the smoothing response time in seconds.
+argument:: val
+A Float duration in seconds.
+
+METHOD:: toggleFreeze
+Toggle live updates on or off.
 
 METHOD:: theme
 Get or set the active link::Classes/ProbeTheme::.

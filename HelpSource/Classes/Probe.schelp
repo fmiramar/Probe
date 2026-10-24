@@ -42,7 +42,7 @@ Visual theme.
 argument:: rate
 \audio or \control.
 argument:: style
-\overlay, \tracks, or \xy.
+\tracks (vertically separated channels, default), \overlay (superimposed channels), or \xy.
 argument:: bufSize
 Oscilloscope buffer size (default 4096).
 
@@ -181,6 +181,8 @@ argument:: busIndex
 Audio bus.
 argument:: theme
 Visual theme.
+argument:: smooth
+Smoothing/lag factor between 0.0 and 0.98 (default 0.7).
 
 METHOD:: inspect
 Opens the static DSP Graph Inspector for a SynthDef or audio Function.

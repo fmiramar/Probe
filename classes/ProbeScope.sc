@@ -23,7 +23,7 @@ PB_ScopeView {
 	var <showToolbar = false;
 	var txtTitle, styleMenu, timeMenu, trigBtn, resetBtn, freezeBtn;
 
-	*new { |server, parent, bounds, busIndex=0, numChannels=2, theme=\graphite, rate=\audio, style=\overlay, bufSize=4096, showToolbar=false|
+	*new { |server, parent, bounds, busIndex=0, numChannels=2, theme=\graphite, rate=\audio, style=\tracks, bufSize=4096, showToolbar=false|
 		^super.new.prInit(server, parent, bounds, busIndex, numChannels, theme, rate, style, bufSize, showToolbar);
 	}
 
@@ -43,7 +43,7 @@ PB_ScopeView {
 			\tracks,  { 0 },
 			\overlay, { 1 },
 			\xy,      { 2 },
-			{ 1 }
+			{ 0 }
 		);
 
 		view = CompositeView(parent, rect);
@@ -77,7 +77,7 @@ PB_ScopeView {
 				.stringColor_(theme.text);
 
 			styleMenu = PopUpMenu(view, Rect(145, 4, 75, btnH))
-				.items_(["Overlay", "Tracks", "X/Y"])
+				.items_(["Tracks", "Overlay", "X/Y"])
 				.font_(theme.font(8))
 				.value_(scopeStyle)
 				.action_({ |m| this.scopeStyle = m.value });
@@ -491,11 +491,11 @@ PB_ScopeView {
 ProbeScope {
 	var <window, <scopeView;
 
-	*new { |server, busIndex=0, numChannels=2, theme=\graphite, rate=\audio, style=\overlay, bufSize=4096|
+	*new { |server, busIndex=0, numChannels=2, theme=\graphite, rate=\audio, style=\tracks, bufSize=4096|
 		^super.new.prInit(server, busIndex, numChannels, theme, rate, style, bufSize);
 	}
 
-	*view { |parent, bounds, server, busIndex=0, numChannels=2, theme=\graphite, rate=\audio, style=\overlay, bufSize=4096, showToolbar=false|
+	*view { |parent, bounds, server, busIndex=0, numChannels=2, theme=\graphite, rate=\audio, style=\tracks, bufSize=4096, showToolbar=false|
 		^PB_ScopeView(server ?? { Server.default }, parent, bounds, busIndex, numChannels, theme, rate, style, bufSize, showToolbar);
 	}
 

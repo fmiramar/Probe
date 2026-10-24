@@ -2,8 +2,8 @@
     ProbeBandAnalyzer.sc
     Probe — 16-Band Calibrated Logarithmic Spectral Band Analyzer
     Visualizes ISO-standard fractional spectral band energy (-80 dBFS to 0 dBFS)
-    with segmented level bars, instantaneous peak-hold indicators, dynamic resizing,
-    and broker deduplication.
+    with segmented level bars, instantaneous peak-hold indicators, controllable smoothing/lag,
+    dynamic resizing, and broker deduplication.
 */
 
 PB_BandAnalyzerView {
@@ -19,20 +19,22 @@ PB_BandAnalyzerView {
 	var <source;
 	var currentBands;    // FloatArray[16]
 	var peakBands;       // FloatArray[16]
+	var <smooth = 0.7;   // Smoothing factor: 0.0 = raw/instantaneous, 0.95 = very smooth
 	var <isFrozen = false;
 	var <isClosed = false;
-	var txtTitle;
+	var txtTitle, txtSmooth, smoothMenu, freezeBtn;
 
-	*new { |server, parent, bounds, busIndex=0, theme=\graphite|
-		^super.new.prInit(server, parent, bounds, busIndex, theme);
+	*new { |server, parent, bounds, busIndex=0, theme=\graphite, smooth=0.7|
+		^super.new.prInit(server, parent, bounds, busIndex, theme, smooth);
 	}
 
-	prInit { |argServer, parent, bounds, argBusIndex, argTheme|
+	prInit { |argServer, parent, bounds, argBusIndex, argTheme, argSmooth=0.7|
 		var rect = bounds ?? { Rect(0, 0, 480, 240) };
 
 		server   = argServer ?? { Server.default };
 		busIndex = argBusIndex.asInteger;
 		theme    = ProbeTheme.get(argTheme);
+		smooth   = (argSmooth ? 0.7).asFloat.clip(0.0, 0.98);
 
 		currentBands = FloatArray.fill(16, -90.0);
 		peakBands    = FloatArray.fill(16, -90.0);
@@ -53,14 +55,37 @@ PB_BandAnalyzerView {
 	prBuildUI { |w, h|
 		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
-		var topOffset = titleH + 6;
+		var btnH = (20 * fs).max(20).min(26).round.asInteger;
+		var topOffset = btnH + 10;
 		var labelH = 16;
 		var meterH = (h - topOffset - labelH - 8).max(40);
 
-		txtTitle = StaticText(view, Rect(10, 4, (w - 20).max(100), titleH))
-			.string_("SPECTRAL BAND ANALYZER [16 BANDS]")
+		txtTitle = StaticText(view, Rect(10, 4, 180, btnH))
+			.string_("BAND ANALYZER [16 ISO]")
 			.font_(theme.font(theme.fontSize, bold: true))
 			.stringColor_(theme.text);
+
+		txtSmooth = StaticText(view, Rect(195, 4, 52, btnH))
+			.string_("Smooth:")
+			.font_(theme.font(8))
+			.stringColor_(theme.subtext);
+
+		smoothMenu = PopUpMenu(view, Rect(250, 4, 82, btnH))
+			.items_(["Off", "Fast", "Normal", "Slow"])
+			.font_(theme.font(8))
+			.value_(this.prSmoothToMenuIndex(smooth))
+			.action_({ |m|
+				var factors = [0.0, 0.4, 0.7, 0.88];
+				smooth = factors[m.value];
+			});
+
+		freezeBtn = Button(view, Rect(338, 4, 60, btnH))
+			.states_([
+				["Freeze", theme.text, theme.panelBackground],
+				["FROZEN", theme.background, theme.warning]
+			])
+			.font_(theme.font(8, bold: true))
+			.action_({ this.toggleFreeze });
 
 		userView = UserView(view, Rect(10, topOffset, (w - 20).max(100), (h - topOffset - 6).max(60)));
 		userView.background = theme.panelBackground;
@@ -117,19 +142,53 @@ PB_BandAnalyzerView {
 				Pen.stringCenteredIn(freqLabels[i], Rect(i * bandW, plotH + 2, bandW, labelH));
 			};
 		};
+
+		// Keyboard controls
+		view.keyDownAction = { |v, char|
+			case
+				{ char === $  } { this.toggleFreeze }
+				{ char === $s or: { char === $l } } {
+					if (smoothMenu.notNil and: { smoothMenu.isClosed.not }) {
+						var nextIdx = (smoothMenu.value + 1) % 4;
+						smoothMenu.valueAction_(nextIdx);
+					};
+				}
+				{ char === $r } {
+					peakBands.fill(-90.0);
+					userView.refresh;
+				};
+		};
+	}
+
+	prSmoothToMenuIndex { |val|
+		^case
+			{ val < 0.20 } { 0 }
+			{ val < 0.55 } { 1 }
+			{ val < 0.80 } { 2 }
+			{ true } { 3 };
 	}
 
 	prHandleResize { |w, h|
 		var fs = theme.fontScale ? 1.25;
 		var titleH = (18 * fs).max(18).round.asInteger;
-		var topOffset = titleH + 6;
+		var btnH = (20 * fs).max(20).min(26).round.asInteger;
+		var topOffset = btnH + 10;
+		var curW = (w - 20).max(100);
 
 		if (isClosed.not and: { view.notNil } and: { view.isClosed.not } and: { userView.notNil } and: { userView.isClosed.not }) {
 			view.bounds = Rect(view.bounds.left, view.bounds.top, w, h);
-			if (txtTitle.notNil) {
-				txtTitle.bounds = Rect(10, 4, (w - 20).max(100), titleH);
+			if (txtTitle.notNil and: { freezeBtn.notNil } and: { smoothMenu.notNil } and: { txtSmooth.notNil }) {
+				var rFreeze = Rect(w - 70, 4, 60, btnH);
+				var rMenu   = Rect(w - 158, 4, 82, btnH);
+				var rLbl    = Rect(w - 214, 4, 52, btnH);
+				var rTitle  = Rect(10, 4, (w - 228).max(80), btnH);
+
+				freezeBtn.bounds = rFreeze;
+				smoothMenu.bounds = rMenu;
+				txtSmooth.bounds = rLbl;
+				txtTitle.bounds = rTitle;
 			};
-			userView.bounds = Rect(10, topOffset, (w - 20).max(100), (h - topOffset - 6).max(60));
+			userView.bounds = Rect(10, topOffset, curW, (h - topOffset - 6).max(60));
 			userView.refresh;
 		};
 	}
@@ -141,13 +200,34 @@ PB_BandAnalyzerView {
 				if (b.notNil) {
 					16.do { |i|
 						var val = b[i] ? -90.0;
-						currentBands[i] = val;
+						// One-pole smoothing / lag filter
+						currentBands[i] = (currentBands[i] * smooth) + (val * (1.0 - smooth));
 						peakBands[i] = peakBands[i].max(val) - 0.4; // gradual peak decay
 					};
 					{ if (isClosed.not and: { userView.notNil } and: { userView.isClosed.not }) { userView.refresh } }.defer;
 				};
 			};
 		});
+	}
+
+	smooth_ { |factor|
+		smooth = factor.asFloat.clip(0.0, 0.98);
+		if (smoothMenu.notNil and: { smoothMenu.isClosed.not }) {
+			smoothMenu.value = this.prSmoothToMenuIndex(smooth);
+		};
+	}
+
+	lag {
+		if (smooth <= 0.005) { ^0.0 };
+		^(-0.05 / log(smooth.max(0.001))).round(0.01);
+	}
+
+	lag_ { |secs|
+		if (secs.asFloat <= 0.005) {
+			this.smooth = 0.0;
+		} {
+			this.smooth = exp(-0.05 / secs.asFloat.max(0.005)).clip(0.0, 0.98);
+		};
 	}
 
 	theme_ { |newTheme|
@@ -157,6 +237,21 @@ PB_BandAnalyzerView {
 		if (txtTitle.notNil) {
 			txtTitle.stringColor = theme.text;
 			txtTitle.font = theme.font(theme.fontSize, bold: true);
+		};
+		if (txtSmooth.notNil) {
+			txtSmooth.stringColor = theme.subtext;
+			txtSmooth.font = theme.font(8);
+		};
+		if (smoothMenu.notNil) {
+			smoothMenu.font = theme.font(8);
+		};
+		if (freezeBtn.notNil) {
+			freezeBtn.states = [
+				["Freeze", theme.text, theme.panelBackground],
+				["FROZEN", theme.background, theme.warning]
+			];
+			freezeBtn.font = theme.font(8, bold: true);
+			freezeBtn.value = if (isFrozen) { 1 } { 0 };
 		};
 		userView.refresh;
 	}
@@ -172,6 +267,9 @@ PB_BandAnalyzerView {
 
 	toggleFreeze {
 		isFrozen = isFrozen.not;
+		if (freezeBtn.notNil and: { freezeBtn.isClosed.not }) {
+			freezeBtn.value = if (isFrozen) { 1 } { 0 };
+		};
 	}
 
 	stop {
@@ -186,20 +284,20 @@ PB_BandAnalyzerView {
 ProbeBandAnalyzer {
 	var <window, <analyzerView;
 
-	*new { |server, busIndex=0, theme=\graphite|
-		^super.new.prInit(server, busIndex, theme);
+	*new { |server, busIndex=0, theme=\graphite, smooth=0.7|
+		^super.new.prInit(server, busIndex, theme, smooth);
 	}
 
-	*view { |parent, bounds, server, busIndex=0, theme=\graphite|
-		^PB_BandAnalyzerView(server ?? { Server.default }, parent, bounds, busIndex, theme);
+	*view { |parent, bounds, server, busIndex=0, theme=\graphite, smooth=0.7|
+		^PB_BandAnalyzerView(server ?? { Server.default }, parent, bounds, busIndex, theme, smooth);
 	}
 
-	prInit { |server, busIndex, theme|
+	prInit { |server, busIndex, theme, smooth=0.7|
 		var s = server ?? { Server.default };
 		var w = 500, h = 260;
 
 		window = Window(s.name ++ " Spectral Bands — Probe", Rect(140, 200, w, h));
-		analyzerView = PB_BandAnalyzerView(s, window, Rect(0, 0, w, h), busIndex, theme);
+		analyzerView = PB_BandAnalyzerView(s, window, Rect(0, 0, w, h), busIndex, theme, smooth);
 		window.view.background = analyzerView.theme.background;
 
 		window.view.onResize = { |v|
@@ -213,6 +311,22 @@ ProbeBandAnalyzer {
 
 	close {
 		window.close;
+	}
+
+	smooth {
+		^analyzerView.smooth;
+	}
+
+	smooth_ { |val|
+		analyzerView.smooth = val;
+	}
+
+	lag {
+		^analyzerView.lag;
+	}
+
+	lag_ { |val|
+		analyzerView.lag = val;
 	}
 
 	theme_ { |aTheme|

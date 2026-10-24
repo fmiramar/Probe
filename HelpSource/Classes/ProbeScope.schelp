@@ -29,7 +29,7 @@ ARGUMENT:: rate
 code::\audio:: or code::\control::.
 
 ARGUMENT:: style
-Display mode: code::\overlay:: (superimposed), code::\tracks:: (stacked channels), or code::\xy:: (Lissajous stereo).
+Display mode: code::\tracks:: (stacked channels separated along the Y axis, default), code::\overlay:: (superimposed channels centered at zero), or code::\xy:: (Lissajous stereo).
 
 ARGUMENT:: bufSize
 Buffer size in frames (default: 4096).
@@ -59,7 +59,7 @@ ARGUMENT:: rate
 code::\audio:: or code::\control::.
 
 ARGUMENT:: style
-Display style: code::\overlay::, code::\tracks::, or code::\xy::.
+Display style: code::\tracks:: (default), code::\overlay::, or code::\xy::.
 
 ARGUMENT:: bufSize
 Scope buffer size in frames.

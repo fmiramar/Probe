@@ -13,7 +13,7 @@ Probe {
 		^ProbeMeter(server, numIns: numIns, numOuts: numOuts, theme: theme, density: density, meterStyle: meterStyle);
 	}
 
-	*scope { |server, busIndex=0, numChannels=2, theme, rate=\audio, style=\overlay, bufSize=4096|
+	*scope { |server, busIndex=0, numChannels=2, theme, rate=\audio, style=\tracks, bufSize=4096|
 		^ProbeScope(server, busIndex: busIndex, numChannels: numChannels, theme: theme, rate: rate, style: style, bufSize: bufSize);
 	}
 
@@ -53,8 +53,8 @@ Probe {
 		^ProbeSpectralDashboard(server, busIndex: busIndex, theme: theme);
 	}
 
-	*bandAnalyzer { |server, busIndex=0, theme|
-		^ProbeBandAnalyzer(server, busIndex: busIndex, theme: theme);
+	*bandAnalyzer { |server, busIndex=0, theme, smooth=0.7|
+		^ProbeBandAnalyzer(server, busIndex: busIndex, theme: theme, smooth: smooth);
 	}
 
 	*inspect { |synthDef, theme|

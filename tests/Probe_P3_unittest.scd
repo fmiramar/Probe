@@ -42,11 +42,20 @@ s.waitForBoot({
 	assert.value(Probe.respondsTo(\bandAnalyzer), "Probe responds to *bandAnalyzer");
 
 	// ------------------------------------------------------------------------
-	// 3. Spectral Band Analyzer Smoke Test
+	// 3. Spectral Band Analyzer Smoke Test & Smoothing/Lag Verification
 	// ------------------------------------------------------------------------
-	bandWin = s.bandAnalyzer(0, theme: \graphite);
-	assert.value(bandWin.notNil and: { bandWin.isKindOf(ProbeBandAnalyzer) }, "s.bandAnalyzer returns ProbeBandAnalyzer instance");
+	bandWin = s.bandAnalyzerPb(0, theme: \graphite);
+	assert.value(bandWin.notNil and: { bandWin.isKindOf(ProbeBandAnalyzer) }, "s.bandAnalyzerPb returns ProbeBandAnalyzer instance");
 	assert.value(bandWin.analyzerView.notNil, "analyzerView is initialized");
+	assert.value(bandWin.smooth == 0.7, "analyzer smooth factor defaults to 0.7");
+	assert.value(bandWin.lag > 0.0, "analyzer lag returns positive seconds (> 0.0)");
+
+	bandWin.smooth = 0.4;
+	assert.value(bandWin.smooth == 0.4, "analyzer smooth setter updates to 0.4");
+
+	bandWin.lag = 0.2;
+	assert.value(bandWin.lag > 0.15 and: { bandWin.lag < 0.25 }, "analyzer lag setter sets calibrated duration (~0.2s)");
+
 	0.2.wait;
 	bandWin.close;
 	0.2.wait;
