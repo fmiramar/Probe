@@ -45,6 +45,12 @@ argument:: style
 \tracks (vertically separated channels, default), \overlay (superimposed channels), or \xy.
 argument:: bufSize
 Oscilloscope buffer size (default 4096).
+argument:: engine
+Rendering engine: \smooth (default, hardware antialiased vector renderer) or \native (ScopeView blit).
+argument:: lineWidth
+Vector stroke width in pixels (default 1.8).
+argument:: fill
+Boolean indicating whether to render translucent ribbon fill (default false).
 
 METHOD:: freqscope
 Opens a precision FFT spectrum analyzer with 3-mode switching (\line, \bands, \spectrogram).
@@ -148,6 +154,10 @@ argument:: theme
 Visual theme.
 argument:: fps
 Frames per second update rate.
+argument:: engine
+Rendering engine: \smooth (default, hardware antialiased vector renderer) or \native.
+argument:: lineWidth
+Vector line width in pixels (default 2.0).
 
 METHOD:: dashboard
 Opens the unified 5-panel command center.

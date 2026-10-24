@@ -12,8 +12,8 @@
 		^Probe.meter(this, numIns, numOuts, theme, density, meterStyle);
 	}
 
-	scopePb { |busIndex=0, numChannels=2, theme, rate=\audio, style=\tracks, bufSize=4096|
-		^Probe.scope(this, busIndex, numChannels, theme, rate, style, bufSize);
+	scopePb { |busIndex=0, numChannels=2, theme, rate=\audio, style=\tracks, bufSize=4096, engine=\smooth, lineWidth=1.8, fill=false|
+		^Probe.scope(this, busIndex, numChannels, theme, rate, style, bufSize, engine, lineWidth, fill);
 	}
 
 	freqscopePb { |busIndex=0, fftSize=2048, theme, dbRange=96.0, freqMode=1|
@@ -40,8 +40,8 @@
 		^Probe.loudness(this, busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
 	}
 
-	vectorscopePb { |busIndex=0, theme, fps=15|
-		^Probe.vectorscope(this, busIndex, theme, fps);
+	vectorscopePb { |busIndex=0, theme, fps=15, engine=\smooth, lineWidth=2.0|
+		^Probe.vectorscope(this, busIndex, theme, fps, engine, lineWidth);
 	}
 
 	dashboardPb { |numIns, numOuts, busIndex=0, theme, targetLUFS= -23.0|
@@ -70,8 +70,8 @@
 		^this.meterPb(numIns, numOuts, theme, density, meterStyle);
 	}
 
-	scope2 { |busIndex=0, numChannels=2, theme, rate=\audio, style=\tracks, bufSize=4096|
-		^this.scopePb(busIndex, numChannels, theme, rate, style, bufSize);
+	scope2 { |busIndex=0, numChannels=2, theme, rate=\audio, style=\tracks, bufSize=4096, engine=\smooth, lineWidth=1.8, fill=false|
+		^this.scopePb(busIndex, numChannels, theme, rate, style, bufSize, engine, lineWidth, fill);
 	}
 
 	freqscope2 { |busIndex=0, fftSize=2048, theme, dbRange=96.0, freqMode=1|
@@ -102,8 +102,8 @@
 		^this.loudnessPb(busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
 	}
 
-	vectorscope { |busIndex=0, theme, fps=15|
-		^this.vectorscopePb(busIndex, theme, fps);
+	vectorscope { |busIndex=0, theme, fps=15, engine=\smooth, lineWidth=2.0|
+		^this.vectorscopePb(busIndex, theme, fps, engine, lineWidth);
 	}
 
 	dashboard { |numIns, numOuts, busIndex=0, theme, targetLUFS= -23.0|

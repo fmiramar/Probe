@@ -31,10 +31,29 @@ s.waitForBoot({
 	sv = scope.scopeView;
 	assert.value(sv.notNil, "scopeView is valid");
 	assert.value(sv.numChannels == 2, "numChannels is 2");
+	assert.value(sv.engine === \smooth, "engine defaults to \\smooth");
+	assert.value(sv.lineWidth == 1.8, "lineWidth defaults to 1.8");
+	assert.value(sv.fill === false, "fill defaults to false");
 
 	0.5.wait;
 	assert.value(sv.scopeBuf.notNil, "ScopeBuffer allocated");
 	assert.value(sv.scopeView.bufnum == sv.scopeBuf.index, "ScopeView bufnum matches allocated ScopeBuffer");
+	assert.value(sv.recordBuf.notNil, "Buffer for smooth vector allocated");
+
+	// 1b. Dual-Engine & Fill controls
+	scope.engine = \native;
+	assert.value(sv.engine === \native, "engine switches to \\native");
+
+	scope.engine = \smooth;
+	assert.value(sv.engine === \smooth, "engine switches back to \\smooth");
+
+	scope.lineWidth = 2.5;
+	assert.value(sv.lineWidth == 2.5, "lineWidth updated to 2.5");
+
+	scope.fill = true;
+	assert.value(sv.fill === true, "fill updated to true");
+	scope.fill = false;
+	assert.value(sv.fill === false, "fill reset to false");
 
 	// 2. Style switching
 	scope.scopeStyle = \tracks;
@@ -79,6 +98,7 @@ s.waitForBoot({
 
 	assert.value(sv.isClosed, "scopeView marked closed");
 	assert.value(sv.scopeBuf.isNil, "ScopeBuffer freed");
+	assert.value(sv.recordBuf.isNil, "Buffer recordBuf freed");
 
 	// Summary
 	("--------------------------------------------------").postln;

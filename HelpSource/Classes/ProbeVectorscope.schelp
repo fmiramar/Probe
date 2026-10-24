@@ -33,6 +33,12 @@ Theme name symbol (e.g. code::\graphite::) or link::Classes/ProbeTheme:: instanc
 ARGUMENT:: updateFreq
 Telemetry update rate in Hz (default 15 Hz).
 
+ARGUMENT:: engine
+Rendering engine: code::\smooth:: (default, antialiased vector renderer using Pen with thick sub-pixel lines) or code::\native:: (ScopeView shared-memory blit).
+
+ARGUMENT:: lineWidth
+Vector line stroke width in pixels when in code::\smooth:: engine (default 2.0).
+
 METHOD:: view
 Embed the vectorscope into a custom parent link::Classes/View:: or link::Classes/Window::.
 
@@ -54,6 +60,12 @@ Visual theme.
 ARGUMENT:: updateFreq
 Telemetry update rate in Hz.
 
+ARGUMENT:: engine
+Rendering engine: code::\smooth:: (default) or code::\native::.
+
+ARGUMENT:: lineWidth
+Vector stroke width in pixels (default 2.0).
+
 INSTANCEMETHODS::
 
 METHOD:: window
@@ -61,6 +73,18 @@ Returns the underlying link::Classes/Window::.
 
 METHOD:: vectorscopeView
 Returns the underlying PB_VectorscopeView composite view.
+
+METHOD:: engine
+Get or set the rendering engine (code::\smooth:: or code::\native::).
+
+ARGUMENT:: aEngine
+Symbol code::\smooth:: or code::\native::.
+
+METHOD:: lineWidth
+Get or set the vector line thickness in pixels.
+
+ARGUMENT:: aWidth
+Float line thickness (clamped to [0.5, 10.0]).
 
 METHOD:: theme
 Update active theme dynamically across the vectorscope display.
@@ -79,6 +103,14 @@ Toggle pause/unpause of the vectorscope.
 
 METHOD:: close
 Close window and release broker subscriptions.
+
+SECTION:: Keyboard Shortcuts
+list::
+## strong::e / E::: Toggle rendering engine between code::\smooth:: and code::\native::
+## strong::+ / =::: Increase line width (+0.5)
+## strong::- / _::: Decrease line width (-0.5)
+## strong::Spacebar::: Freeze / resume display updates
+::
 
 EXAMPLES::
 

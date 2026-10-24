@@ -34,6 +34,15 @@ Display mode: code::\tracks:: (stacked channels separated along the Y axis, defa
 ARGUMENT:: bufSize
 Buffer size in frames (default: 4096).
 
+ARGUMENT:: engine
+Rendering engine: code::\smooth:: (default, antialiased vector renderer using Pen with thick sub-pixel lines) or code::\native:: (ScopeView shared-memory blit).
+
+ARGUMENT:: lineWidth
+Vector line stroke width in pixels when in code::\smooth:: engine (default 1.8).
+
+ARGUMENT:: fill
+Boolean indicating whether to fill the area between waveform and baseline with a translucent ribbon (default false).
+
 METHOD:: view
 Embed the oscilloscope into a custom parent link::Classes/View:: or link::Classes/Window::.
 
@@ -67,6 +76,15 @@ Scope buffer size in frames.
 ARGUMENT:: showToolbar
 Boolean indicating whether to show top toolbar controls.
 
+ARGUMENT:: engine
+Rendering engine: code::\smooth:: (default) or code::\native::.
+
+ARGUMENT:: lineWidth
+Vector stroke width in pixels (default 1.8).
+
+ARGUMENT:: fill
+Boolean indicating whether to fill waveform area (default false).
+
 INSTANCEMETHODS::
 
 METHOD:: window
@@ -74,6 +92,24 @@ Returns the underlying link::Classes/Window::.
 
 METHOD:: scopeView
 Returns the underlying PB_ScopeView composite view.
+
+METHOD:: engine
+Get or set the rendering engine (code::\smooth:: or code::\native::).
+
+ARGUMENT:: aEngine
+Symbol code::\smooth:: or code::\native::.
+
+METHOD:: lineWidth
+Get or set the vector line thickness in pixels.
+
+ARGUMENT:: aWidth
+Float line thickness (clamped to [0.5, 10.0]).
+
+METHOD:: fill
+Get or set translucent ribbon area fill.
+
+ARGUMENT:: aFill
+Boolean.
 
 METHOD:: theme
 Changes theme palette dynamically.
@@ -136,6 +172,12 @@ SECTION:: Keyboard Shortcuts
 list::
 ## strong::+ / =::: Zoom in vertically
 ## strong::- / _::: Zoom out vertically
-## strong::s::: Cycle through display styles (Overlay -> Tracks -> X/Y)
-## strong::Spacebar::: Freeze / Resume waveform drawing
+## strong::[ / ]::: Zoom time in / out
+## strong::0 / r::: Reset zoom to 1.0x
+## strong::e / E::: Toggle rendering engine between code::\smooth:: and code::\native::
+## strong::f / F::: Toggle translucent ribbon fill
+## strong::w / W::: Increase / decrease line stroke width (+/- 0.2)
+## strong::t::: Cycle triggering mode (\free -> \rising -> \falling)
+## strong::s::: Cycle through display styles (Tracks -> Overlay -> X/Y)
+## strong::Spacebar::: Freeze / resume waveform drawing
 ::

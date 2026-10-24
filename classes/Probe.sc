@@ -13,8 +13,8 @@ Probe {
 		^ProbeMeter(server, numIns: numIns, numOuts: numOuts, theme: theme, density: density, meterStyle: meterStyle);
 	}
 
-	*scope { |server, busIndex=0, numChannels=2, theme, rate=\audio, style=\tracks, bufSize=4096|
-		^ProbeScope(server, busIndex: busIndex, numChannels: numChannels, theme: theme, rate: rate, style: style, bufSize: bufSize);
+	*scope { |server, busIndex=0, numChannels=2, theme, rate=\audio, style=\tracks, bufSize=4096, engine=\smooth, lineWidth=1.8, fill=false|
+		^ProbeScope(server, busIndex: busIndex, numChannels: numChannels, theme: theme, rate: rate, style: style, bufSize: bufSize, engine: engine, lineWidth: lineWidth, fill: fill);
 	}
 
 	*freqscope { |server, busIndex=0, fftSize=2048, theme, dbRange=96.0, freqMode=1|
@@ -41,8 +41,8 @@ Probe {
 		^ProbeLoudness(server, busType: busType, busIndex: busIndex, numChannels: numChannels, theme: theme, targetLUFS: targetLUFS, updateFreq: updateFreq);
 	}
 
-	*vectorscope { |server, busIndex=0, theme, fps=15|
-		^ProbeVectorscope(server, busIndex: busIndex, theme: theme, fps: fps);
+	*vectorscope { |server, busIndex=0, theme, fps=15, engine=\smooth, lineWidth=2.0|
+		^ProbeVectorscope(server, busIndex: busIndex, theme: theme, updateFreq: fps, engine: engine, lineWidth: lineWidth);
 	}
 
 	*dashboard { |server, numIns, numOuts, busIndex=0, theme, targetLUFS= -23.0|
