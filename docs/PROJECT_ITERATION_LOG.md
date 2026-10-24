@@ -444,6 +444,51 @@ This document serves as the persistent historical record of all development iter
 
 ---
 
+### Iteration 23: Pure Data Minimalist Theme, Scope Default Inversion & Band Smoothing Filter
+- **Focus:** User requested Pure Data aesthetic, scope style default correction, and controllable smoothing on rapidly blinking band analyzers.
+- **Key Enhancements Applied:**
+  1. **Scope Style Default Inversion:**
+     - User feedback: selecting "Overlay" previously showed separated waveforms while "Tracks" showed centered zero.
+     - Inverted style popup items and mapping so `\tracks` (style 0) vertically separates channels along the Y axis, and `\overlay` (style 1) centers waveforms at zero.
+     - Set default oscilloscope mode to `\tracks` so multi-channel signals are immediately legible without overlapping.
+  2. **Controllable Smoothing on `ProbeBandAnalyzer`:**
+     - Solved visual flicker on rapidly changing audio transients by introducing an exponential moving average (EMA) lag filter: $y[n] = y[n-1] + \alpha \cdot (x[n] - y[n-1])$.
+     - Added `smooth` property (`0.0` – `0.98`, default `0.7`), `lag` property in seconds, header `Smooth:` popup preset menu (`Off`, `Fast`, `Normal`, `Slow`), and interactive Freeze button.
+  3. **Pure Data Minimalist Low-Res B&W Theme (`\puredata`):**
+     - Registered new `\puredata` palette in `ProbeTheme`: pure white canvas (`#FFFFFF`), stark black signal traces (`#000000`), dark secondary signal (`#333333`), subtle light gray grid (`#D0D0D0`), and solid black border (`#000000`).
+     - Automatic monospace typography: `ProbeTheme:font` automatically selects Courier / Menlo / Monospace font family when active, mirroring Miller Puckette Pure Data's classic Tk terminal aesthetic.
+  4. **Theming Documentation & Examples:**
+     - Added comprehensive theming documentation and runnable Pure Data code example to `HelpSource/Classes/Probe.schelp` under `SUBSECTION:: Theming`.
+- **Deliverables:** `classes/ProbeTheme.sc`, `classes/ProbeBandAnalyzer.sc`, `classes/ProbeScope.sc`, `HelpSource/Classes/Probe.schelp`, Commit `1a093dc`, Commit `204b1a4`.
+
+---
+
+### Iteration 24: Signal Line Thickness & Antialiasing Analysis, Dual-Engine Architecture (`\smooth` vs `\native`)
+- **Focus:** User requested resolution of thin, pixelated signal traces on scope and vectorscope; evaluated C++ root causes, CPU costs, and implemented Alternative B with default set to `\smooth`.
+- **Root-Cause Analysis:**
+  - `QcScopeShm.cpp` in SuperCollider core hardcodes cosmetic pen (`pen.setWidth(0)` = 0.5pt on Retina) without `QPainter::Antialiasing`, using integer Bresenham pixel stepping.
+- **Key Enhancements Applied:**
+  1. **ADR-002 Architectural Documentation:**
+     - Created `docs/decisions/ADR-002-Dual-Engine-Smooth-Antialiased-Rendering.md` documenting C++ root causes, CPU benchmarks, and the dual-engine design.
+  2. **Dual-Engine Architecture (`\smooth` vs `\native`):**
+     - `\smooth` (default): Hardware antialiased vector renderer using SuperCollider's `Pen` on `UserView` with sub-pixel floating-point coordinates, round joins/caps (`Pen.capStyle = 1; Pen.joinStyle = 1;`), configurable `lineWidth` (default `1.8` on scope, `2.0` on vectorscope), and optional translucent ribbon `fill`.
+     - `\native`: SuperCollider's native C++ `ScopeView` (`QcScopeShm`) blit.
+  3. **Zero Audio-Thread DSP Overhead:**
+     - `ScopeOut2.ar` writes to shared-memory `ScopeBuffer` (for `\native`), while `BufWr.ar` writes to standard `Buffer.alloc` (for `\smooth`).
+     - Non-blocking client-side telemetry via `/b_getn` queried at 30 Hz with AppClock-scheduled view refreshes.
+     - SCLang vector draw time measured at **0.20 ms for 1024 points** (~0.6% of one CPU core).
+  4. **Interactive Controls & Keyboard Shortcuts:**
+     - Added interactive `Smooth`/`Native` engine button and `Fill` button directly to the scope toolbar.
+     - Added header engine button to vectorscope.
+     - Shortcuts: <kbd>e</kbd> toggles engine, <kbd>f</kbd> toggles fill, <kbd>w</kbd>/<kbd>W</kbd> adjusts scope line width, <kbd>+</kbd>/<kbd>-</kbd> adjusts vectorscope line width.
+  5. **Verification & Quality Gate:**
+     - 14/14 unit test suites passed in `tests/run_all_tests.scd`.
+     - 104/104 system install assertions passed in `scripts/verify_system_install.scd`.
+     - 15/15 SCDoc files validated with 0 errors/warnings in `scripts/verify_scdoc.scd`.
+- **Deliverables:** `docs/decisions/ADR-002-Dual-Engine-Smooth-Antialiased-Rendering.md`, `classes/ProbeScope.sc`, `classes/ProbeVectorscope.sc`, `classes/Probe.sc`, `classes/extServerProbe.sc`, `HelpSource/Classes/ProbeScope.schelp`, `HelpSource/Classes/ProbeVectorscope.schelp`, Commit `eb36383`.
+
+---
+
 ## Decision Matrix & Invariant Log
 
 | Parameter / Feature | Chosen Design | Rationale | Invariant Status |
@@ -453,6 +498,11 @@ This document serves as the persistent historical record of all development iter
 | **GUI Embeddability** | `Probe*.view(parent, bounds, ...)` | High-level factory pattern returning embeddable `PB_*View` instances without exposing internal class names. | Active Invariant (v0.4.0) |
 | **Default Font Scale** | `1.25` (125%) | Optimum balance of legibility on modern high-DPI retina displays without overflowing panels. | Active Invariant |
 | **Control Layout** | Tight (28px buttons at 1.25, 4–6px gaps) | Sleek laboratory instrument aesthetic; eliminates bloated dead space. | Active Invariant |
+| **Oscilloscope Engine** | Dual-Engine (`\smooth` vs `\native`), default `\smooth` | Eliminates Retina hairline thinness (0.5pt) and Bresenham staircase pixelation using Qt vector antialiasing and configurable `lineWidth`; retains zero-SCLang native blit fallback. | Active Invariant (v0.4.0) |
+| **Vectorscope Engine** | Dual-Engine (`\smooth` vs `\native`), default `\smooth` | Sub-pixel antialiased Lissajous curves with configurable thickness (`lineWidth = 2.0`) and zero audio thread DSP overhead. | Active Invariant (v0.4.0) |
+| **Scope Default Style** | `\tracks` (vertically separated channels) | Vertically separated channels along Y axis prevent immediate overlap confusion on multi-channel inputs. | Active Invariant (v0.4.0) |
+| **Band Analyzer Smoothing** | Exponential Moving Average lag filter (`smooth=0.7`) | Eliminates rapid visual flicker on fast transients while preserving peak envelope tracking. | Active Invariant (v0.4.0) |
+| **Pure Data Theme** | `\puredata` (B&W palette + Monospace font) | Minimalist Miller Puckette aesthetic with pure white canvas, stark black traces, and Courier/Tk monospace typography. | Active Invariant (v0.4.0) |
 | **FFT Smoothing** | Raw FFT scan (no PV smoothing) | PV smoothing introduced smearing and edge ripples; raw FFT preserves instant transient response. | Active Invariant |
 | **Telemetry Transport** | `PB_Broker` Reference-Counted Synths | Prevents duplicate FFT/peak-RMS synths on identical bus monitoring. Legacy aliases `SCVMeasurementBroker` and `ProbeBroker` retained. | Active Invariant (v0.4.0) |
 | **Core SC Overrides** | Forbidden (`s.meter`, `s.scope`, `s.freqscope` unchanged) | Strict non-interference with vanilla SuperCollider workflows. | Permanent Invariant |
