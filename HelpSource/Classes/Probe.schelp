@@ -11,6 +11,9 @@ Probe maintains strict non-interference with vanilla SuperCollider core methods 
 
 CLASSMETHODS::
 
+METHOD:: version
+Returns the current Probe suite version string.
+
 METHOD:: meter
 Opens a vertical server meter.
 argument:: server
@@ -21,6 +24,10 @@ argument:: numOuts
 Number of output channels.
 argument:: theme
 Theme symbol.
+argument:: density
+Visual density (\micro, \compact, \extended).
+argument:: meterStyle
+Meter style (\dualRuler, etc.).
 
 METHOD:: scope
 Opens a precision oscilloscope with trigger edge stabilization.
@@ -36,9 +43,26 @@ argument:: rate
 \audio or \control.
 argument:: style
 \overlay, \tracks, or \xy.
+argument:: bufSize
+Oscilloscope buffer size (default 4096).
+
+METHOD:: freqscope
+Opens a precision FFT spectrum analyzer with 3-mode switching (\line, \bands, \spectrogram).
+argument:: server
+Target server.
+argument:: busIndex
+Audio bus to monitor.
+argument:: fftSize
+FFT size (default 2048).
+argument:: theme
+Visual theme.
+argument:: dbRange
+Decibel dynamic range (default 96).
+argument:: freqMode
+0 for linear, 1 for logarithmic.
 
 METHOD:: spectrum
-Opens a precision FFT spectrum analyzer with 3-mode switching (\line, \bands, \spectrogram).
+Alias for freqscope.
 argument:: server
 Target server.
 argument:: busIndex
@@ -51,6 +75,94 @@ argument:: dbRange
 Decibel dynamic range (default 96).
 argument:: freqMode
 0 for linear, 1 for logarithmic.
+
+METHOD:: spectrogram
+Opens a 2D scrolling time-frequency spectrogram.
+argument:: server
+Target server.
+argument:: busIndex
+Audio bus to monitor.
+argument:: fftSize
+FFT analysis size.
+argument:: theme
+Visual theme.
+argument:: fps
+Frames per second update rate.
+
+METHOD:: waterfall
+Opens a 2.5D isometric stacked waterfall spectrum.
+argument:: server
+Target server.
+argument:: busIndex
+Audio bus to monitor.
+argument:: fftSize
+FFT analysis size.
+argument:: theme
+Visual theme.
+argument:: fps
+Frames per second update rate.
+argument:: numLines
+Number of waterfall history lines.
+
+METHOD:: history
+Opens a rolling peak, RMS, and crest factor timeline history chart.
+argument:: server
+Target server.
+argument:: busType
+\inputs or \outputs.
+argument:: busIndex
+Bus index to monitor.
+argument:: numChannels
+Number of channels.
+argument:: theme
+Visual theme.
+argument:: fps
+Display frames per second.
+argument:: maxHistory
+Maximum history frames.
+
+METHOD:: loudness
+Opens an ITU-R BS.1770 / EBU R128 loudness meter.
+argument:: server
+Target server.
+argument:: busType
+\inputs or \outputs.
+argument:: busIndex
+Bus index to monitor.
+argument:: numChannels
+Number of channels.
+argument:: theme
+Visual theme.
+argument:: targetLUFS
+Target loudness in LUFS (-23 or -14).
+argument:: updateFreq
+Display refresh frequency in Hz.
+
+METHOD:: vectorscope
+Opens a stereo Lissajous X/Y display with polar graticule and phase correlation.
+argument:: server
+Target server.
+argument:: busIndex
+Audio bus index.
+argument:: theme
+Visual theme.
+argument:: fps
+Frames per second update rate.
+
+METHOD:: dashboard
+Opens the unified 5-panel command center.
+argument:: server
+Target server.
+argument:: numIns
+Number of input channels.
+argument:: numOuts
+Number of output channels.
+argument:: busIndex
+Bus index to monitor.
+argument:: theme
+Visual theme.
+argument:: targetLUFS
+Target loudness in LUFS.
 
 METHOD:: spectralDashboard
 Opens the 4-preset advanced spectral dashboard.
@@ -67,6 +179,8 @@ argument:: server
 Target server.
 argument:: busIndex
 Audio bus.
+argument:: theme
+Visual theme.
 
 METHOD:: inspect
 Opens the static DSP Graph Inspector for a SynthDef or audio Function.
@@ -74,6 +188,25 @@ argument:: synthDef
 A SynthDef or Function.
 argument:: theme
 Visual theme.
+
+METHOD:: inspector
+Alias for inspect.
+argument:: synthDef
+A SynthDef or Function.
+argument:: theme
+Visual theme.
+
+METHOD:: broker
+Returns the shared singleton measurement broker.
+
+METHOD:: theme
+Returns the current active theme.
+
+METHOD:: fontScale
+Returns the current font scale factor.
+
+METHOD:: defaultFontScale
+Returns the default font scale factor (1.25).
 
 EXAMPLES::
 
