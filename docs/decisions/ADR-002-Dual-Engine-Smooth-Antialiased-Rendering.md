@@ -50,10 +50,11 @@ We selected **Alternative B**, establishing a dual-engine architecture across bo
 Audio-rate safety and zero audio-thread overhead are strictly maintained:
 1. **Dual Writer in Analysis Synth:**
    - `ScopeOut2.ar` writes to shared-memory `ScopeBuffer` (for `\native` engine).
-   - `BufWr.ar` / `RecordBuf.ar` writes to standard `Buffer.alloc` (for `\smooth` engine).
-   - `BufWr` operates as a simple linear memory copy per audio vector block; audio CPU impact is negligible (< 0.05%).
-2. **Zero-Crossing Trigger Synchronization:**
-   - In free and edge-triggered modes, the write phasor sweeps from 0 to `cycleFrames` synchronized to waveform rising zero-crossings (with 25 Hz auto-sweep fallback), ensuring rock-solid, drift-free vector frames.
+   - `RecordBuf.ar(..., loop: 1)` writes circularly to standard `Buffer.alloc` (for `\smooth` engine).
+   - `RecordBuf` operates as a simple linear memory copy per audio vector block; audio CPU impact is negligible (< 0.05%).
+2. **Buffer Capture & Continuous Circular Writing (Post-Mortem on Truncation Bug):**
+   - In continuous free-running mode (`\free`), audio waveforms are written circularly using `RecordBuf.ar(in.asArray, recordBuf.bufnum, loop: 1)`.
+   - *Bug Root-Cause & Resolution:* An earlier implementation attempted to use `BufWr` with `Phasor.ar(trig, 1, 0, cycleFrames)` to reset on zero-crossings. When playing periodic waves whose period is shorter than the buffer size (e.g. 100 Hz sawtooth = 480 samples at 48kHz, whereas `cycleFrames` = 1024), the phasor reset back to 0 every 480 samples, before ever reaching 1024. Consequently, only frames 0–479 were written while frames 480–1023 remained at 0.0, displaying half sawtooth and half zero line. Switching to continuous circular recording (`RecordBuf.ar(..., loop: 1)`) ensures 100% full-buffer continuous waveforms across all frequencies with zero truncation and natural continuous oscilloscope motion matching native `ScopeView`.
 3. **Non-Blocking Telemetry Transport:**
    - A client-side Routine on `AppClock` queries `/b_getn` at 25–30 Hz.
    - `/b_getn` executes on the server's command thread (never the real-time audio thread) and returns interleaved floats via UDP.

@@ -473,8 +473,9 @@ This document serves as the persistent historical record of all development iter
   2. **Dual-Engine Architecture (`\smooth` vs `\native`):**
      - `\smooth` (default): Hardware antialiased vector renderer using SuperCollider's `Pen` on `UserView` with sub-pixel floating-point coordinates, round joins/caps (`Pen.capStyle = 1; Pen.joinStyle = 1;`), configurable `lineWidth` (default `1.8` on scope, `2.0` on vectorscope), and optional translucent ribbon `fill`.
      - `\native`: SuperCollider's native C++ `ScopeView` (`QcScopeShm`) blit.
-  3. **Zero Audio-Thread DSP Overhead:**
-     - `ScopeOut2.ar` writes to shared-memory `ScopeBuffer` (for `\native`), while `BufWr.ar` writes to standard `Buffer.alloc` (for `\smooth`).
+  3. **Zero Audio-Thread DSP Overhead & Continuous Buffer Recording:**
+     - `ScopeOut2.ar` writes to shared-memory `ScopeBuffer` (for `\native`), while `RecordBuf.ar(..., loop: 1)` writes circularly to standard `Buffer.alloc` (for `\smooth`).
+     - *Truncated Phasor Post-Mortem:* Resolved an issue where an earlier `BufWr` zero-crossing reset caused waveforms whose period was shorter than 1024 frames (e.g. 100 Hz sawtooth = 480 frames) to reset prematurely, leaving the second half of the buffer at 0.0. Circular recording (`RecordBuf.ar(..., loop: 1)`) guarantees 100% full-buffer continuous waveforms across all frequencies with zero truncation and natural continuous oscilloscope motion matching native `ScopeView`.
      - Non-blocking client-side telemetry via `/b_getn` queried at 30 Hz with AppClock-scheduled view refreshes.
      - SCLang vector draw time measured at **0.20 ms for 1024 points** (~0.6% of one CPU core).
   4. **Interactive Controls & Keyboard Shortcuts:**

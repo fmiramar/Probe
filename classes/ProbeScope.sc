@@ -526,12 +526,8 @@ PB_ScopeView {
 				if (triggerMode === \free) {
 					sdef = SynthDef(synthDefName, { |cycleFrames=1024|
 						var in = In.ar(busIndex, numChannels);
-						var in0 = in.asArray[0];
-						var trig = (in0 >= 0.0) * (Delay1.ar(in0) < 0.0);
-						var combinedTrig = (trig + Impulse.ar(25)).clip(0, 1);
-						var wrPhasor = Phasor.ar(combinedTrig, 1, 0, cycleFrames);
 						ScopeOut2.ar(in, scopeBuf.index, bufSize, cycleFrames);
-						BufWr.ar(in.asArray, recordBuf.bufnum, wrPhasor, loop: 0);
+						RecordBuf.ar(in.asArray, recordBuf.bufnum, loop: 1);
 					});
 				} {
 					sdef = SynthDef(synthDefName, { |cycleFrames=1024, thresh=0.0|
@@ -552,7 +548,7 @@ PB_ScopeView {
 						var rdIdx = (startIdx + rdPhasor) % bufSize;
 						var rd = BufRd.ar(numChannels, lbuf, rdIdx, loop: 1, interpolation: 1);
 						ScopeOut2.ar(rd, scopeBuf.index, bufSize, cycleFrames);
-						BufWr.ar(rd, recordBuf.bufnum, Phasor.ar(combinedTrig, 1, 0, cycleFrames), loop: 0);
+						RecordBuf.ar(rd, recordBuf.bufnum, loop: 1);
 					});
 				};
 			} {
@@ -560,7 +556,7 @@ PB_ScopeView {
 					var in = In.kr(busIndex, numChannels);
 					var inA = K2A.ar(in);
 					ScopeOut2.ar(inA, scopeBuf.index, bufSize, cycleFrames);
-					BufWr.ar(inA, recordBuf.bufnum, Phasor.ar(Impulse.ar(25), 1, 0, cycleFrames), loop: 0);
+					RecordBuf.ar(inA, recordBuf.bufnum, loop: 1);
 				});
 			};
 
