@@ -23,7 +23,7 @@ ProbeDescriptorsView {
 	prInit { |argServer, parent, bounds, argBusIndex, argTheme|
 		server   = argServer ?? { Server.default };
 		busIndex = argBusIndex.asInteger;
-		theme    = SCVTheme.get(argTheme);
+		theme    = ProbeTheme.get(argTheme);
 
 		view = CompositeView(parent, bounds);
 		view.resize = 5;
@@ -77,7 +77,7 @@ ProbeDescriptorsView {
 			};
 		};
 
-		source = SCVisuals.broker.subscribeSpectral(this, server, busIndex, 15, { |data|
+		source = Probe.broker.subscribeSpectral(this, server, busIndex, 15, { |data|
 			if (isClosed.not) {
 				centroid = data[\centroid] ? centroid;
 				flatness = data[\flatness] ? flatness;
@@ -89,7 +89,7 @@ ProbeDescriptorsView {
 	}
 
 	theme_ { |newTheme|
-		theme = SCVTheme.get(newTheme);
+		theme = ProbeTheme.get(newTheme);
 		view.background = theme.background;
 		userView.background = theme.panelBackground;
 		userView.refresh;
@@ -106,7 +106,7 @@ ProbeDescriptorsView {
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
-			SCVisuals.broker.unsubscribeAll(this);
+			Probe.broker.unsubscribeAll(this);
 			source = nil;
 		};
 	}
@@ -128,7 +128,7 @@ ProbePitchTrackerView {
 	prInit { |argServer, parent, bounds, argBusIndex, argTheme|
 		server   = argServer ?? { Server.default };
 		busIndex = argBusIndex.asInteger;
-		theme    = SCVTheme.get(argTheme);
+		theme    = ProbeTheme.get(argTheme);
 		history  = FloatArray.fill(maxPts, 440.0);
 
 		view = CompositeView(parent, bounds);
@@ -175,7 +175,7 @@ ProbePitchTrackerView {
 			};
 		};
 
-		source = SCVisuals.broker.subscribeSpectral(this, server, busIndex, 15, { |data|
+		source = Probe.broker.subscribeSpectral(this, server, busIndex, 15, { |data|
 			if (isClosed.not) {
 				pitch = data[\pitch] ? pitch;
 				hasPitch = data[\hasPitch] ? hasPitch;
@@ -187,7 +187,7 @@ ProbePitchTrackerView {
 	}
 
 	theme_ { |newTheme|
-		theme = SCVTheme.get(newTheme);
+		theme = ProbeTheme.get(newTheme);
 		view.background = theme.background;
 		userView.background = theme.panelBackground;
 		userView.refresh;
@@ -204,7 +204,7 @@ ProbePitchTrackerView {
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
-			SCVisuals.broker.unsubscribeAll(this);
+			Probe.broker.unsubscribeAll(this);
 			source = nil;
 		};
 	}
@@ -225,7 +225,7 @@ ProbeChromagramView {
 	prInit { |argServer, parent, bounds, argBusIndex, argTheme|
 		server   = argServer ?? { Server.default };
 		busIndex = argBusIndex.asInteger;
-		theme    = SCVTheme.get(argTheme);
+		theme    = ProbeTheme.get(argTheme);
 		chroma   = FloatArray.fill(12, 0.0);
 
 		view = CompositeView(parent, bounds);
@@ -263,7 +263,7 @@ ProbeChromagramView {
 			};
 		};
 
-		source = SCVisuals.broker.subscribeSpectral(this, server, busIndex, 15, { |data|
+		source = Probe.broker.subscribeSpectral(this, server, busIndex, 15, { |data|
 			if (isClosed.not) {
 				var ch = data[\chroma];
 				if (ch.notNil) {
@@ -275,7 +275,7 @@ ProbeChromagramView {
 	}
 
 	theme_ { |newTheme|
-		theme = SCVTheme.get(newTheme);
+		theme = ProbeTheme.get(newTheme);
 		view.background = theme.background;
 		userView.background = theme.panelBackground;
 		userView.refresh;
@@ -292,7 +292,7 @@ ProbeChromagramView {
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
-			SCVisuals.broker.unsubscribeAll(this);
+			Probe.broker.unsubscribeAll(this);
 			source = nil;
 		};
 	}
@@ -313,7 +313,7 @@ ProbeSpectralCompareView {
 	prInit { |argServer, parent, bounds, argBusIndex, argTheme|
 		server    = argServer ?? { Server.default };
 		busIndex  = argBusIndex.asInteger;
-		theme     = SCVTheme.get(argTheme);
+		theme     = ProbeTheme.get(argTheme);
 		liveBands = FloatArray.fill(16, -90.0);
 		refBands  = FloatArray.fill(16, -90.0);
 
@@ -361,7 +361,7 @@ ProbeSpectralCompareView {
 			};
 		};
 
-		source = SCVisuals.broker.subscribeSpectral(this, server, busIndex, 15, { |data|
+		source = Probe.broker.subscribeSpectral(this, server, busIndex, 15, { |data|
 			if (isClosed.not) {
 				var b = data[\bands];
 				if (b.notNil) {
@@ -382,7 +382,7 @@ ProbeSpectralCompareView {
 	}
 
 	theme_ { |newTheme|
-		theme = SCVTheme.get(newTheme);
+		theme = ProbeTheme.get(newTheme);
 		view.background = theme.background;
 		userView.background = theme.panelBackground;
 		userView.refresh;
@@ -399,7 +399,7 @@ ProbeSpectralCompareView {
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
-			SCVisuals.broker.unsubscribeAll(this);
+			Probe.broker.unsubscribeAll(this);
 			source = nil;
 		};
 	}

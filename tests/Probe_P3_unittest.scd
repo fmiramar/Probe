@@ -85,7 +85,7 @@ s.waitForBoot({
 	testSynth = { SinOsc.ar(1000, 0, 0.2) }.play;
 	0.2.wait;
 
-	specSource = SCVisuals.broker.subscribeSpectral(this, s, 0, 20, { |data|
+	specSource = Probe.broker.subscribeSpectral(this, s, 0, 20, { |data|
 		receivedData = data;
 	});
 
@@ -115,7 +115,7 @@ s.waitForBoot({
 		);
 	};
 
-	SCVisuals.broker.unsubscribeAll(this);
+	Probe.broker.unsubscribeAll(this);
 	testSynth.free;
 	0.3.wait;
 

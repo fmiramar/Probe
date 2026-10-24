@@ -6,19 +6,19 @@
 
 Probe {
 	*version {
-		^"0.2.0";
+		^"0.3.0";
 	}
 
 	*meter { |server, numIns, numOuts, theme, density, meterStyle|
-		^SCVMeter(server, numIns: numIns, numOuts: numOuts, theme: theme, density: density, meterStyle: meterStyle);
+		^ProbeMeter(server, numIns: numIns, numOuts: numOuts, theme: theme, density: density, meterStyle: meterStyle);
 	}
 
 	*scope { |server, busIndex=0, numChannels=2, theme, rate=\audio, style=\overlay, bufSize=4096|
-		^SCVScope(server, busIndex: busIndex, numChannels: numChannels, theme: theme, rate: rate, style: style, bufSize: bufSize);
+		^ProbeScope(server, busIndex: busIndex, numChannels: numChannels, theme: theme, rate: rate, style: style, bufSize: bufSize);
 	}
 
 	*freqscope { |server, busIndex=0, fftSize=2048, theme, dbRange=96.0, freqMode=1|
-		^SCVSpectrum(server, busIndex: busIndex, fftSize: fftSize, theme: theme, dbRange: dbRange, freqMode: freqMode);
+		^ProbeSpectrum(server, busIndex: busIndex, fftSize: fftSize, theme: theme, dbRange: dbRange, freqMode: freqMode);
 	}
 
 	*spectrum { |server, busIndex=0, fftSize=2048, theme, dbRange=96.0, freqMode=1|
@@ -26,27 +26,27 @@ Probe {
 	}
 
 	*spectrogram { |server, busIndex=0, fftSize=64, theme, fps=25|
-		^SCVSpectrogram(server, busIndex: busIndex, fftSize: fftSize, theme: theme, fps: fps);
+		^ProbeSpectrogram(server, busIndex: busIndex, fftSize: fftSize, theme: theme, fps: fps);
 	}
 
 	*waterfall { |server, busIndex=0, fftSize=64, theme, fps=25, numLines=48|
-		^SCVWaterfall(server, busIndex: busIndex, fftSize: fftSize, theme: theme, fps: fps, numLines: numLines);
+		^ProbeWaterfall(server, busIndex: busIndex, fftSize: fftSize, theme: theme, fps: fps, numLines: numLines);
 	}
 
 	*history { |server, busType=\outputs, busIndex=0, numChannels=2, theme, fps=25, maxHistory=200|
-		^SCVHistory(server, busType: busType, busIndex: busIndex, numChannels: numChannels, theme: theme, fps: fps, maxHistory: maxHistory);
+		^ProbeHistory(server, busType: busType, busIndex: busIndex, numChannels: numChannels, theme: theme, fps: fps, maxHistory: maxHistory);
 	}
 
 	*loudness { |server, busType=\outputs, busIndex=0, numChannels=2, theme, targetLUFS= -23.0, updateFreq=15|
-		^SCVLoudness(server, busType: busType, busIndex: busIndex, numChannels: numChannels, theme: theme, targetLUFS: targetLUFS, updateFreq: updateFreq);
+		^ProbeLoudness(server, busType: busType, busIndex: busIndex, numChannels: numChannels, theme: theme, targetLUFS: targetLUFS, updateFreq: updateFreq);
 	}
 
 	*vectorscope { |server, busIndex=0, theme, fps=15|
-		^SCVVectorscope(server, busIndex: busIndex, theme: theme, fps: fps);
+		^ProbeVectorscope(server, busIndex: busIndex, theme: theme, fps: fps);
 	}
 
 	*dashboard { |server, numIns, numOuts, busIndex=0, theme, targetLUFS= -23.0|
-		^SCVDashboard(server, numIns: numIns, numOuts: numOuts, busIndex: busIndex, theme: theme, targetLUFS: targetLUFS);
+		^ProbeDashboard(server, numIns: numIns, numOuts: numOuts, busIndex: busIndex, theme: theme, targetLUFS: targetLUFS);
 	}
 
 	*spectralDashboard { |server, busIndex=0, theme|
@@ -67,30 +67,45 @@ Probe {
 
 	// Broker & Themes
 	*broker {
-		^SCVisuals.broker;
+		^ProbeBroker.default;
 	}
 
 	*theme {
-		^SCVTheme.current;
+		^ProbeTheme.current;
 	}
 
-	*theme_ { |name|
-		SCVisuals.theme = name;
+	*theme_ { |aTheme|
+		ProbeTheme.current = ProbeTheme.get(aTheme);
 	}
 
 	*fontScale {
-		^SCVisuals.fontScale;
+		^ProbeTheme.defaultFontScale;
 	}
 
 	*fontScale_ { |scale|
-		SCVisuals.fontScale = scale;
+		var s = scale.asFloat.clip(0.6, 2.5);
+		ProbeTheme.defaultFontScale = s;
+		ProbeTheme.themes.do { |th| th.fontScale = s };
+		if (ProbeTheme.current.notNil) { ProbeTheme.current.fontScale = s };
 	}
 
 	*defaultFontScale {
-		^SCVTheme.defaultFontScale;
+		^ProbeTheme.defaultFontScale;
 	}
 
 	*defaultFontScale_ { |scale|
-		SCVTheme.defaultFontScale = scale;
+		this.fontScale = scale;
+	}
+
+	*themes {
+		^ProbeTheme.themes;
+	}
+
+	*sources {
+		^this.broker.sources;
+	}
+
+	*freeAll {
+		this.broker.freeAll;
 	}
 }

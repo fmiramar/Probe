@@ -1,5 +1,5 @@
-// SCVisuals — Example 03: Themed Scope & Spectrum Analyzer
-// Runs SCVScope and SCVSpectrum side-by-side on an active harmonic synthesizer,
+// Probe — Example 03: Themed Scope & Spectrum Analyzer
+// Runs ProbeScope and ProbeSpectrum side-by-side on an active harmonic synthesizer,
 // with interactive theme switching, scope styles (\tracks, \overlay, \xy),
 // spectrum frequency modes (\linear, \logarithmic), and zoom controls.
 
@@ -10,7 +10,7 @@ s.waitForBoot({
 	var themeMenu, scopeStyleMenu, specModeMenu, dbRangeMenu, freezeBtn;
 	var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome];
 
-	"Starting SCVisuals Scope & Spectrum Demo...".postln;
+	"Starting Probe Scope & Spectrum Demo...".postln;
 
 	// Audio Generator: Harmonic rich waveform with slow vibrato and filter sweep
 	testSig = {
@@ -22,15 +22,15 @@ s.waitForBoot({
 	}.play;
 
 	// 1. Launch Scope (Positioned left)
-	scope = SCVisuals.scope(s, 0, 2, theme: \graphite, style: \overlay);
+	scope = Probe.scope(s, 0, 2, theme: \graphite, style: \overlay);
 	scope.window.bounds = Rect(80, 320, 380, 250);
 
 	// 2. Launch Spectrum (Positioned right)
-	spec = SCVisuals.spectrum(s, 0, 2048, theme: \graphite, freqMode: \logarithmic, dbRange: 96);
+	spec = Probe.spectrum(s, 0, 2048, theme: \graphite, freqMode: 1, dbRange: 96);
 	spec.window.bounds = Rect(470, 320, 440, 250);
 
 	// 3. Consolidated Control Panel
-	controlWin = Window("SCVisuals Tools Controller", Rect(80, 180, 830, 100), resizable: false);
+	controlWin = Window("Probe Tools Controller", Rect(80, 180, 830, 100), resizable: false);
 	controlWin.background = Color.fromHexString("#171A20");
 
 	// Theme Selector
@@ -106,7 +106,7 @@ s.waitForBoot({
 		if (scope.window.isClosed.not) { scope.close };
 		if (spec.window.isClosed.not) { spec.close };
 		testSig.free;
-		"SCVisuals Scope & Spectrum Demo stopped.".postln;
+		"Probe Scope & Spectrum Demo stopped.".postln;
 	};
 
 	controlWin.front;

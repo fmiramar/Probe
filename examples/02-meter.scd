@@ -1,4 +1,4 @@
-// SCVisuals — Example 02: Production ServerMeter (SCVMeter)
+// Probe — Example 02: Production ServerMeter (ProbeMeter)
 // Demonstrates vertical channel strips, legible dB tick ruler, dynamic theme switching
 // (Graphite, Phosphor, Ice, Amber, Paper, Monochrome), density switching, and peak-hold reset.
 
@@ -10,7 +10,7 @@ s.waitForBoot({
 	var densities = [\micro, \compact, \extended];
 	var styles = [\continuous, \led];
 
-	"Starting SCVisuals Meter Demo...".postln;
+	"Starting Probe Meter Demo...".postln;
 
 	// Start test audio: Stereo chords + transient pulse
 	testSig = {
@@ -21,11 +21,11 @@ s.waitForBoot({
 		Out.ar(0, sig);
 	}.play;
 
-	// Launch SCVMeter
-	meter = SCVisuals.meter(s, 2, 2, theme: \graphite, density: \compact, meterStyle: \continuous);
+	// Launch ProbeMeter
+	meter = Probe.meter(s, 2, 2, theme: \graphite, density: \compact, meterStyle: \continuous);
 
 	// Dedicated Control Panel Window
-	controlWin = Window("SCVMeter Controls", Rect(300, 450, 320, 110), resizable: false);
+	controlWin = Window("ProbeMeter Controls", Rect(300, 450, 320, 110), resizable: false);
 	controlWin.background = Color.fromHexString("#171A20");
 
 	StaticText(controlWin, Rect(12, 10, 60, 20))
@@ -74,7 +74,7 @@ s.waitForBoot({
 	meter.window.onClose = {
 		if (controlWin.isClosed.not) { controlWin.close };
 		testSig.free;
-		"SCVMeter Demo stopped.".postln;
+		"ProbeMeter Demo stopped.".postln;
 	};
 
 	controlWin.onClose = {

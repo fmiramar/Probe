@@ -31,7 +31,7 @@ ProbeGraphView {
 
 	prInit { |parent, bounds, argSynthDef, argTheme|
 		var rect = bounds ?? { Rect(0, 0, 720, 440) };
-		theme = SCVTheme.get(argTheme);
+		theme = ProbeTheme.get(argTheme);
 
 		if (argSynthDef.isKindOf(Function)) {
 			synthDef = argSynthDef.asSynthDef;
@@ -275,7 +275,7 @@ ProbeGraphView {
 	}
 
 	theme_ { |newTheme|
-		theme = SCVTheme.get(newTheme);
+		theme = ProbeTheme.get(newTheme);
 		view.background = theme.background;
 		view.refresh;
 	}

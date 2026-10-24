@@ -1,0 +1,91 @@
+TITLE:: ProbeSpectrum
+summary:: Themed spectrum analyzer wrapping the FreqScope FFT pipeline
+categories:: GUI>Visuals
+related:: Classes/Probe, Classes/ProbeSpectrumView, Classes/FreqScope
+
+DESCRIPTION::
+ProbeSpectrum provides a modern, theme-consistent real-time spectrum analyzer wrapping the verified FreqScope FFT pipeline (FFT size 2048, hop 0.75, Hann window, PV_MagSmear, phasor ScopeOut2).
+
+It features calibrated frequency markings (linear or logarithmic mode), dB level markers (0 to -96 dB), dynamic palette theming, and pause/freeze capability.
+
+CLASSMETHODS::
+
+METHOD:: new
+Opens and returns a new ProbeSpectrum window.
+
+ARGUMENT:: server
+The target audio Server (must be a local server).
+
+ARGUMENT:: busIndex
+Audio bus to analyze.
+
+ARGUMENT:: fftSize
+FFT frame size (default: 2048).
+
+ARGUMENT:: theme
+Theme name symbol (e.g. code::\graphite::, code::\phosphor::, code::\ice::, etc.).
+
+ARGUMENT:: freqMode
+code::\logarithmic:: or code::\linear::.
+
+ARGUMENT:: dbRange
+Dynamic range in dB (default: 96 dB).
+
+ARGUMENT:: smoothing
+FFT smoothing mode: code::\none::, code::\low::, code::\med::, or code::\high::.
+
+INSTANCEMETHODS::
+
+METHOD:: window
+Returns the underlying link::Classes/Window::.
+
+METHOD:: spectrumView
+Returns the underlying link::Classes/ProbeSpectrumView::.
+
+METHOD:: theme
+Changes theme palette dynamically.
+
+ARGUMENT:: aTheme
+Theme symbol or link::Classes/ProbeTheme::.
+
+METHOD:: viewMode
+Sets the active spectrum visualization view mode (Line, Bands, Spectrogram).
+
+ARGUMENT:: aMode
+Symbol mode: code::\line::, code::\bands::, or code::\spectrogram::.
+
+METHOD:: freqMode
+Switches between code::\logarithmic:: and code::\linear:: frequency axes.
+
+ARGUMENT:: aMode
+Frequency axis symbol: code::\logarithmic:: or code::\linear::.
+
+METHOD:: dbRange
+Adjusts the vertical dB display range.
+
+ARGUMENT:: aRange
+Float dB range (e.g. 96.0).
+
+METHOD:: smoothing
+Sets smoothing filter level.
+
+ARGUMENT:: aSmoothing
+Symbol smoothing level.
+
+METHOD:: fontScale
+Get or set the active typography scaling factor.
+
+ARGUMENT:: aScale
+Float font scale between 0.6 and 2.5.
+
+METHOD:: toggleFreeze
+Toggle pause/unpause of spectral drawing.
+
+METHOD:: close
+Closes window and frees ScopeBuffer and FFT analysis nodes.
+
+SECTION:: Keyboard Shortcuts
+list::
+## strong::m::: Toggle between Logarithmic and Linear frequency display
+## strong::Spacebar::: Freeze / Resume spectral drawing
+::

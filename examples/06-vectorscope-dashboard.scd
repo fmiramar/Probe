@@ -1,12 +1,12 @@
-// SCVisuals — Example 06: Vectorscope & Unified Multi-Panel Dashboard
-// Runs SCVDashboard hosting Meter, Oscilloscope, Spectrum, Loudness, and Vectorscope
+// Probe — Example 06: Vectorscope & Unified Multi-Panel Dashboard
+// Runs ProbeDashboard hosting Meter, Oscilloscope, Spectrum, Loudness, and Vectorscope
 // in a single synchronized command center, sharing measurement broker sources.
 
 (
 s.waitForBoot({
 	var dash, testSig;
 
-	"Starting SCVisuals Unified Dashboard Demo...".postln;
+	"Starting Probe Unified Dashboard Demo...".postln;
 
 	// Audio Generator: Stereo synthesizer with panning sweep, harmonics, and sub bass
 	testSig = {
@@ -20,7 +20,7 @@ s.waitForBoot({
 	}.play;
 
 	// Launch Unified Dashboard
-	dash = SCVisuals.dashboard(s, numIns: 2, numOuts: 2, busIndex: 0, theme: \graphite, targetLUFS: -23.0);
+	dash = Probe.dashboard(s, numIns: 2, numOuts: 2, busIndex: 0, theme: \graphite, targetLUFS: -23.0);
 
 	dash.window.onClose = {
 		testSig.free;

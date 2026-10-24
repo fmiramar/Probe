@@ -1,5 +1,5 @@
-// SCVisuals — Example 05: ITU-R BS.1770 / EBU R128 Loudness Meter
-// Runs SCVLoudness on live audio, demonstrating Momentary (400ms), Short-term (3s),
+// Probe — Example 05: ITU-R BS.1770 / EBU R128 Loudness Meter
+// Runs ProbeLoudness on live audio, demonstrating Momentary (400ms), Short-term (3s),
 // Integrated gated program loudness, Loudness Range (LRA), and target switching (-23 / -14 LUFS).
 
 (
@@ -9,7 +9,7 @@ s.waitForBoot({
 	var themeMenu, targetMenu, resetBtn;
 	var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome];
 
-	"Starting SCVisuals Loudness Meter Demo...".postln;
+	"Starting Probe Loudness Meter Demo...".postln;
 
 	// Audio Generator: Dynamic music-like synthesizer with alternating loud bursts and quiet passages
 	testSig = {
@@ -22,7 +22,7 @@ s.waitForBoot({
 	}.play;
 
 	// 1. Launch Loudness Meter
-	loud = SCVisuals.loudness(s, \outputs, 0, 2, theme: \graphite, targetLUFS: -23.0, updateFreq: 15);
+	loud = Probe.loudness(s, \outputs, 0, 2, theme: \graphite, targetLUFS: -23.0, updateFreq: 15);
 	loud.window.bounds = Rect(120, 280, 440, 290);
 
 	// 2. Control Window
@@ -30,7 +30,7 @@ s.waitForBoot({
 	controlWin.background = Color.fromHexString("#171A20");
 
 	StaticText(controlWin, Rect(16, 14, 300, 20))
-		.string_("SCVisuals Loudness Suite")
+		.string_("Probe Loudness Suite")
 		.font_(Font.sansSerif(13).boldVariant)
 		.stringColor_(Color.white);
 

@@ -1,0 +1,148 @@
+TITLE:: ProbeBroker
+summary:: Centralized measurement broker and subscription manager
+categories:: GUI>Visuals
+related:: Classes/Probe, Classes/ProbeLevelsSource, Classes/ProbeSpectrumSource, Classes/ProbeLoudnessSource, Classes/ProbeVectorscopeSource
+
+DESCRIPTION::
+ProbeBroker acts as the central coordinator between audio-server analysis synths and graphical presentation widgets. It keys sources by server, measurement type, bus index, channel count, and update frequency.
+
+When multiple visualizer windows (e.g. two meters or a dashboard) monitor the same bus, the broker shares a single analysis Synth and OSC responder rather than duplicating audio thread load.
+
+CLASSMETHODS::
+
+METHOD:: default
+Returns the default singleton broker.
+
+METHOD:: new
+Creates a new broker instance.
+
+INSTANCEMETHODS::
+
+METHOD:: subscribeLevels
+Subscribes a consumer object to a peak and RMS level measurement source.
+
+ARGUMENT:: consumer
+An identifying object (e.g. view or symbol).
+
+ARGUMENT:: server
+The target audio Server.
+
+ARGUMENT:: busType
+code::\outputs::, code::\inputs::, or code::\bus::.
+
+ARGUMENT:: busIndex
+Audio bus offset.
+
+ARGUMENT:: numChannels
+Number of audio channels.
+
+ARGUMENT:: updateFreq
+Telemetry update frequency in Hz.
+
+ARGUMENT:: onDataCallback
+Function evaluated on AppClock when new measurement values arrive: code::{ |peaks, rms, peakHold, source| ... }::.
+
+METHOD:: subscribeSpectrum
+Subscribes to a shared logarithmic spectral band analysis source.
+
+ARGUMENT:: consumer
+Consumer object.
+
+ARGUMENT:: server
+The target audio Server.
+
+ARGUMENT:: busIndex
+Audio bus index.
+
+ARGUMENT:: numBands
+Number of logarithmic filter bands (default 64).
+
+ARGUMENT:: updateFreq
+Update frequency in Hz.
+
+ARGUMENT:: onDataCallback
+Function evaluated with new band array data.
+
+METHOD:: subscribeLoudness
+Subscribes to an ITU-R BS.1770-4 / EBU R128 loudness telemetry source.
+
+ARGUMENT:: consumer
+Consumer object.
+
+ARGUMENT:: server
+The target audio Server.
+
+ARGUMENT:: busType
+code::\outputs::, code::\inputs::, or code::\bus::.
+
+ARGUMENT:: busIndex
+Audio bus offset.
+
+ARGUMENT:: numChannels
+Number of channels (1 or 2).
+
+ARGUMENT:: updateFreq
+Update rate in Hz.
+
+ARGUMENT:: onDataCallback
+Function evaluated with code::{ |m, s, i, lra, maxPeak, source| ... }::.
+
+METHOD:: subscribeCorrelation
+Subscribes to a stereo correlation and balance measurement source.
+
+ARGUMENT:: consumer
+Consumer object.
+
+ARGUMENT:: server
+The target audio Server.
+
+ARGUMENT:: busIndex
+Audio bus index.
+
+ARGUMENT:: updateFreq
+Update rate in Hz.
+
+ARGUMENT:: onDataCallback
+Function evaluated with code::{ |corr, bal, source| ... }::.
+
+METHOD:: subscribeSpectral
+Subscribes to a shared multi-descriptor spectral analysis source.
+
+ARGUMENT:: consumer
+Consumer object.
+
+ARGUMENT:: server
+The target audio Server.
+
+ARGUMENT:: busIndex
+Audio bus index.
+
+ARGUMENT:: updateFreq
+Update rate in Hz.
+
+ARGUMENT:: onDataCallback
+Function evaluated with dictionary of spectral descriptors, pitch, chroma, and bands.
+
+METHOD:: unsubscribe
+Unsubscribes a consumer from a specific source key. If no consumers remain, the source is automatically stopped and freed.
+
+ARGUMENT:: consumer
+Consumer object.
+
+ARGUMENT:: sourceKey
+Symbolic source key.
+
+METHOD:: unsubscribeAll
+Unsubscribes a consumer from all active sources.
+
+ARGUMENT:: consumer
+Consumer object to release.
+
+METHOD:: sourceCount
+Returns the number of active sources.
+
+METHOD:: totalSubscriberCount
+Returns the total number of active subscriptions across all sources.
+
+METHOD:: freeAll
+Frees all active sources and clears all subscriptions.

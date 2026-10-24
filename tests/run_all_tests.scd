@@ -1,18 +1,18 @@
 // tests/run_all_tests.scd
-// Master Test Runner for SCVisuals
+// Master Test Runner for Probe Suite
 // Discovers and executes all unit test suites, reporting aggregated pass/fail metrics.
 
 (
 var testFiles = [
-	"tests/SCVTheme_unittest.scd",
-	"tests/SCVBroker_unittest.scd",
-	"tests/SCVLifecycle_unittest.scd",
-	"tests/SCVMeter_unittest.scd",
-	"tests/SCVScope_unittest.scd",
-	"tests/SCVSpectrum_unittest.scd",
-	"tests/SCVSpectrogram_unittest.scd",
-	"tests/SCVLoudness_unittest.scd",
-	"tests/SCVDashboard_unittest.scd",
+	"tests/ProbeTheme_unittest.scd",
+	"tests/ProbeBroker_unittest.scd",
+	"tests/ProbeLifecycle_unittest.scd",
+	"tests/ProbeMeter_unittest.scd",
+	"tests/ProbeScope_unittest.scd",
+	"tests/ProbeSpectrum_unittest.scd",
+	"tests/ProbeSpectrogram_unittest.scd",
+	"tests/ProbeLoudness_unittest.scd",
+	"tests/ProbeDashboard_unittest.scd",
 	"tests/Probe_P1_unittest.scd",
 	"tests/Probe_P2_unittest.scd",
 	"tests/Probe_P3_unittest.scd",
@@ -24,12 +24,12 @@ var suitePassed = 0, suiteFailed = 0;
 var basePath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/";
 
 "========================================================================".postln;
-"             SCVisuals — Master Unit Test Suite Runner                  ".postln;
+"             Probe — Master Unit Test Suite Runner (v0.3.0)             ".postln;
 "========================================================================".postln;
 
 testFiles.do { |relPath|
 	var fullPath = basePath ++ relPath;
-	var cmd = "sclang -l \"" ++ basePath ++ "sclang_conf.yaml\" \"" ++ fullPath ++ "\" > /tmp/scv_test_out.log 2>&1; sleep 0.4";
+	var cmd = "sclang -l \"" ++ basePath ++ "sclang_conf.yaml\" \"" ++ fullPath ++ "\" > /tmp/probe_test_out.log 2>&1; sleep 0.4";
 	var exitCode;
 
 	("--> Running Suite: " ++ relPath).postln;
@@ -45,7 +45,7 @@ testFiles.do { |relPath|
 };
 
 "========================================================================".postln;
-("SCVisuals Test Execution Summary: " ++ suitePassed ++ " suites passed, " ++ suiteFailed ++ " suites failed.").postln;
+("Probe Test Execution Summary: " ++ suitePassed ++ " suites passed, " ++ suiteFailed ++ " suites failed.").postln;
 "========================================================================".postln;
 
 if (suiteFailed == 0) {

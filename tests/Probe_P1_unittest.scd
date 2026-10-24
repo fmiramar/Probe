@@ -80,25 +80,25 @@ s.waitForBoot({
 	// ------------------------------------------------------------------------
 	// A. s.meter2
 	meter = s.meter2(2, 2);
-	assert.value(meter.notNil and: { meter.isKindOf(SCVMeter) }, "s.meter2 creates SCVMeter instance");
+	assert.value(meter.notNil and: { meter.isKindOf(ProbeMeter) }, "s.meter2 creates ProbeMeter instance");
 	meter.close;
 	0.2.wait;
 
 	// B. s.scope2
 	scope = s.scope2(0, 2);
-	assert.value(scope.notNil and: { scope.isKindOf(SCVScope) }, "s.scope2 creates SCVScope instance");
+	assert.value(scope.notNil and: { scope.isKindOf(ProbeScope) }, "s.scope2 creates ProbeScope instance");
 	scope.close;
 	0.2.wait;
 
 	// C. s.freqscope2
 	spec = s.freqscope2(0);
-	assert.value(spec.notNil and: { spec.isKindOf(SCVSpectrum) }, "s.freqscope2 creates SCVSpectrum instance");
+	assert.value(spec.notNil and: { spec.isKindOf(ProbeSpectrum) }, "s.freqscope2 creates ProbeSpectrum instance");
 	spec.close;
 	0.2.wait;
 
 	// D. s.dashboard
 	dash = s.dashboard(2, 2);
-	assert.value(dash.notNil and: { dash.isKindOf(SCVDashboard) }, "s.dashboard creates SCVDashboard instance");
+	assert.value(dash.notNil and: { dash.isKindOf(ProbeDashboard) }, "s.dashboard creates ProbeDashboard instance");
 	dash.close;
 	0.5.wait;
 

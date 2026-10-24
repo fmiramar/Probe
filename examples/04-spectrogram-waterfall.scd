@@ -1,5 +1,5 @@
-// SCVisuals — Example 04: Real-Time Spectrogram, Waterfall & Level History
-// Runs SCVSpectrogram, SCVWaterfall, and SCVHistory side-by-side on an active synthesizer.
+// Probe — Example 04: Real-Time Spectrogram, Waterfall & Level History
+// Runs ProbeSpectrogram, ProbeWaterfall, and ProbeHistory side-by-side on an active synthesizer.
 // Demonstrates shared measurement sources (single FFT analysis for both Spectrogram and Waterfall),
 // palette color mapping, freeze/clear controls, and crest factor visualization.
 
@@ -10,7 +10,7 @@ s.waitForBoot({
 	var themeMenu, freezeBtn, clearBtn;
 	var themes = [\graphite, \phosphor, \ice, \amber, \paper, \monochrome];
 
-	"Starting SCVisuals Spectrogram, Waterfall & History Demo...".postln;
+	"Starting Probe Spectrogram, Waterfall & History Demo...".postln;
 
 	// Audio Generator: Harmonic chirp + sweeping resonant noise + pulsing bass
 	testSig = {
@@ -24,28 +24,28 @@ s.waitForBoot({
 	}.play;
 
 	// 1. Launch Spectrogram (Top-left)
-	spec = SCVisuals.spectrogram(s, busIndex: 0, numBands: 64, theme: \graphite, updateFreq: 20);
+	spec = Probe.spectrogram(s, busIndex: 0, numBands: 64, theme: \graphite, updateFreq: 20);
 	spec.window.bounds = Rect(60, 380, 440, 240);
 
 	// 2. Launch Waterfall (Top-right)
-	water = SCVisuals.waterfall(s, busIndex: 0, numBands: 64, theme: \graphite, updateFreq: 20, numLines: 40);
+	water = Probe.waterfall(s, busIndex: 0, numBands: 64, theme: \graphite, updateFreq: 20, numLines: 40);
 	water.window.bounds = Rect(510, 380, 460, 240);
 
 	// 3. Launch Level History (Bottom-left)
-	hist = SCVisuals.history(s, busType: \outputs, busIndex: 0, numChannels: 2, theme: \graphite, updateFreq: 20);
+	hist = Probe.history(s, busType: \outputs, busIndex: 0, numChannels: 2, theme: \graphite, updateFreq: 20);
 	hist.window.bounds = Rect(60, 110, 500, 230);
 
 	// 4. Controller Window (Bottom-right)
-	controlWin = Window("SCVisuals Spectral & History Controller", Rect(570, 110, 400, 230), resizable: false);
+	controlWin = Window("Probe Spectral & History Controller", Rect(570, 110, 400, 230), resizable: false);
 	controlWin.background = Color.fromHexString("#171A20");
 
 	StaticText(controlWin, Rect(16, 16, 360, 24))
-		.string_("SCVisuals Spectral & History Suite")
+		.string_("Probe Spectral & History Suite")
 		.font_(Font.sansSerif(14).boldVariant)
 		.stringColor_(Color.white);
 
 	StaticText(controlWin, Rect(16, 44, 360, 32))
-		.string_("Both Spectrogram and Waterfall share a single analysis Synth via SCVMeasurementBroker.")
+		.string_("Both Spectrogram and Waterfall share a single analysis Synth via ProbeBroker.")
 		.font_(Font.sansSerif(10))
 		.stringColor_(Color.gray(0.7));
 
@@ -84,7 +84,7 @@ s.waitForBoot({
 
 	// Broker info label
 	StaticText(controlWin, Rect(16, 180, 360, 30))
-		.string_("Active Broker Sources: " ++ SCVisuals.sources.size)
+		.string_("Active Broker Sources: " ++ Probe.sources.size)
 		.font_(Font.monospace(9))
 		.stringColor_(Color.fromHexString("#7ED6BA"));
 

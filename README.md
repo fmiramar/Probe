@@ -15,18 +15,18 @@ A cohesive, laboratory-grade, **lightweight** family of real-time audio analysis
 
 | Instrument | Description | Backend Transport | Status |
 |---|---|---|---|
-| **`s.meter2`** / `Probe.meter` | Compact vertical server meter (inputs/outputs, dB ruler, peak/RMS, peak-hold) | `SendPeakRMS` via `SCVLevelsSource` | **Production (v0.2.0)** |
-| **`s.scope2`** / `Probe.scope` | Oscilloscope with calibrated ms/dBFS axes, stationary trigger edge lock (`\rising`, `\falling`), tracks/overlay/XY | `ScopeView` / `ScopeOut2` + DSP circular latch buffer | **Production (v0.2.0)** |
-| **`s.freqscope2`** / `Probe.spectrum` | Unified FFT spectrum analyzer with 3 modes (Line, 16-Band Analyzer, Spectrogram) and interactive cursor | Precision FreqScope FFT pipeline | **Production (v0.2.0)** |
-| **`s.spectralDashboard`** | 4-preset command center (Overview, Pitch, Time-Frequency, Compare) with 16-band analyzer, chroma, and descriptors | `ProbeSpectralSource` & `SCVBroker` | **Production (v0.2.0)** |
-| **`s.inspector`** / `Probe.inspect` | Static topological signal-flow Directed Acyclic Graph (DAG) inspector with rate coloring and bezier routing | Static SCLang DAG compilation | **Production (v0.2.0)** |
-| **`.trace`** | Transparent runtime in-graph signal tracing for audio rate (Scope) and control rate (20 Hz Timeline HUD) | Dual transport: `ScopeOut2` / `SendReply.kr` | **Production (v0.2.0)** |
-| **`s.spectrogram`** | 2D scrolling time–frequency spectrogram with circular ring-buffer blit | 64-band logarithmic `SendReply.kr` | **Production (v0.2.0)** |
-| **`s.waterfall`** | 2.5D isometric stacked-line spectral history with depth-cued color shading | Shared `SCVSpectrumSource` | **Production (v0.2.0)** |
-| **`s.history`** | Rolling peak, RMS, and shaded crest factor timeline history chart | Shared `SCVLevelsSource` | **Production (v0.2.0)** |
-| **`s.loudness`** | ITU-R BS.1770-4 / EBU R128 loudness meter (M, S, I, LRA, -23 / -14 LUFS targets) | Two-stage K-weighting biquads | **Production (v0.2.0)** |
-| **`s.vectorscope`** | Stereo Lissajous X/Y display with Mid/Side polar graticule and phase correlation | `ScopeOut2` + Correlation UGen | **Production (v0.2.0)** |
-| **`s.dashboard`** | Unified 5-panel command center with global theme propagation and master freeze | `SCVMeasurementBroker` | **Production (v0.2.0)** |
+| **`s.meter2`** / `Probe.meter` | Compact vertical server meter (inputs/outputs, dB ruler, peak/RMS, peak-hold) | `SendPeakRMS` via `ProbeLevelsSource` | **Production (v0.3.0)** |
+| **`s.scope2`** / `Probe.scope` | Oscilloscope with calibrated ms/dBFS axes, stationary trigger edge lock (`\rising`, `\falling`), tracks/overlay/XY | `ScopeView` / `ScopeOut2` + DSP circular latch buffer | **Production (v0.3.0)** |
+| **`s.freqscope2`** / `Probe.spectrum` | Unified FFT spectrum analyzer with 3 modes (Line, 16-Band Analyzer, Spectrogram) and interactive cursor | Precision FreqScope FFT pipeline | **Production (v0.3.0)** |
+| **`s.spectralDashboard`** | 4-preset command center (Overview, Pitch, Time-Frequency, Compare) with 16-band analyzer, chroma, and descriptors | `ProbeSpectralSource` & `ProbeBroker` | **Production (v0.3.0)** |
+| **`s.inspector`** / `Probe.inspect` | Static topological signal-flow Directed Acyclic Graph (DAG) inspector with rate coloring and bezier routing | Static SCLang DAG compilation | **Production (v0.3.0)** |
+| **`.trace`** | Transparent runtime in-graph signal tracing for audio rate (Scope) and control rate (20 Hz Timeline HUD) | Dual transport: `ScopeOut2` / `SendReply.kr` | **Production (v0.3.0)** |
+| **`s.spectrogram`** | 2D scrolling time–frequency spectrogram with circular ring-buffer blit | 64-band logarithmic `SendReply.kr` | **Production (v0.3.0)** |
+| **`s.waterfall`** | 2.5D isometric stacked-line spectral history with depth-cued color shading | Shared `ProbeSpectrumSource` | **Production (v0.3.0)** |
+| **`s.history`** | Rolling peak, RMS, and shaded crest factor timeline history chart | Shared `ProbeLevelsSource` | **Production (v0.3.0)** |
+| **`s.loudness`** | ITU-R BS.1770-4 / EBU R128 loudness meter (M, S, I, LRA, -23 / -14 LUFS targets) | Two-stage K-weighting biquads | **Production (v0.3.0)** |
+| **`s.vectorscope`** | Stereo Lissajous X/Y display with Mid/Side polar graticule and phase correlation | `ScopeOut2` + Correlation UGen | **Production (v0.3.0)** |
+| **`s.dashboard`** | Unified 5-panel command center with global theme propagation and master freeze | `ProbeBroker` | **Production (v0.3.0)** |
 
 ---
 

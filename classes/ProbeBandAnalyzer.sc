@@ -32,7 +32,7 @@ ProbeBandAnalyzerView {
 
 		server   = argServer ?? { Server.default };
 		busIndex = argBusIndex.asInteger;
-		theme    = SCVTheme.get(argTheme);
+		theme    = ProbeTheme.get(argTheme);
 
 		currentBands = FloatArray.fill(16, -90.0);
 		peakBands    = FloatArray.fill(16, -90.0);
@@ -135,7 +135,7 @@ ProbeBandAnalyzerView {
 	}
 
 	prSubscribeSource {
-		source = SCVisuals.broker.subscribeSpectral(this, server, busIndex, 20, { |data|
+		source = Probe.broker.subscribeSpectral(this, server, busIndex, 20, { |data|
 			if (isClosed.not and: { isFrozen.not }) {
 				var b = data[\bands];
 				if (b.notNil) {
@@ -151,7 +151,7 @@ ProbeBandAnalyzerView {
 	}
 
 	theme_ { |newTheme|
-		theme = SCVTheme.get(newTheme);
+		theme = ProbeTheme.get(newTheme);
 		view.background = theme.background;
 		userView.background = theme.panelBackground;
 		if (txtTitle.notNil) {
@@ -177,7 +177,7 @@ ProbeBandAnalyzerView {
 	stop {
 		if (isClosed.not) {
 			isClosed = true;
-			SCVisuals.broker.unsubscribeAll(this);
+			Probe.broker.unsubscribeAll(this);
 			source = nil;
 		};
 	}

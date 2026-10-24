@@ -200,13 +200,28 @@ METHOD:: broker
 Returns the shared singleton measurement broker.
 
 METHOD:: theme
-Returns the current active theme.
+Get or set the current active theme.
+argument:: aTheme
+Optional theme symbol or link::Classes/ProbeTheme:: to set.
 
 METHOD:: fontScale
-Returns the current font scale factor.
+Get or set the active typography scaling factor.
+argument:: scale
+Float scale between 0.6 and 2.5.
 
 METHOD:: defaultFontScale
-Returns the default font scale factor (1.25).
+Get or set the default font scale factor (default 1.25).
+argument:: scale
+Float scale factor.
+
+METHOD:: themes
+Returns the dictionary of all registered themes.
+
+METHOD:: sources
+Returns the dictionary of all active measurement sources managed by the broker.
+
+METHOD:: freeAll
+Frees all active measurement sources and clear subscriptions.
 
 EXAMPLES::
 

@@ -1,4 +1,4 @@
-// SCVisuals — Example 01: Theme & Density Gallery
+// Probe — Example 01: Theme & Density Gallery
 // Visual reference displaying all six themes (Graphite, Phosphor, Ice, Amber, Paper, Monochrome)
 // and allowing interactive switching between themes and densities (\micro, \compact, \extended).
 
@@ -9,9 +9,9 @@ var densities = [\micro, \compact, \extended];
 var densityMenu, themeMenu;
 var renderGallery;
 
-currentTheme = SCVTheme.get(\graphite);
+currentTheme = ProbeTheme.get(\graphite);
 
-win = Window("SCVisuals — Theme & Density Gallery", Rect(100, 150, 720, 360));
+win = Window("Probe — Theme & Density Gallery", Rect(100, 150, 720, 360));
 win.background = currentTheme.background;
 
 // Header controls
@@ -43,7 +43,7 @@ renderGallery = {
 
 	// Render preview cards for each theme
 	themes.do { |thName, idx|
-		var th = SCVTheme.get(thName).withDensity(currentTheme.density);
+		var th = ProbeTheme.get(thName).withDensity(currentTheme.density);
 		var cardX = (idx % 3) * 230;
 		var cardY = (idx.div(3)) * 145;
 		var card = CompositeView(mainLayout, Rect(cardX, cardY, 220, 138));
@@ -116,7 +116,7 @@ renderGallery = {
 };
 
 themeMenu.action = { |m|
-	currentTheme = SCVTheme.get(themes[m.value]).withDensity(currentTheme.density);
+	currentTheme = ProbeTheme.get(themes[m.value]).withDensity(currentTheme.density);
 	renderGallery.value;
 };
 

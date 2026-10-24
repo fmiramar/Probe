@@ -189,7 +189,7 @@ ProbeTraceScopeWindow {
 
 	prInit { |argServer, argBus, argNumChannels, argRate, argLabel, argTheme, options|
 		var bounds = ProbeTrace.cascadeBounds(380, 240);
-		var th = SCVTheme.get(argTheme);
+		var th = ProbeTheme.get(argTheme);
 		var bufSize = (options ? ()).at(\bufSize) ? 4096;
 		var cycle = (options ? ()).at(\cycle) ? 1024;
 		var titleH = (18 * (th.fontScale ? 1.25)).max(18).round.asInteger;
@@ -299,7 +299,7 @@ ProbeTraceHistoryWindow {
 
 	prInit { |argServer, argTapId, argNumChannels, argLabel, argTheme, argUpdateFreq, options|
 		var bounds = ProbeTrace.cascadeBounds(380, 200);
-		var th = SCVTheme.get(argTheme);
+		var th = ProbeTheme.get(argTheme);
 		var titleH = (18 * (th.fontScale ? 1.25)).max(18).round.asInteger;
 		var topOffset = titleH + 6;
 
@@ -418,10 +418,10 @@ ProbeTraceMeterWindow {
 		bus = argBus;
 		numChannels = argNumChannels;
 		label = argLabel;
-		theme = SCVTheme.get(argTheme);
+		theme = ProbeTheme.get(argTheme);
 
 		window = Window(label ++ " [Meter] — Probe Trace", bounds);
-		meter = SCVMeterView(server, window, 0@0, 0, numChannels, theme, \compact);
+		meter = ProbeMeterView(server, window, 0@0, 0, numChannels, theme, \compact);
 		window.view.background = theme.background;
 		window.onClose = { this.close };
 		window.front;
@@ -453,10 +453,10 @@ ProbeTraceSpectrumWindow {
 		bus = argBus;
 		numChannels = argNumChannels;
 		label = argLabel;
-		theme = SCVTheme.get(argTheme);
+		theme = ProbeTheme.get(argTheme);
 
 		window = Window(label ++ " [Spectrum] — Probe Trace", bounds);
-		spectrum = SCVSpectrumView(server, window, Rect(0, 0, bounds.width, bounds.height), bus.index, 2048, theme);
+		spectrum = ProbeSpectrumView(server, window, Rect(0, 0, bounds.width, bounds.height), bus.index, 2048, theme);
 		window.view.background = theme.background;
 		window.onClose = { this.close };
 		window.front;

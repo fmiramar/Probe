@@ -1,0 +1,72 @@
+TITLE:: ProbeWaterfall
+summary:: Real-time 2.5D stacked line waterfall spectrum
+categories:: GUI>Visuals
+related:: Classes/Probe, Classes/ProbeWaterfallView, Classes/ProbeSpectrogram, Classes/ProbeSpectrum
+
+DESCRIPTION::
+ProbeWaterfall renders a 2.5D isometric stacked line waterfall spectrum analyzer.
+Lines roll from the foreground to background with perspective offset and theme gradient shading.
+
+list::
+## Zero duplicate FFT cost: shares ProbeSpectrumSource with link::Classes/ProbeSpectrogram:: via link::Classes/ProbeBroker::
+## Bounded line memory (default 48 historical frames)
+## Shaded depth cues from background subtext to foreground signal/warning colors
+## Interactive freeze control (Space)
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+Creates and displays a new ProbeWaterfall window.
+
+ARGUMENT:: server
+The target link::Classes/Server:: (defaults to code::Server.default::).
+
+ARGUMENT:: busIndex
+Audio bus index to analyze (default 0).
+
+ARGUMENT:: numBands
+Number of logarithmic frequency bands (default 64).
+
+ARGUMENT:: theme
+Theme name symbol or link::Classes/ProbeTheme:: instance.
+
+ARGUMENT:: updateFreq
+Analysis update rate in Hz (default 20 Hz).
+
+ARGUMENT:: numLines
+Number of stacked isometric historical traces (default 48).
+
+INSTANCEMETHODS::
+
+METHOD:: window
+Returns the underlying link::Classes/Window::.
+
+METHOD:: waterfallView
+Returns the underlying link::Classes/ProbeWaterfallView::.
+
+METHOD:: theme
+Update active theme dynamically.
+
+ARGUMENT:: aTheme
+Theme symbol or link::Classes/ProbeTheme::.
+
+METHOD:: fontScale
+Get or set the active typography scaling factor.
+
+ARGUMENT:: aScale
+Float font scale between 0.6 and 2.5.
+
+METHOD:: toggleFreeze
+Toggle pause/unpause of the waterfall rolling display.
+
+METHOD:: close
+Close the window and release broker subscriptions.
+
+EXAMPLES::
+
+code::
+s.boot;
+x = { Saw.ar(SinOsc.kr(0.2).range(100, 3000)) * 0.2 }.play;
+w = Probe.waterfall(s, 0, 64, \graphite);
+::

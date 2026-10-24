@@ -1,0 +1,97 @@
+TITLE:: ProbeMeter
+summary:: Compact, vertical real-time server level meter
+categories:: GUI>Visuals
+related:: Classes/Probe, Classes/ProbeMeterView, Classes/ServerMeter
+
+DESCRIPTION::
+ProbeMeter provides a compact, modernized vertical level meter for SuperCollider audio servers. It preserves the classic separated Input and Output channel strip arrangement while incorporating:
+
+list::
+## High-legibility dB tick ruler (0, -3, -6, -12, -18, -24, -36, -48, -60, -80 dBFS)
+## Dynamic palette theming (Graphite, Phosphor, Ice, Amber, Paper, Monochrome)
+## Three density presets (code::\micro::, code::\compact::, code::\extended::)
+## Dual meter styles (code::\continuous:: and code::\led::)
+## Peak-hold tracking with interactive click or keyboard ('r') reset
+## Shared measurement broker: opening multiple meter windows never duplicates audio-server analysis synths
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+Creates and displays a new ProbeMeter window.
+
+ARGUMENT:: server
+The target link::Classes/Server:: (defaults to code::Server.default::).
+
+ARGUMENT:: numIns
+Number of input channels to meter.
+
+ARGUMENT:: numOuts
+Number of output channels to meter.
+
+ARGUMENT:: theme
+Theme name symbol (e.g. code::\graphite::) or link::Classes/ProbeTheme:: instance.
+
+ARGUMENT:: density
+Density preset: code::\micro::, code::\compact::, or code::\extended::.
+
+ARGUMENT:: meterStyle
+Meter display style: code::\continuous:: or code::\led::.
+
+INSTANCEMETHODS::
+
+METHOD:: window
+Returns the underlying link::Classes/Window::.
+
+METHOD:: meterView
+Returns the underlying link::Classes/ProbeMeterView::.
+
+METHOD:: theme
+Changes the active theme dynamically without restarting analysis synths.
+
+ARGUMENT:: aTheme
+Theme symbol or link::Classes/ProbeTheme::.
+
+METHOD:: density
+Switches density mode and updates window dimensions.
+
+ARGUMENT:: aDensity
+Density symbol: code::\micro::, code::\compact::, or code::\extended::.
+
+METHOD:: meterStyle
+Switches between continuous and segmented LED styling.
+
+ARGUMENT:: aStyle
+Style symbol: code::\continuous:: or code::\led::.
+
+METHOD:: fontScale
+Get or set the active typography scaling factor.
+
+ARGUMENT:: aScale
+Float font scale between 0.6 and 2.5.
+
+METHOD:: resetPeakHold
+Resets peak-hold indicators to current levels.
+
+METHOD:: close
+Closes the meter window and unsubscribes from the broker.
+
+EXAMPLES::
+
+code::
+s.boot;
+
+// Default 2-in, 2-out compact meter in Graphite
+m = Probe.meter(s, 2, 2);
+
+// Switch themes dynamically
+m.theme = \ice;
+m.theme = \phosphor;
+
+// Switch density
+m.density = \micro;
+m.density = \compact;
+
+// Close
+m.close;
+::

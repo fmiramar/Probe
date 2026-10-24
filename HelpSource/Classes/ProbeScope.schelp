@@ -1,0 +1,108 @@
+TITLE:: ProbeScope
+summary:: Modernized oscilloscope wrapping native ScopeView with theme styling
+categories:: GUI>Visuals
+related:: Classes/Probe, Classes/ProbeScopeView, Classes/Stethoscope
+
+DESCRIPTION::
+ProbeScope wraps SuperCollider's native ScopeView (powered by ScopeOut2 and shared-memory QcScopeShm) in an elegant, theme-consistent window with an overlaid transparent grid, multi-channel wave colors, and keyboard shortcuts.
+
+Audio thread safety is strictly preserved: rendering uses the native shared-memory buffer path, adding zero additional audio DSP overhead.
+
+CLASSMETHODS::
+
+METHOD:: new
+Opens and returns a new ProbeScope window.
+
+ARGUMENT:: server
+The target audio Server (must be a local server for shared-memory scoping).
+
+ARGUMENT:: busIndex
+Audio or control bus index.
+
+ARGUMENT:: numChannels
+Number of channels to scope.
+
+ARGUMENT:: theme
+Theme name symbol (e.g. code::\graphite::, code::\phosphor::, code::\ice::, etc.).
+
+ARGUMENT:: rate
+code::\audio:: or code::\control::.
+
+ARGUMENT:: style
+Display mode: code::\overlay:: (superimposed), code::\tracks:: (stacked channels), or code::\xy:: (Lissajous stereo).
+
+ARGUMENT:: bufSize
+Buffer size in frames (default: 4096).
+
+INSTANCEMETHODS::
+
+METHOD:: window
+Returns the underlying link::Classes/Window::.
+
+METHOD:: scopeView
+Returns the underlying link::Classes/ProbeScopeView::.
+
+METHOD:: theme
+Changes theme palette dynamically.
+
+ARGUMENT:: aTheme
+Theme symbol or link::Classes/ProbeTheme::.
+
+METHOD:: scopeStyle
+Switches display mode: code::\overlay::, code::\tracks::, or code::\xy::.
+
+ARGUMENT:: aStyle
+Style mode symbol.
+
+METHOD:: yZoom
+Adjusts vertical amplitude zoom.
+
+ARGUMENT:: val
+Float zoom factor.
+
+METHOD:: xZoom
+Adjusts horizontal time zoom.
+
+ARGUMENT:: val
+Float zoom factor.
+
+METHOD:: cycle
+Sets window frame cycle length.
+
+ARGUMENT:: frames
+Integer cycle frame size.
+
+METHOD:: triggerMode
+Sets the oscilloscope triggering mode.
+
+ARGUMENT:: mode
+Trigger mode: code::\free::, code::\rising::, or code::\falling::.
+
+METHOD:: triggerThreshold
+Sets the waveform trigger threshold level.
+
+ARGUMENT:: val
+Float threshold amplitude.
+
+METHOD:: resetZoom
+Resets both X and Y zoom factors to 1.0.
+
+METHOD:: toggleFreeze
+Toggle pause/unpause of oscilloscope updates.
+
+METHOD:: fontScale
+Get or set the active typography scaling factor.
+
+ARGUMENT:: aScale
+Float font scale between 0.6 and 2.5.
+
+METHOD:: close
+Closes window and frees ScopeBuffer and analysis Synth.
+
+SECTION:: Keyboard Shortcuts
+list::
+## strong::+ / =::: Zoom in vertically
+## strong::- / _::: Zoom out vertically
+## strong::s::: Cycle through display styles (Overlay -> Tracks -> X/Y)
+## strong::Spacebar::: Freeze / Resume waveform drawing
+::

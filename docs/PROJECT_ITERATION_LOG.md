@@ -3,7 +3,7 @@
 **Project:** Probe (formerly developed under the working name `SCVisuals`)  
 **Target Environment:** SuperCollider 3.14+ (macOS, Linux, Windows)  
 **Repository Path:** `/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals`  
-**Last Updated:** 2026-10-17  
+**Last Updated:** 2026-10-24  
 
 ---
 
@@ -351,7 +351,61 @@ This document serves as the persistent historical record of all development iter
      - Executed all 14 test suites in `tests/run_all_tests.scd`: 14/14 suites passed cleanly (100%).
   4. **Phase II Release Audit:**
      - Completed comprehensive audit across all 10 release acceptance criteria in `reports/phase2/P6.md`. Zero regressions, zero memory leaks, and zero audio distortions.
-- **Deliverables:** `README.md`, `HelpSource/Classes/Probe.schelp`, `examples/phase2/08_dsp_graph_inspector.scd`, `reports/phase2/P6.md`, Commit pending.
+- **Deliverables:** `README.md`, `HelpSource/Classes/Probe.schelp`, `examples/phase2/08_dsp_graph_inspector.scd`, `reports/phase2/P6.md`, Commit `43105ff`.
+
+---
+
+### Iteration 21: Unified Probe Namespace Migration (v0.3.0) & Zero-Warning HelpSource Documentation
+- **Focus:** Complete elimination of internal `SCV_` / `SCV*` legacy prefixes across classes, filenames, SynthDefs, OSC paths, and HelpSource; fixing SuperCollider `SCDoc` argument mismatch warnings on `Cmd+D`; delivering seamless 100% backward-compatibility via `ProbeLegacyCompat.sc`.
+- **Key Enhancements Applied:**
+  1. **SCDoc HelpSource Warnings Resolution (`Cmd+D`):**
+     - Resolved SuperCollider documentation compilation warnings reported during class inspection:
+       - `Probe *meter`: Added missing `argument:: input` and `argument:: output` doc tags (matching all 6 method parameters).
+       - `Probe *scope`: Added missing `argument:: channelOffset` doc tag (matching all 7 method parameters).
+       - `Probe *bandAnalyzer`: Added missing `argument:: numBands` doc tag (matching all 3 method parameters).
+     - Rectified property setter syntax in all 14 `.schelp` files (documenting `METHOD:: prop` with `argument:: value` instead of illegal `prop_`).
+     - Replaced non-standard tags (`KEYBOARD SHORTCUTS::`) with standard `SECTION:: Keyboard Shortcuts`.
+     - Validated via `SCDoc.parseAndRender`: **14/14 documentation files parse with 0 warnings and 0 syntax errors**.
+  2. **Class & File Namespace Unification:**
+     - Renamed 12 instrument and telemetry class files from `SCV*.sc` to `Probe*.sc`:
+       - `SCVTheme` -> `ProbeTheme`
+       - `SCVMeasurementBroker` -> `ProbeBroker`
+       - `SCVLevelsSource` -> `ProbeLevelsSource`
+       - `SCVSpectrumSource` -> `ProbeSpectrumSource`
+       - `SCVLoudnessSource` -> `ProbeLoudnessSource`
+       - `SCVVectorscopeSource` -> `ProbeVectorscopeSource`
+       - `SCVScope` / `SCVScopeView` -> `ProbeScope` / `ProbeScopeView`
+       - `SCVSpectrum` / `SCVSpectrumView` -> `ProbeSpectrum` / `ProbeSpectrumView`
+       - `SCVSpectrogram` / `SCVSpectrogramView` -> `ProbeSpectrogram` / `ProbeSpectrogramView`
+       - `SCVWaterfall` / `SCVWaterfallView` -> `ProbeWaterfall` / `ProbeWaterfallView`
+       - `SCVMeter` / `SCVMeterView` -> `ProbeMeter` / `ProbeMeterView`
+       - `SCVLoudness` / `SCVLoudnessView` -> `ProbeLoudness` / `ProbeLoudnessView`
+       - `SCVVectorscope` / `SCVVectorscopeView` -> `ProbeVectorscope` / `ProbeVectorscopeView`
+       - `SCVHistory` / `SCVHistoryView` -> `ProbeHistory` / `ProbeHistoryView`
+       - `SCVDashboard` / `SCVDashboardView` -> `ProbeDashboard` / `ProbeDashboardView`
+     - Renamed 11 HelpSource documents from `SCV*.schelp` to `Probe*.schelp`.
+     - Renamed 9 test suite files from `SCV*_unittest.scd` to `Probe*_unittest.scd`.
+  3. **SynthDef & OSC Path Namespace Unification:**
+     - Renamed internal SynthDefs from `\scv_*` to `\probe_*`:
+       - `\scv_meter_levels` -> `\probe_meter_levels`
+       - `\scv_scope_*` -> `\probe_scope_*`
+       - `\scv_spectrum_*` -> `\probe_spectrum_*`
+       - `\scv_spectrogram_fft` -> `\probe_spectrogram_fft`
+       - `\scv_loudness_*` -> `\probe_loudness_*`
+       - `\scv_vecscope_*` -> `\probe_vecscope_*`
+     - Renamed OSC message reply paths from `'/scv_*'` to `'/probe_*'`.
+  4. **Zero-Breakage Backward Compatibility Layer:**
+     - Created `classes/ProbeLegacyCompat.sc` defining 22 legacy subclasses inheriting directly from their `Probe*` counterparts (e.g. `SCVTheme : ProbeTheme {}`, `SCVMeasurementBroker : ProbeBroker {}`, `SCVScope : ProbeScope {}`, `SCVMeter : ProbeMeter {}`).
+     - Legacy code continues to execute without error or deprecation failure while transparently sharing underlying singleton state and class variables.
+  5. **Verification & Test Suite Coverage:**
+     - Class library recompile confirmed clean in 0.27s (0 errors, 0 duplicate class warnings).
+     - Master test runner (`tests/run_all_tests.scd`): 14/14 test suites passed cleanly (100%).
+     - System install verification (`scripts/verify_system_install.scd`): 73/73 assertions passed (0 failed).
+     - HelpSource verification (`scripts/verify_scdoc.scd`): 14/14 documents verified with 0 warnings.
+  6. **Release Packaging (`v0.3.0`):**
+     - Version bumped to `0.3.0` in `Probe.quark`, `SCVisuals.quark`, `Probe.sc`, `SCVisuals.sc`, and `README.md`.
+     - All 6 examples in `examples/01` - `06` updated to modern `Probe` idiomatic API.
+- **Deliverables:** `classes/Probe*.sc`, `classes/ProbeLegacyCompat.sc`, `HelpSource/Classes/Probe*.schelp`, `tests/Probe*_unittest.scd`, `scripts/verify_*.scd`, Commit pending.
 
 ---
 
@@ -359,11 +413,11 @@ This document serves as the persistent historical record of all development iter
 
 | Parameter / Feature | Chosen Design | Rationale | Invariant Status |
 |---|---|---|---|
-| **Suite Name** | `Probe` (migrating from `SCVisuals`) | Professional instrumentation terminology; avoids `SC` legacy namespace clutter and collision with core `Monitor`. | Active Invariant (Phase II) |
+| **Suite Name** | `Probe` (`v0.3.0`, unified namespace) | Professional instrumentation terminology; completely replaces internal `SCV` prefix while preserving legacy subclasses in `ProbeLegacyCompat.sc`. | Active Invariant (v0.3.0) |
 | **Default Font Scale** | `1.25` (125%) | Optimum balance of legibility on modern high-DPI retina displays without overflowing panels. | Active Invariant |
 | **Control Layout** | Tight (28px buttons at 1.25, 4–6px gaps) | Sleek laboratory instrument aesthetic; eliminates bloated dead space. | Active Invariant |
 | **FFT Smoothing** | Raw FFT scan (no PV smoothing) | PV smoothing introduced smearing and edge ripples; raw FFT preserves instant transient response. | Active Invariant |
-| **Telemetry Transport** | `SCVBroker` Reference-Counted Synths | Prevents duplicate FFT/peak-RMS synths on identical bus monitoring. | Active Invariant |
+| **Telemetry Transport** | `ProbeBroker` Reference-Counted Synths | Prevents duplicate FFT/peak-RMS synths on identical bus monitoring. Legacy alias `SCVMeasurementBroker` retained. | Active Invariant (v0.3.0) |
 | **Core SC Overrides** | Forbidden (`s.meter`, `s.scope`, `s.freqscope` unchanged) | Strict non-interference with vanilla SuperCollider workflows. | Permanent Invariant |
 | **Server Shortcuts** | `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard`, `s.spectralDashboard`, `s.bandAnalyzer`, `s.inspector` | Non-conflicting ergonomic shortcuts following SuperCollider numbering conventions. | Active Invariant |
 | **Signal Tracing** | Transparent `.trace` with Dual Transport | Sample-accurate waveforms for audio rate, low-bandwidth 20 Hz timeline HUD for control rate. | Active Invariant (Phase II) |
@@ -371,6 +425,6 @@ This document serves as the persistent historical record of all development iter
 | **Oscilloscope Triggering** | DSP Zero-Crossing Latch Buffer | Guarantees drift-free stationary waveforms for periodic signals without external plugins. | Active Invariant (Phase II) |
 | **Unified FreqScope Modes** | Subview Visibility Switching | Seamless single-window transitions between Line, 16-Band, and Spectrogram modes. | Active Invariant (Phase II) |
 | **DSP Graph Inspector** | Static Topological DAG Parsing | Pure sclang evaluation; renders clear signal flow without server messaging overhead or audio thread interference. | Active Invariant (Phase II) |
-| **Packaging & Compatibility** | Dual-Quark Alias (`Probe` + `SCVisuals`) | Seamless migration path ensuring zero broken workflows for existing installations. | Active Invariant (Phase II) |
+| **Packaging & Compatibility** | Dual-Quark Alias (`Probe` + `SCVisuals`) & `ProbeLegacyCompat.sc` | Seamless migration path ensuring zero broken workflows for existing installations; 22 legacy `SCV*` classes preserved. | Active Invariant (v0.3.0) |
 
 

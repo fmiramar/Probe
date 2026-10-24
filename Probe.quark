@@ -1,7 +1,7 @@
 (
 	name: "Probe",
 	summary: "High-performance real-time audio visualization & instrumentation suite for SuperCollider.",
-	version: "0.2.0",
+	version: "0.3.0",
 	schelp: "Probe",
 	license: "GPL-3.0-or-later",
 	copyright: "2026 Probe Contributors",

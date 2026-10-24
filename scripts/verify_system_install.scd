@@ -1,5 +1,5 @@
 // scripts/verify_system_install.scd
-// Verifies system-wide installation of Probe and backwards-compatible SCVisuals.
+// Verifies system-wide installation of Probe (v0.3.0) and backwards-compatible SCVisuals.
 
 (
 var passed = 0, failed = 0;
@@ -14,12 +14,36 @@ var assert = { |cond, msg|
 };
 
 "========================================================================".postln;
-"Testing System-Wide SuperCollider Installation of Probe (v0.2.0)...".postln;
+"Testing System-Wide SuperCollider Installation of Probe (v0.3.0)...".postln;
 "========================================================================".postln;
 
-// 1. Probe Core Classes
+// 1. Probe Unified Namespace Classes
 [
 	Probe,
+	ProbeTheme,
+	ProbeBroker,
+	ProbeLevelsSource,
+	ProbeSpectrumSource,
+	ProbeLoudnessSource,
+	ProbeVectorscopeSource,
+	ProbeMeter,
+	ProbeMeterView,
+	ProbeScope,
+	ProbeScopeView,
+	ProbeSpectrum,
+	ProbeSpectrumView,
+	ProbeSpectrogram,
+	ProbeSpectrogramView,
+	ProbeWaterfall,
+	ProbeWaterfallView,
+	ProbeHistory,
+	ProbeHistoryView,
+	ProbeLoudness,
+	ProbeLoudnessView,
+	ProbeVectorscope,
+	ProbeVectorscopeView,
+	ProbeDashboard,
+	ProbeDashboardView,
 	ProbeBandAnalyzer,
 	ProbeBandAnalyzerView,
 	ProbeSpectralDashboard,
@@ -79,8 +103,8 @@ assert.value(Server.findMethod(\inspector).notNil, "Server:inspector extension r
 assert.value(UGen.findMethod(\trace).notNil, "UGen:trace extension registered");
 
 // 5. Versioning & Theme Integrity
-assert.value(Probe.version == "0.2.0", "Probe.version is 0.2.0");
-assert.value(SCVisuals.version == "0.2.0", "SCVisuals.version is 0.2.0");
+assert.value(Probe.version == "0.3.0", "Probe.version is 0.3.0");
+assert.value(SCVisuals.version == "0.3.0", "SCVisuals.version is 0.3.0");
 assert.value(Probe.theme.name === \graphite, "Probe default theme is \\graphite");
 assert.value(Probe.fontScale == 1.25, "Probe default fontScale is 1.25");
 

@@ -34,7 +34,7 @@ ProbeSpectralDashboardView {
 
 		server      = argServer ?? { Server.default };
 		busIndex    = argBusIndex.asInteger;
-		theme       = SCVTheme.get(argTheme);
+		theme       = ProbeTheme.get(argTheme);
 		allSubViews = List.new;
 
 		view = CompositeView(parent, rect);
@@ -120,7 +120,7 @@ ProbeSpectralDashboardView {
 			var halfW = ((cw - 8) * 0.5).floor;
 			var topPartH = (ch * 0.65).floor;
 			var botPartH = ch - topPartH - 8;
-			specOverview = SCVSpectrumView(server, panelOverview, Rect(0, 0, halfW, topPartH), busIndex, 2048, theme);
+			specOverview = ProbeSpectrumView(server, panelOverview, Rect(0, 0, halfW, topPartH), busIndex, 2048, theme);
 			bandView     = ProbeBandAnalyzerView(server, panelOverview, Rect(halfW + 8, 0, halfW, topPartH), busIndex, theme);
 			descView     = ProbeDescriptorsView(server, panelOverview, Rect(0, topPartH + 8, cw, botPartH), busIndex, theme);
 			allSubViews.addAll([specOverview, bandView, descView]);
@@ -145,8 +145,8 @@ ProbeSpectralDashboardView {
 		panelTimeFreq.visible = false;
 		{
 			var halfH = ((ch - 8) * 0.5).floor;
-			gramView = SCVSpectrogramView(server, panelTimeFreq, Rect(0, 0, cw, halfH), busIndex, 64, theme);
-			fallView = SCVWaterfallView(server, panelTimeFreq, Rect(0, halfH + 8, cw, halfH), busIndex, 64, theme);
+			gramView = ProbeSpectrogramView(server, panelTimeFreq, Rect(0, 0, cw, halfH), busIndex, 64, theme);
+			fallView = ProbeWaterfallView(server, panelTimeFreq, Rect(0, halfH + 8, cw, halfH), busIndex, 64, theme);
 			allSubViews.addAll([gramView, fallView]);
 		}.value;
 
@@ -157,7 +157,7 @@ ProbeSpectralDashboardView {
 		panelCompare.visible = false;
 		{
 			var halfH = ((ch - 8) * 0.5).floor;
-			specCompare = SCVSpectrumView(server, panelCompare, Rect(0, 0, cw, halfH), busIndex, 2048, theme);
+			specCompare = ProbeSpectrumView(server, panelCompare, Rect(0, 0, cw, halfH), busIndex, 2048, theme);
 			compareView = ProbeSpectralCompareView(server, panelCompare, Rect(0, halfH + 8, cw, halfH), busIndex, theme);
 			allSubViews.addAll([specCompare, compareView]);
 		}.value;
@@ -305,7 +305,7 @@ ProbeSpectralDashboardView {
 	prStartTelemetry {
 		AppClock.sched(0.5, {
 			if (isClosed.not and: { txtStatus.notNil and: { txtStatus.isClosed.not } }) {
-				var b = SCVisuals.broker;
+				var b = Probe.broker;
 				txtStatus.string = "Bus: " ++ busIndex ++ " | FFT: 2048 | Broker: " ++ b.sourceCount ++ " src / " ++ b.totalSubscriberCount ++ " sub";
 				0.5;
 			} {
@@ -315,7 +315,7 @@ ProbeSpectralDashboardView {
 	}
 
 	theme_ { |newTheme|
-		theme = SCVTheme.get(newTheme);
+		theme = ProbeTheme.get(newTheme);
 		view.background = theme.background;
 		if (containerView.notNil and: { containerView.isClosed.not }) {
 			containerView.background = theme.background;
