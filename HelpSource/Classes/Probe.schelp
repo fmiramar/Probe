@@ -227,6 +227,8 @@ Frees all active measurement sources and clear subscriptions.
 
 EXAMPLES::
 
+SUBSECTION:: Basic Usage
+
 code::
 s.boot;
 
@@ -244,4 +246,24 @@ s.inspectorPb({ |freq=440| RLPF.ar(Saw.ar(freq), 1200, 0.2) });
 // 3. Transparent Signal Tracing
 y = { SinOsc.ar(440, 0, 0.1).trace(\sineWave) }.play;
 y.free;
+::
+
+SUBSECTION:: Theming
+
+code::
+// because we all love puredata
+s.boot;
+
+// 1. Open any instrument directly in Pure Data mode
+s.scopePb(theme: \puredata);
+s.bandAnalyzerPb(theme: \puredata);
+s.meterPb(theme: \puredata);
+s.dashboardPb(theme: \puredata);
+
+// 2. Or switch theme dynamically on any running instrument
+~scope = s.scopePb;
+~scope.theme = \puredata;
+
+// 3. Or set globally as default
+ProbeTheme.current = ProbeTheme.get(\puredata);
 ::
