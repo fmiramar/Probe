@@ -490,6 +490,42 @@ This document serves as the persistent historical record of all development iter
 
 ---
 
+### Iteration 25: Native Engine Freeze Waveform Vanishing Fix & Server Synth Pause Lifecycle
+- **Context & Problem Reported:**
+  When using `ProbeScope` in `\native` engine mode and clicking the "Freeze" button, the waveform completely vanished from the screen, leaving a blank canvas. In `\smooth` mode, the waveform froze and remained visible as expected.
+- **Root Cause in C++ `QcScopeShm` (`QtCollider`):**
+  1. `PB_ScopeView:toggleFreeze` previously called `scopeView.stop` when entering frozen state.
+  2. In SuperCollider's Qt C++ backend (`QtCollider/widgets/QcScopeShm.cpp`):
+     ```cpp
+     void QcScopeShm::stop() {
+         delete _shm->client;
+         _shm->client = 0;
+         timer->stop();
+         _running = false;
+     }
+     ```
+     `stop()` destroys the shared memory client and sets `_running = false`.
+  3. In `QcScopeShm::paintEvent`:
+     ```cpp
+     _pixmap.fill(_bkg);
+     if (_running && _availableFrames) {
+         // render waveforms
+     }
+     ```
+     Because `_running` was set to `false`, the widget filled the canvas with background color `_bkg` and completely skipped painting any waveforms, causing the trace to vanish.
+- **Solution & Implementation:**
+  1. `ScopeView:stop` is reserved solely for instrument disposal (`stop`/`close`), never for pausing/freezing.
+  2. For freezing, `PB_ScopeView` and `PB_VectorscopeView` now pause the server-side analysis synth using `synth.run(false)` (sending `/n_run, id, 0`).
+  3. Pausing the synth stops `ScopeOut2` and `RecordBuf` from pushing new audio blocks into the shared ring buffer.
+  4. In `QcScopeShm`, `_running` remains `true` and the last captured audio frames remain valid in memory. Qt continues drawing the frozen waveform across all subsequent paint events without wiping.
+  5. On unfreeze, `synth.run(true)` resumes audio capture immediately without reconnecting shared memory.
+  6. Added seamless cross-engine state preservation: if the user toggles between `\smooth` and `\native` while frozen, a single `/b_getn` frame is fetched so the vector renderer displays the exact frozen waveform without unpausing the server synth.
+  7. Added `isFrozen` getter forwarding on `ProbeScope` and `ProbeVectorscope`.
+  8. Verified across 14/14 test suites including new regression assertions in `tests/ProbeScope_unittest.scd`.
+- **Deliverables:** `classes/ProbeScope.sc`, `classes/ProbeVectorscope.sc`, `tests/ProbeScope_unittest.scd`, `docs/PROJECT_ITERATION_LOG.md`, `docs/decisions/ADR-002-Dual-Engine-Smooth-Antialiased-Rendering.md`.
+
+---
+
 ## Decision Matrix & Invariant Log
 
 | Parameter / Feature | Chosen Design | Rationale | Invariant Status |

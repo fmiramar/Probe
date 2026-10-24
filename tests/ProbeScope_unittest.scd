@@ -85,11 +85,28 @@ s.waitForBoot({
 		assert.value(sv.theme.name === thName, "Theme updated to " ++ thName);
 	};
 
-	// 5. Freeze toggle
+	// 5. Freeze toggle (smooth and native)
+	assert.value(scope.isFrozen == false, "Wrapper scope.isFrozen initially false");
 	sv.toggleFreeze;
+	0.1.wait;
 	assert.value(sv.isFrozen, "Scope is frozen");
+	assert.value(scope.isFrozen, "Wrapper isFrozen reflects frozen state");
+	if (sv.synth.notNil) {
+		assert.value(sv.synth.isRunning == false, "Synth paused during freeze");
+	};
+
+	// Switch to native while frozen
+	scope.engine = \native;
+	0.05.wait;
+	assert.value(sv.scopeView.getProperty(\running) == true, "Native ScopeView running flag remains true during freeze to retain waveform");
+
 	sv.toggleFreeze;
+	0.1.wait;
 	assert.value(sv.isFrozen.not, "Scope is un-frozen (running)");
+	assert.value(scope.isFrozen.not, "Wrapper isFrozen reflects running state");
+	if (sv.synth.notNil) {
+		assert.value(sv.synth.isRunning == true, "Synth resumed on unfreeze");
+	};
 
 	// 6. Close and resource reclamation
 	scope.close;

@@ -13,7 +13,7 @@ PB_VectorscopeView {
 	var <view;
 	var <scopeView, <overlayView;
 	var <busIndex, <updateFreq;
-	var <scopeBuf, <recordBuf, synth;
+	var <scopeBuf, <recordBuf, <synth;
 	var <source;
 	var <theme;
 	var <correlation = 1.0;
@@ -290,6 +290,9 @@ PB_VectorscopeView {
 		};
 
 		scopeView.start;
+		if (isFrozen) {
+			synth.run(false);
+		};
 		if (engine === \smooth) {
 			this.prStartPoller;
 		};
@@ -355,8 +358,14 @@ PB_VectorscopeView {
 		};
 		if (engine === \smooth) {
 			this.prStartPoller;
+			if (isFrozen and: { recordBuf.notNil } and: { server.serverRunning }) {
+				server.sendMsg('/b_getn', recordBuf.bufnum, 0, 1024 * 2);
+			};
 		} {
 			this.prStopPoller;
+			if (scopeView.notNil and: { scopeView.isClosed.not }) {
+				scopeView.refresh;
+			};
 		};
 		if (overlayView.notNil and: { overlayView.isClosed.not }) {
 			overlayView.refresh;
@@ -416,11 +425,15 @@ PB_VectorscopeView {
 
 	toggleFreeze {
 		if (isFrozen) {
-			if (scopeView.notNil and: { scopeView.isClosed.not }) { scopeView.start };
 			isFrozen = false;
+			if (synth.notNil and: { synth.isPlaying }) {
+				synth.run(true);
+			};
 		} {
-			if (scopeView.notNil and: { scopeView.isClosed.not }) { scopeView.stop };
 			isFrozen = true;
+			if (synth.notNil and: { synth.isPlaying }) {
+				synth.run(false);
+			};
 		};
 		overlayView.refresh;
 	}
@@ -524,6 +537,10 @@ ProbeVectorscope {
 
 	toggleFreeze {
 		vectorscopeView.toggleFreeze;
+	}
+
+	isFrozen {
+		^vectorscopeView.isFrozen;
 	}
 
 	fontScale {

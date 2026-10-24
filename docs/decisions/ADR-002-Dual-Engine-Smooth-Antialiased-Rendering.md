@@ -59,6 +59,9 @@ Audio-rate safety and zero audio-thread overhead are strictly maintained:
    - A client-side Routine on `AppClock` queries `/b_getn` at 25–30 Hz.
    - `/b_getn` executes on the server's command thread (never the real-time audio thread) and returns interleaved floats via UDP.
    - De-interleaving and view refresh are executed on `AppClock` with `{ view.refresh }.defer`.
+4. **Lifecycle & Freeze State (Post-Mortem on Native Freeze Waveform Vanishing):**
+   - *Bug Root-Cause:* Calling `ScopeView:stop` invokes `QcScopeShm::stop()`, which tears down the shared memory client (`delete _shm->client`) and sets `_running = false`. On subsequent Qt paint events, `paintEvent` filled the pixmap with background color and skipped painting because `_running` was false, causing the waveform to completely disappear in `\native` mode.
+   - *Architectural Resolution:* Freezing is implemented at the synthesis layer by pausing the analysis synth (`synth.run(false)`), never by stopping the Qt widget. `QcScopeShm` remains in running state (`_running == true`), keeping its internal data pointer valid so that Qt continues rendering the exact frozen waveform across all repaint events. When unfreezing, `synth.run(true)` seamlessly resumes live audio capture. Dynamically toggling between `\native` and `\smooth` while frozen issues a single `/b_getn` read to populate `channelData` so the frozen state is cleanly preserved across engines.
 
 ---
 

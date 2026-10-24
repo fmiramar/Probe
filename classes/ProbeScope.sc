@@ -14,7 +14,7 @@ PB_ScopeView {
 	var <gridOverlay;
 	var <busIndex, <numChannels, <rate;
 	var <bufSize, <cycle;
-	var <scopeBuf, <recordBuf, synth;
+	var <scopeBuf, <recordBuf, <synth;
 	var <theme;
 	var <scopeStyle;     // 0 = \tracks, 1 = \overlay, 2 = \xy
 	var <xZoom = 1.0, <yZoom = 1.0;
@@ -564,6 +564,9 @@ PB_ScopeView {
 		};
 
 		scopeView.start;
+		if (isFrozen) {
+			synth.run(false);
+		};
 		if (engine === \smooth) {
 			this.prStartPoller;
 		};
@@ -628,8 +631,14 @@ PB_ScopeView {
 		};
 		if (engine === \smooth) {
 			this.prStartPoller;
+			if (isFrozen and: { recordBuf.notNil } and: { server.serverRunning }) {
+				server.sendMsg('/b_getn', recordBuf.bufnum, 0, 1024 * numChannels);
+			};
 		} {
 			this.prStopPoller;
+			if (scopeView.notNil and: { scopeView.isClosed.not }) {
+				scopeView.refresh;
+			};
 		};
 		if (gridOverlay.notNil and: { gridOverlay.isClosed.not }) {
 			gridOverlay.refresh;
@@ -794,12 +803,16 @@ PB_ScopeView {
 
 	toggleFreeze {
 		if (isFrozen) {
-			if (scopeView.notNil and: { scopeView.isClosed.not }) { scopeView.start };
 			isFrozen = false;
+			if (synth.notNil and: { synth.isPlaying }) {
+				synth.run(true);
+			};
 			if (freezeBtn.notNil and: { freezeBtn.isClosed.not }) { freezeBtn.value = 0 };
 		} {
-			if (scopeView.notNil and: { scopeView.isClosed.not }) { scopeView.stop };
 			isFrozen = true;
+			if (synth.notNil and: { synth.isPlaying }) {
+				synth.run(false);
+			};
 			if (freezeBtn.notNil and: { freezeBtn.isClosed.not }) { freezeBtn.value = 1 };
 		};
 		if (gridOverlay.notNil and: { gridOverlay.isClosed.not }) {
@@ -944,6 +957,10 @@ ProbeScope {
 
 	toggleFreeze {
 		scopeView.toggleFreeze;
+	}
+
+	isFrozen {
+		^scopeView.isFrozen;
 	}
 
 	fontScale {
