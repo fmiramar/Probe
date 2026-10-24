@@ -6,7 +6,7 @@
     and broker deduplication.
 */
 
-ProbeBandAnalyzerView {
+PB_BandAnalyzerView {
 	classvar <freqLabels = #[
 		"31", "63", "125", "250", "400", "630", "800", "1k",
 		"1.6k", "2.5k", "4k", "6.3k", "8k", "10k", "12.5k", "16k"
@@ -190,12 +190,16 @@ ProbeBandAnalyzer {
 		^super.new.prInit(server, busIndex, theme);
 	}
 
+	*view { |parent, bounds, server, busIndex=0, theme=\graphite|
+		^PB_BandAnalyzerView(server ?? { Server.default }, parent, bounds, busIndex, theme);
+	}
+
 	prInit { |server, busIndex, theme|
 		var s = server ?? { Server.default };
 		var w = 500, h = 260;
 
 		window = Window(s.name ++ " Spectral Bands — Probe", Rect(140, 200, w, h));
-		analyzerView = ProbeBandAnalyzerView(s, window, Rect(0, 0, w, h), busIndex, theme);
+		analyzerView = PB_BandAnalyzerView(s, window, Rect(0, 0, w, h), busIndex, theme);
 		window.view.background = analyzerView.theme.background;
 
 		window.view.onResize = { |v|

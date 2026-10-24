@@ -13,7 +13,7 @@
     - Fully compatible with Probe theme palettes and font scaling
 */
 
-ProbeGraphView {
+PB_GraphView {
 	var <view;
 	var <synthDef;
 	var <theme;
@@ -288,10 +288,14 @@ ProbeInspector {
 		^super.new.prInit(synthDef, theme);
 	}
 
+	*view { |parent, bounds, synthDef, theme=\graphite|
+		^PB_GraphView(parent, bounds, synthDef, theme);
+	}
+
 	prInit { |synthDef, theme|
 		var w = 820, h = 500;
 		window = Window("Probe — DSP Graph Inspector", Rect(100, 100, w, h));
-		graphView = ProbeGraphView(window, Rect(0, 0, w, h), synthDef, theme);
+		graphView = PB_GraphView(window, Rect(0, 0, w, h), synthDef, theme);
 		window.view.background = graphView.theme.background;
 
 		window.view.onResize = { |v|

@@ -22,27 +22,27 @@ try {
     win = Window("Test P5", Rect(0, 0, 800, 600));
 
     // 1. Spectrogram View initialization
-    specView = ProbeSpectrogramView(server, win, Rect(0, 0, 300, 200), 0, 64, \graphite, 20);
-    assert.value(specView.notNil, "ProbeSpectrogramView instantiates");
-    assert.value(specView.numBands == 64, "ProbeSpectrogramView has 64 bands");
-    assert.value(specView.img.notNil, "ProbeSpectrogramView preallocated Image buffer");
-    assert.value(specView.colorLUT.size == 256, "ProbeSpectrogramView builds 256-entry color LUT");
-    assert.value(specView.isFrozen == false, "ProbeSpectrogramView starts unfrozen");
+    specView = PB_SpectrogramView(server, win, Rect(0, 0, 300, 200), 0, 64, \graphite, 20);
+    assert.value(specView.notNil, "PB_SpectrogramView instantiates");
+    assert.value(specView.numBands == 64, "PB_SpectrogramView has 64 bands");
+    assert.value(specView.img.notNil, "PB_SpectrogramView preallocated Image buffer");
+    assert.value(specView.colorLUT.size == 256, "PB_SpectrogramView builds 256-entry color LUT");
+    assert.value(specView.isFrozen == false, "PB_SpectrogramView starts unfrozen");
 
     specView.toggleFreeze;
     assert.value(specView.isFrozen == true, "toggleFreeze toggles freeze state");
     specView.toggleFreeze;
 
     // 2. Waterfall View initialization
-    waterView = ProbeWaterfallView(server, win, Rect(310, 0, 300, 200), 0, 64, \graphite, 20, 32);
-    assert.value(waterView.notNil, "ProbeWaterfallView instantiates");
-    assert.value(waterView.numBands == 64, "ProbeWaterfallView has 64 bands");
-    assert.value(waterView.numLines == 32, "ProbeWaterfallView has 32 lines");
-    assert.value(waterView.isFrozen == false, "ProbeWaterfallView starts unfrozen");
+    waterView = PB_WaterfallView(server, win, Rect(310, 0, 300, 200), 0, 64, \graphite, 20, 32);
+    assert.value(waterView.notNil, "PB_WaterfallView instantiates");
+    assert.value(waterView.numBands == 64, "PB_WaterfallView has 64 bands");
+    assert.value(waterView.numLines == 32, "PB_WaterfallView has 32 lines");
+    assert.value(waterView.isFrozen == false, "PB_WaterfallView starts unfrozen");
 
     // 3. Broker Spectral Source Sharing Check
-    assert.value(specView.source === waterView.source, "Spectrogram and Waterfall on same bus share identical ProbeSpectrumSource instance");
-    assert.value(specView.source.consumerCount == 2, "Shared ProbeSpectrumSource reports consumerCount == 2");
+    assert.value(specView.source === waterView.source, "Spectrogram and Waterfall on same bus share identical PB_SpectrumSource instance");
+    assert.value(specView.source.consumerCount == 2, "Shared PB_SpectrumSource reports consumerCount == 2");
 
     // 4. Feed mock spectrum data
     specView.prHandleBands(FloatArray.fill(64, { |i| (i / 64) * 0.5 }));
@@ -50,11 +50,11 @@ try {
     assert.value(true, "Spectrogram and Waterfall handle incoming band frames without error");
 
     // 5. History View initialization
-    histView = ProbeHistoryView(server, win, Rect(0, 220, 400, 200), \outputs, 0, 2, \graphite, 20, 100);
-    assert.value(histView.notNil, "ProbeHistoryView instantiates");
-    assert.value(histView.numChannels == 2, "ProbeHistoryView has 2 channels");
-    assert.value(histView.maxPoints == 100, "ProbeHistoryView allocates maxPoints 100");
-    assert.value(histView.source.notNil, "ProbeHistoryView subscribes to ProbeLevelsSource");
+    histView = PB_HistoryView(server, win, Rect(0, 220, 400, 200), \outputs, 0, 2, \graphite, 20, 100);
+    assert.value(histView.notNil, "PB_HistoryView instantiates");
+    assert.value(histView.numChannels == 2, "PB_HistoryView has 2 channels");
+    assert.value(histView.maxPoints == 100, "PB_HistoryView allocates maxPoints 100");
+    assert.value(histView.source.notNil, "PB_HistoryView subscribes to PB_LevelsSource");
 
     // Feed mock levels data
     histView.prHandleLevels(FloatArray[0.5, 0.7], FloatArray[0.2, 0.3]);

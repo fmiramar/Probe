@@ -6,7 +6,7 @@
     dynamic window resizing, theme contrast, and shared measurement broker integration.
 */
 
-ProbeLoudnessView {
+PB_LoudnessView {
 	var <server;
 	var <view;
 	var <meterView, <readoutView;
@@ -388,12 +388,16 @@ ProbeLoudness {
 		^super.new.prInit(server, busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
 	}
 
+	*view { |parent, bounds, server, busType=\outputs, busIndex=0, numChannels=2, theme=\graphite, targetLUFS=(-23.0), updateFreq=10|
+		^PB_LoudnessView(server ?? { Server.default }, parent, bounds, busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
+	}
+
 	prInit { |server, busType, busIndex, numChannels, theme, targetLUFS, updateFreq|
 		var s = server ?? { Server.default };
 		var w = 440, h = 290;
 
 		window = Window(s.name ++ " Loudness Meter — Probe", Rect(360, 240, w, h));
-		loudnessView = ProbeLoudnessView(s, window, Rect(0, 0, w, h), busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
+		loudnessView = PB_LoudnessView(s, window, Rect(0, 0, w, h), busType, busIndex, numChannels, theme, targetLUFS, updateFreq);
 		window.view.background = loudnessView.theme.background;
 
 		window.view.onResize = { |v|

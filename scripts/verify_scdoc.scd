@@ -1,29 +1,52 @@
 // scripts/verify_scdoc.scd
-"Verifying SCDoc documentation entries...".postln;
+(
+var docsToVerify, hasError;
+
+"Verifying SCDoc documentation entries for all 14 public instruments...".postln;
 SCDoc.indexAllDocuments;
-[
+
+docsToVerify = [
 	"Classes/Probe",
-	"Classes/ProbeDashboard",
-	"Classes/ProbeHistory",
-	"Classes/ProbeLevelsSource",
-	"Classes/ProbeLoudness",
-	"Classes/ProbeBroker",
-	"Classes/ProbeMeter",
-	"Classes/ProbeScope",
-	"Classes/ProbeSpectrogram",
-	"Classes/ProbeSpectrum",
 	"Classes/ProbeTheme",
-	"Classes/ProbeVectorscope",
+	"Classes/ProbeScope",
+	"Classes/ProbeSpectrum",
+	"Classes/ProbeSpectrogram",
 	"Classes/ProbeWaterfall",
+	"Classes/ProbeMeter",
+	"Classes/ProbeLoudness",
+	"Classes/ProbeVectorscope",
+	"Classes/ProbeBandAnalyzer",
+	"Classes/ProbeSpectralDashboard",
+	"Classes/ProbeDashboard",
+	"Classes/ProbeInspector",
+	"Classes/ProbeHistory",
 	"Classes/SCVisuals"
-].do { |docPath|
+];
+
+hasError = false;
+
+docsToVerify.do { |docPath|
 	var entry = SCDoc.documents[docPath];
 	if (entry.notNil) {
 		("  [DOC FOUND]: " ++ docPath ++ " -> " ++ entry.title).postln;
+		try {
+			SCDoc.parseAndRender(entry);
+			("    [PARSE OK]: " ++ docPath).postln;
+		} { |err|
+			("    [PARSE ERROR]: " ++ docPath ++ " -> " ++ err.errorString).warn;
+			hasError = true;
+		};
 	} {
 		("  [DOC MISSING]: " ++ docPath).postln;
-		1.exit;
+		hasError = true;
 	};
 };
-"All SCDoc documents verified successfully!".postln;
-0.exit;
+
+if (hasError) {
+	"ERROR: One or more SCDoc documents failed verification!".postln;
+	1.exit;
+} {
+	"All 15 SCDoc documents verified and parsed successfully with zero errors!".postln;
+	0.exit;
+};
+)

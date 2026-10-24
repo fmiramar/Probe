@@ -30,7 +30,7 @@ s.waitForBoot {
 	// 1. ProbeScopeView Tier A: Initial State & Parameters
 	// -------------------------------------------------------------
 	scopeWin = Window("Test Scope P4", Rect(100, 100, 520, 300));
-	scopeView = ProbeScopeView(s, scopeWin, Rect(0, 0, 520, 300), busIndex: 0, numChannels: 2, showToolbar: true);
+	scopeView = PB_ScopeView(s, scopeWin, Rect(0, 0, 520, 300), busIndex: 0, numChannels: 2, showToolbar: true);
 
 	assert.value(scopeView.notNil, "ProbeScopeView instantiates cleanly");
 	assert.value(scopeView.showToolbar == true, "ProbeScopeView honors showToolbar=true flag");
@@ -87,7 +87,7 @@ s.waitForBoot {
 	// 5. ProbeSpectrumView Section 5.4: 3-Mode Switching
 	// -------------------------------------------------------------
 	specWin = Window("Test Spectrum P4", Rect(120, 120, 520, 300));
-	specView = ProbeSpectrumView(s, specWin, Rect(0, 0, 520, 300), busIndex: 0, showToolbar: true);
+	specView = PB_SpectrumView(s, specWin, Rect(0, 0, 520, 300), busIndex: 0, showToolbar: true);
 
 	assert.value(specView.notNil, "ProbeSpectrumView instantiates cleanly");
 	assert.value(specView.showToolbar == true, "ProbeSpectrumView honors showToolbar=true flag");

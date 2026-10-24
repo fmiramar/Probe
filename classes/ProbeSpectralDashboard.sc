@@ -7,7 +7,7 @@
     synchronized, theme-aware laboratory console.
 */
 
-ProbeSpectralDashboardView {
+PB_SpectralDashboardView {
 	var <server;
 	var <view;
 	var <busIndex;
@@ -120,9 +120,9 @@ ProbeSpectralDashboardView {
 			var halfW = ((cw - 8) * 0.5).floor;
 			var topPartH = (ch * 0.65).floor;
 			var botPartH = ch - topPartH - 8;
-			specOverview = ProbeSpectrumView(server, panelOverview, Rect(0, 0, halfW, topPartH), busIndex, 2048, theme);
-			bandView     = ProbeBandAnalyzerView(server, panelOverview, Rect(halfW + 8, 0, halfW, topPartH), busIndex, theme);
-			descView     = ProbeDescriptorsView(server, panelOverview, Rect(0, topPartH + 8, cw, botPartH), busIndex, theme);
+			specOverview = PB_SpectrumView(server, panelOverview, Rect(0, 0, halfW, topPartH), busIndex, 2048, theme);
+			bandView     = PB_BandAnalyzerView(server, panelOverview, Rect(halfW + 8, 0, halfW, topPartH), busIndex, theme);
+			descView     = PB_DescriptorsView(server, panelOverview, Rect(0, topPartH + 8, cw, botPartH), busIndex, theme);
 			allSubViews.addAll([specOverview, bandView, descView]);
 		}.value;
 
@@ -133,8 +133,8 @@ ProbeSpectralDashboardView {
 		panelPitch.visible = false;
 		{
 			var halfH = ((ch - 8) * 0.5).floor;
-			pitchView  = ProbePitchTrackerView(server, panelPitch, Rect(0, 0, cw, halfH), busIndex, theme);
-			chromaView = ProbeChromagramView(server, panelPitch, Rect(0, halfH + 8, cw, halfH), busIndex, theme);
+			pitchView  = PB_PitchTrackerView(server, panelPitch, Rect(0, 0, cw, halfH), busIndex, theme);
+			chromaView = PB_ChromagramView(server, panelPitch, Rect(0, halfH + 8, cw, halfH), busIndex, theme);
 			allSubViews.addAll([pitchView, chromaView]);
 		}.value;
 
@@ -145,8 +145,8 @@ ProbeSpectralDashboardView {
 		panelTimeFreq.visible = false;
 		{
 			var halfH = ((ch - 8) * 0.5).floor;
-			gramView = ProbeSpectrogramView(server, panelTimeFreq, Rect(0, 0, cw, halfH), busIndex, 64, theme);
-			fallView = ProbeWaterfallView(server, panelTimeFreq, Rect(0, halfH + 8, cw, halfH), busIndex, 64, theme);
+			gramView = PB_SpectrogramView(server, panelTimeFreq, Rect(0, 0, cw, halfH), busIndex, 64, theme);
+			fallView = PB_WaterfallView(server, panelTimeFreq, Rect(0, halfH + 8, cw, halfH), busIndex, 64, theme);
 			allSubViews.addAll([gramView, fallView]);
 		}.value;
 
@@ -157,8 +157,8 @@ ProbeSpectralDashboardView {
 		panelCompare.visible = false;
 		{
 			var halfH = ((ch - 8) * 0.5).floor;
-			specCompare = ProbeSpectrumView(server, panelCompare, Rect(0, 0, cw, halfH), busIndex, 2048, theme);
-			compareView = ProbeSpectralCompareView(server, panelCompare, Rect(0, halfH + 8, cw, halfH), busIndex, theme);
+			specCompare = PB_SpectrumView(server, panelCompare, Rect(0, 0, cw, halfH), busIndex, 2048, theme);
+			compareView = PB_SpectralCompareView(server, panelCompare, Rect(0, halfH + 8, cw, halfH), busIndex, theme);
 			allSubViews.addAll([specCompare, compareView]);
 		}.value;
 
@@ -384,12 +384,16 @@ ProbeSpectralDashboard {
 		^super.new.prInit(server, busIndex, theme);
 	}
 
+	*view { |parent, bounds, server, busIndex=0, theme=\graphite|
+		^PB_SpectralDashboardView(server ?? { Server.default }, parent, bounds, busIndex, theme);
+	}
+
 	prInit { |server, busIndex, theme|
 		var s = server ?? { Server.default };
 		var w = 980, h = 600;
 
 		window = Window(s.name ++ " Spectral Dashboard — Probe", Rect(80, 100, w, h));
-		dashboardView = ProbeSpectralDashboardView(s, window, Rect(0, 0, w, h), busIndex, theme);
+		dashboardView = PB_SpectralDashboardView(s, window, Rect(0, 0, w, h), busIndex, theme);
 		window.view.background = dashboardView.theme.background;
 
 		window.view.onResize = { |v|

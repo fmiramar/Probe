@@ -6,7 +6,7 @@
     stereo balance meter, and broker integration.
 */
 
-ProbeVectorscopeView {
+PB_VectorscopeView {
 	var <server;
 	var <view;
 	var <scopeView, <overlayView;
@@ -318,12 +318,16 @@ ProbeVectorscope {
 		^super.new.prInit(server, busIndex, theme, updateFreq);
 	}
 
+	*view { |parent, bounds, server, busIndex=0, theme=\graphite, updateFreq=15|
+		^PB_VectorscopeView(server ?? { Server.default }, parent, bounds, busIndex, theme, updateFreq);
+	}
+
 	prInit { |server, busIndex, theme, updateFreq|
 		var s = server ?? { Server.default };
 		var w = 340, h = 360;
 
 		window = Window(s.name ++ " Vectorscope — Probe", Rect(340, 240, w, h));
-		vectorscopeView = ProbeVectorscopeView(s, window, Rect(0, 0, w, h), busIndex, theme, updateFreq);
+		vectorscopeView = PB_VectorscopeView(s, window, Rect(0, 0, w, h), busIndex, theme, updateFreq);
 		window.view.background = vectorscopeView.theme.background;
 
 		window.view.onResize = { |v|

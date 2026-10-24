@@ -1,47 +1,47 @@
 /*
-    ProbeSpectrumSource.sc
-    Probe — Shared Logarithmic Spectral Band Analysis Source
-    Generates calibrated logarithmic spectral bands and streams frames via SendReply.kr,
-    allowing multiple subscribers (Spectrogram, Waterfall) to share a single analysis synth.
+    PB_VectorscopeSource.sc
+    Probe — Stereo Correlation & Balance Analysis Source (Internal)
+    Real-time stereo phase correlation [-1.0, +1.0] and left/right balance [-1.0, +1.0]
+    analysis source managed by PB_Broker.
 */
 
-ProbeSpectrumSource {
+PB_VectorscopeSource {
 	var <key;
 	var <server;
 	var <busIndex;
-	var <numBands;
 	var <updateFreq;
 	var <oscCmd;
 
-	var synth, oscFunc;
-	var <currentBands;
-	var <consumers;     // IdentityDictionary: consumer -> callback
+	var <synth, <oscFunc;
+	var <correlation = 1.0;
+	var <balance = 0.0;
+	var <consumers;
 	var isUpdating = false;
 
-	*new { |server, busIndex=0, numBands=64, updateFreq=20|
-		^super.new.prInit(server, busIndex, numBands, updateFreq);
+	*new { |server, busIndex=0, updateFreq=15|
+		^super.new.prInit(server, busIndex, updateFreq);
 	}
 
-	prInit { |argServer, argBusIndex, argNumBands, argUpdateFreq|
+	prInit { |argServer, argBusIndex, argUpdateFreq|
 		server      = argServer ?? { Server.default };
 		busIndex    = argBusIndex.asInteger;
-		numBands    = argNumBands.asInteger.clip(16, 128);
 		updateFreq  = argUpdateFreq.asInteger.clip(5, 30);
 
-		key = (server.name ++ "_spectrum_" ++ busIndex ++ "_" ++ numBands ++ "_" ++ updateFreq).asSymbol;
+		key = (server.name ++ "_corr_" ++ busIndex ++ "_" ++ updateFreq).asSymbol;
 		oscCmd = ("/" ++ key).asSymbol;
 
-		currentBands = FloatArray.fill(numBands, 0.0);
 		consumers = IdentityDictionary.new;
 	}
 
 	start {
-		var synthDefName;
+		var synthDefName, samps;
+		var sRate = server.sampleRate ? 48000;
 
 		if (this.isRunning) { ^this };
 		if (server.serverRunning.not) { ^this };
 
-		synthDefName = ("probe_specsource_" ++ numBands ++ "_" ++ updateFreq).asSymbol;
+		samps = (sRate * 0.25).round.asInteger; // 250ms integration window
+		synthDefName = ("probe_corr_" ++ busIndex ++ "_" ++ updateFreq).asSymbol;
 
 		if (oscFunc.isNil) {
 			oscFunc = OSCFunc({ |msg|
@@ -51,26 +51,27 @@ ProbeSpectrumSource {
 
 		server.bind {
 			var sdef = SynthDef(synthDefName, {
-				var in = In.ar(busIndex, 1);
-				var trig = Impulse.kr(updateFreq);
-				// Logarithmically spaced filterbank from 40 Hz to 18,000 Hz
-				var bands = Array.fill(numBands, { |i|
-					var freq = (i / (numBands - 1)).linexp(0, 1, 40, 18000);
-					var q = 0.15;
-					Amplitude.kr(BPF.ar(in, freq, q), 0.01, 0.06);
-				});
-				SendReply.kr(trig, oscCmd, bands);
+				var sig = In.ar(busIndex, 2);
+				var sigL = sig[0];
+				var sigR = sig[1];
+
+				var dot  = RunningSum.ar(sigL * sigR, samps) / samps;
+				var pwrL = RunningSum.ar(sigL.squared, samps) / samps;
+				var pwrR = RunningSum.ar(sigR.squared, samps) / samps;
+
+				var corr = (dot / ((pwrL * pwrR).sqrt + 1e-9)).clip(-1.0, 1.0);
+				var bal  = ((pwrR.sqrt - pwrL.sqrt) / (pwrR.sqrt + pwrL.sqrt + 1e-9)).clip(-1.0, 1.0);
+
+				SendReply.kr(Impulse.kr(updateFreq), oscCmd, [corr, bal]);
 			});
+
 			synth = sdef.play(RootNode(server), nil, \addToTail);
 		};
 	}
 
 	prHandleOSC { |msg|
-		var bandCount = min(msg.size - 3, numBands);
-
-		bandCount.do { |i|
-			currentBands[i] = msg[3 + i];
-		};
+		correlation = msg[3];
+		balance     = msg[4];
 
 		if (isUpdating.not and: { consumers.notEmpty }) {
 			isUpdating = true;
@@ -78,9 +79,9 @@ ProbeSpectrumSource {
 				isUpdating = false;
 				consumers.do { |callback|
 					try {
-						callback.value(currentBands, this);
+						callback.value(correlation, balance, this);
 					} { |err|
-						("ProbeSpectrumSource callback error: " ++ err.errorString).warn;
+						("PB_VectorscopeSource callback error: " ++ err.errorString).warn;
 					};
 				};
 				nil;
@@ -138,9 +139,5 @@ ProbeSpectrumSource {
 		if (consumers.notEmpty and: { server.serverRunning }) {
 			this.start;
 		};
-	}
-
-	printOn { |stream|
-		stream << "ProbeSpectrumSource(" << key << ", consumers: " << consumers.size << ", running: " << this.isRunning << ")";
 	}
 }

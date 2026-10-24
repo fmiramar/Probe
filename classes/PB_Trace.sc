@@ -1,12 +1,12 @@
 /*
-    ProbeTrace.sc
-    Probe — Transparent Internal-Signal Trace Manager & Instrumentation Windows
+    PB_Trace.sc
+    Probe — Transparent Internal-Signal Trace Manager & Instrumentation Windows (Internal)
     Provides zero-overhead, pass-through signal inspection with automated GUI lifecycle,
     dual transport (ScopeOut2 for audio waveforms, SendReply for control rates),
     cascading window geometry, and leak-free resource deallocation.
 */
 
-ProbeTrace {
+PB_Trace {
 	classvar <activeTraces;
 	classvar <tapCounter = 0;
 	classvar <cascadeCount = 0;
@@ -143,25 +143,25 @@ ProbeTrace {
 	}
 
 	*prOpenScope { |server, bus, numChannels, rate, label, theme, options|
-		var win = ProbeTraceScopeWindow(server, bus, numChannels, rate, label, theme, options);
+		var win = PB_TraceScopeWindow(server, bus, numChannels, rate, label, theme, options);
 		activeTraces.add(win);
 		^win;
 	}
 
 	*prOpenHistory { |server, tapId, numChannels, label, theme, updateFreq, options|
-		var win = ProbeTraceHistoryWindow(server, tapId, numChannels, label, theme, updateFreq, options);
+		var win = PB_TraceHistoryWindow(server, tapId, numChannels, label, theme, updateFreq, options);
 		activeTraces.add(win);
 		^win;
 	}
 
 	*prOpenMeter { |server, bus, numChannels, label, theme, options|
-		var win = ProbeTraceMeterWindow(server, bus, numChannels, label, theme, options);
+		var win = PB_TraceMeterWindow(server, bus, numChannels, label, theme, options);
 		activeTraces.add(win);
 		^win;
 	}
 
 	*prOpenSpectrum { |server, bus, numChannels, label, theme, options|
-		var win = ProbeTraceSpectrumWindow(server, bus, numChannels, label, theme, options);
+		var win = PB_TraceSpectrumWindow(server, bus, numChannels, label, theme, options);
 		activeTraces.add(win);
 		^win;
 	}
@@ -177,7 +177,7 @@ ProbeTrace {
 	}
 }
 
-ProbeTraceScopeWindow {
+PB_TraceScopeWindow {
 	var <window, <scopeView;
 	var <server, <bus, <numChannels, <rate, <label, <theme;
 	var <scopeBuf, synth;
@@ -188,7 +188,7 @@ ProbeTraceScopeWindow {
 	}
 
 	prInit { |argServer, argBus, argNumChannels, argRate, argLabel, argTheme, options|
-		var bounds = ProbeTrace.cascadeBounds(380, 240);
+		var bounds = PB_Trace.cascadeBounds(380, 240);
 		var th = ProbeTheme.get(argTheme);
 		var bufSize = (options ? ()).at(\bufSize) ? 4096;
 		var cycle = (options ? ()).at(\cycle) ? 1024;
@@ -276,13 +276,13 @@ ProbeTraceScopeWindow {
 			if (synth.notNil) { synth.free; synth = nil };
 			if (scopeBuf.notNil) { scopeBuf.free; scopeBuf = nil };
 			if (bus.notNil) { bus.free; bus = nil };
-			ProbeTrace.removeTrace(this);
+			PB_Trace.removeTrace(this);
 			if (window.notNil and: { window.isClosed.not }) { window.close };
 		};
 	}
 }
 
-ProbeTraceHistoryWindow {
+PB_TraceHistoryWindow {
 	var <window, <userView;
 	var <server, <tapId, <numChannels, <label, <theme, <updateFreq;
 	var history;          // Array of FloatArray[numChannels]
@@ -298,7 +298,7 @@ ProbeTraceHistoryWindow {
 	}
 
 	prInit { |argServer, argTapId, argNumChannels, argLabel, argTheme, argUpdateFreq, options|
-		var bounds = ProbeTrace.cascadeBounds(380, 200);
+		var bounds = PB_Trace.cascadeBounds(380, 200);
 		var th = ProbeTheme.get(argTheme);
 		var titleH = (18 * (th.fontScale ? 1.25)).max(18).round.asInteger;
 		var topOffset = titleH + 6;
@@ -397,13 +397,13 @@ ProbeTraceHistoryWindow {
 		if (isClosed.not) {
 			isClosed = true;
 			if (oscFunc.notNil) { oscFunc.free; oscFunc = nil };
-			ProbeTrace.removeTrace(this);
+			PB_Trace.removeTrace(this);
 			if (window.notNil and: { window.isClosed.not }) { window.close };
 		};
 	}
 }
 
-ProbeTraceMeterWindow {
+PB_TraceMeterWindow {
 	var <window, <meter;
 	var <server, <bus, <numChannels, <label, <theme;
 	var <isClosed = false;
@@ -413,7 +413,7 @@ ProbeTraceMeterWindow {
 	}
 
 	prInit { |argServer, argBus, argNumChannels, argLabel, argTheme, options|
-		var bounds = ProbeTrace.cascadeBounds(200, 260);
+		var bounds = PB_Trace.cascadeBounds(200, 260);
 		server = argServer;
 		bus = argBus;
 		numChannels = argNumChannels;
@@ -421,7 +421,7 @@ ProbeTraceMeterWindow {
 		theme = ProbeTheme.get(argTheme);
 
 		window = Window(label ++ " [Meter] — Probe Trace", bounds);
-		meter = ProbeMeterView(server, window, 0@0, 0, numChannels, theme, \compact);
+		meter = PB_MeterView(server, window, 0@0, 0, numChannels, theme, \compact);
 		window.view.background = theme.background;
 		window.onClose = { this.close };
 		window.front;
@@ -432,13 +432,13 @@ ProbeTraceMeterWindow {
 			isClosed = true;
 			if (meter.notNil) { meter.stop };
 			if (bus.notNil) { bus.free; bus = nil };
-			ProbeTrace.removeTrace(this);
+			PB_Trace.removeTrace(this);
 			if (window.notNil and: { window.isClosed.not }) { window.close };
 		};
 	}
 }
 
-ProbeTraceSpectrumWindow {
+PB_TraceSpectrumWindow {
 	var <window, <spectrum;
 	var <server, <bus, <numChannels, <label, <theme;
 	var <isClosed = false;
@@ -448,7 +448,7 @@ ProbeTraceSpectrumWindow {
 	}
 
 	prInit { |argServer, argBus, argNumChannels, argLabel, argTheme, options|
-		var bounds = ProbeTrace.cascadeBounds(420, 260);
+		var bounds = PB_Trace.cascadeBounds(420, 260);
 		server = argServer;
 		bus = argBus;
 		numChannels = argNumChannels;
@@ -456,7 +456,7 @@ ProbeTraceSpectrumWindow {
 		theme = ProbeTheme.get(argTheme);
 
 		window = Window(label ++ " [Spectrum] — Probe Trace", bounds);
-		spectrum = ProbeSpectrumView(server, window, Rect(0, 0, bounds.width, bounds.height), bus.index, 2048, theme);
+		spectrum = PB_SpectrumView(server, window, Rect(0, 0, bounds.width, bounds.height), bus.index, 2048, theme);
 		window.view.background = theme.background;
 		window.onClose = { this.close };
 		window.front;
@@ -467,7 +467,7 @@ ProbeTraceSpectrumWindow {
 			isClosed = true;
 			if (spectrum.notNil) { spectrum.stop };
 			if (bus.notNil) { bus.free; bus = nil };
-			ProbeTrace.removeTrace(this);
+			PB_Trace.removeTrace(this);
 			if (window.notNil and: { window.isClosed.not }) { window.close };
 		};
 	}

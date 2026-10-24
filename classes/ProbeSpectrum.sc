@@ -6,7 +6,7 @@
     with full horizontal grid lines, multi-level smoothing controls, dynamic window resizing, and clean lifecycle.
 */
 
-ProbeSpectrumView {
+PB_SpectrumView {
 	var <server;
 	var <view;
 	var <scopeView;
@@ -321,7 +321,7 @@ ProbeSpectrumView {
 				gridOverlay.visible = false;
 				if (gramView.notNil and: { gramView.view.notNil }) { gramView.view.visible = false };
 				if (bandView.isNil) {
-					bandView = ProbeBandAnalyzerView(server, view, Rect(0, topOffset, view.bounds.width, view.bounds.height - topOffset), busIndex, theme);
+					bandView = PB_BandAnalyzerView(server, view, Rect(0, topOffset, view.bounds.width, view.bounds.height - topOffset), busIndex, theme);
 				};
 				bandView.view.visible = true;
 				bandView.prHandleResize(view.bounds.width, view.bounds.height - topOffset);
@@ -331,7 +331,7 @@ ProbeSpectrumView {
 				gridOverlay.visible = false;
 				if (bandView.notNil and: { bandView.view.notNil }) { bandView.view.visible = false };
 				if (gramView.isNil) {
-					gramView = ProbeSpectrogramView(server, view, Rect(0, topOffset, view.bounds.width, view.bounds.height - topOffset), busIndex, 64, theme);
+					gramView = PB_SpectrogramView(server, view, Rect(0, topOffset, view.bounds.width, view.bounds.height - topOffset), busIndex, 64, theme);
 				};
 				gramView.view.visible = true;
 				gramView.prHandleResize(view.bounds.width, view.bounds.height - topOffset);
@@ -518,12 +518,16 @@ ProbeSpectrum {
 		^super.new.prInit(server, busIndex, fftSize, theme, freqMode, dbRange, smoothing);
 	}
 
+	*view { |parent, bounds, server, busIndex=0, fftSize=2048, theme=\graphite, freqMode=\logarithmic, dbRange=96, smoothing=\none, showToolbar=false|
+		^PB_SpectrumView(server ?? { Server.default }, parent, bounds, busIndex, fftSize, theme, freqMode, dbRange, smoothing, showToolbar);
+	}
+
 	prInit { |server, busIndex, fftSize, theme, freqMode, dbRange, smoothing|
 		var s = server ?? { Server.default };
 		var w = 520, h = 300;
 
 		window = Window(s.name ++ " Spectrum Analyzer — Probe", Rect(120, 200, w, h));
-		spectrumView = ProbeSpectrumView(s, window, Rect(0, 0, w, h), busIndex, fftSize, theme, freqMode, dbRange, smoothing, showToolbar: true);
+		spectrumView = PB_SpectrumView(s, window, Rect(0, 0, w, h), busIndex, fftSize, theme, freqMode, dbRange, smoothing, showToolbar: true);
 		window.view.background = spectrumView.theme.background;
 
 		window.view.onResize = { |v|

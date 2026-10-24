@@ -1,11 +1,11 @@
 /*
-    ProbeBroker.sc
-    Probe — Centralized Measurement Broker
+    PB_Broker.sc
+    Probe — Centralized Measurement Broker (Internal Telemetry Transport)
     Manages analysis source lifecycles, reference-counts consumer subscriptions,
     prevents duplicate measurement synths, and handles server reboot/CmdPeriod cleanly.
 */
 
-ProbeBroker {
+PB_Broker {
 	classvar <default;
 
 	var <sources;          // key -> sourceInstance
@@ -47,7 +47,7 @@ ProbeBroker {
 
 		source = sources[key];
 		if (source.isNil) {
-			source = ProbeLevelsSource(server, busType, busIndex, numChannels, updateFreq);
+			source = PB_LevelsSource(server, busType, busIndex, numChannels, updateFreq);
 			sources.put(key, source);
 			subscriptions.put(key, Set.new);
 		};
@@ -69,7 +69,7 @@ ProbeBroker {
 
 		source = sources[key];
 		if (source.isNil) {
-			source = ProbeSpectrumSource(server, busIndex, numBands, updateFreq);
+			source = PB_SpectrumSource(server, busIndex, numBands, updateFreq);
 			sources.put(key, source);
 			subscriptions.put(key, Set.new);
 		};
@@ -91,7 +91,7 @@ ProbeBroker {
 
 		source = sources[key];
 		if (source.isNil) {
-			source = ProbeLoudnessSource(server, busType, busIndex, numChannels, updateFreq);
+			source = PB_LoudnessSource(server, busType, busIndex, numChannels, updateFreq);
 			sources.put(key, source);
 			subscriptions.put(key, Set.new);
 		};
@@ -113,7 +113,7 @@ ProbeBroker {
 
 		source = sources[key];
 		if (source.isNil) {
-			source = ProbeVectorscopeSource(server, busIndex, updateFreq);
+			source = PB_VectorscopeSource(server, busIndex, updateFreq);
 			sources.put(key, source);
 			subscriptions.put(key, Set.new);
 		};
@@ -135,7 +135,7 @@ ProbeBroker {
 
 		source = sources[key];
 		if (source.isNil) {
-			source = ProbeSpectralSource(server, busIndex, updateFreq);
+			source = PB_SpectralSource(server, busIndex, updateFreq);
 			sources.put(key, source);
 			subscriptions.put(key, Set.new);
 		};
@@ -226,6 +226,6 @@ ProbeBroker {
 	}
 
 	printOn { |stream|
-		stream << "ProbeBroker(sources: " << sources.size << ", subscribers: " << this.totalSubscriberCount << ")";
+		stream << "PB_Broker(sources: " << sources.size << ", subscribers: " << this.totalSubscriberCount << ")";
 	}
 }

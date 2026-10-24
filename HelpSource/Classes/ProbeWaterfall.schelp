@@ -1,14 +1,14 @@
 TITLE:: ProbeWaterfall
 summary:: Real-time 2.5D stacked line waterfall spectrum
 categories:: GUI>Visuals
-related:: Classes/Probe, Classes/ProbeWaterfallView, Classes/ProbeSpectrogram, Classes/ProbeSpectrum
+related:: Classes/Probe, Classes/ProbeSpectrogram, Classes/ProbeSpectrum
 
 DESCRIPTION::
 ProbeWaterfall renders a 2.5D isometric stacked line waterfall spectrum analyzer.
 Lines roll from the foreground to background with perspective offset and theme gradient shading.
 
 list::
-## Zero duplicate FFT cost: shares ProbeSpectrumSource with link::Classes/ProbeSpectrogram:: via link::Classes/ProbeBroker::
+## Zero duplicate FFT cost: shares spectral telemetry via the internal measurement broker.
 ## Bounded line memory (default 48 historical frames)
 ## Shaded depth cues from background subtext to foreground signal/warning colors
 ## Interactive freeze control (Space)
@@ -37,13 +37,40 @@ Analysis update rate in Hz (default 20 Hz).
 ARGUMENT:: numLines
 Number of stacked isometric historical traces (default 48).
 
+METHOD:: view
+Embed the waterfall display into a custom parent link::Classes/View:: or link::Classes/Window::.
+
+ARGUMENT:: parent
+Parent view or window.
+
+ARGUMENT:: bounds
+Dimensions and position as link::Classes/Rect::.
+
+ARGUMENT:: server
+Target link::Classes/Server::.
+
+ARGUMENT:: busIndex
+Audio bus index to analyze.
+
+ARGUMENT:: numBands
+Number of logarithmic frequency bands.
+
+ARGUMENT:: theme
+Visual theme.
+
+ARGUMENT:: updateFreq
+Analysis update rate in Hz.
+
+ARGUMENT:: numLines
+Number of stacked isometric historical traces.
+
 INSTANCEMETHODS::
 
 METHOD:: window
 Returns the underlying link::Classes/Window::.
 
 METHOD:: waterfallView
-Returns the underlying link::Classes/ProbeWaterfallView::.
+Returns the underlying PB_WaterfallView composite view.
 
 METHOD:: theme
 Update active theme dynamically.

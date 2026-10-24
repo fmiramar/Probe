@@ -1,14 +1,14 @@
 TITLE:: ProbeSpectrogram
 summary:: Real-time scrolling audio spectrogram with ring-buffer blit
 categories:: GUI>Visuals
-related:: Classes/Probe, Classes/ProbeSpectrogramView, Classes/ProbeWaterfall, Classes/ProbeSpectrum
+related:: Classes/Probe, Classes/ProbeWaterfall, Classes/ProbeSpectrum
 
 DESCRIPTION::
 ProbeSpectrogram provides a high-performance, real-time scrolling audio spectrogram.
 It utilizes a preallocated 2D raster with circular ring-buffer blit (via Pen.drawImage) to achieve sub-millisecond redraws without garbage collection overhead. Frequency bands are mapped through the active ProbeTheme color palette LUT.
 
 list::
-## Subscribes to shared link::Classes/ProbeSpectrumSource:: via link::Classes/ProbeBroker::
+## Subscribes to shared spectral telemetry via the internal measurement broker.
 ## Frequency axis tick markings (40 Hz to 18 kHz)
 ## Freeze (Space) and Clear ('c') keyboard controls
 ## Dynamic palette theming across all ProbeTheme palettes
@@ -34,13 +34,37 @@ Theme name symbol (e.g. code::\graphite::) or link::Classes/ProbeTheme:: instanc
 ARGUMENT:: updateFreq
 Analysis update rate in Hz (default 20 Hz).
 
+METHOD:: view
+Embed the spectrogram into a custom parent link::Classes/View:: or link::Classes/Window::.
+
+ARGUMENT:: parent
+Parent view or window.
+
+ARGUMENT:: bounds
+Dimensions and position as link::Classes/Rect::.
+
+ARGUMENT:: server
+Target link::Classes/Server::.
+
+ARGUMENT:: busIndex
+Audio bus index to analyze.
+
+ARGUMENT:: numBands
+Number of logarithmic frequency bands.
+
+ARGUMENT:: theme
+Visual theme.
+
+ARGUMENT:: updateFreq
+Analysis update rate in Hz.
+
 INSTANCEMETHODS::
 
 METHOD:: window
 Returns the underlying link::Classes/Window::.
 
 METHOD:: spectrogramView
-Returns the underlying link::Classes/ProbeSpectrogramView::.
+Returns the underlying PB_SpectrogramView composite view.
 
 METHOD:: theme
 Update active theme dynamically.

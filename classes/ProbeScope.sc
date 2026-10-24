@@ -5,7 +5,7 @@
     multichannel color mapping, style modes (Tracks, Overlay, X/Y), dynamic window resizing, and clean lifecycle.
 */
 
-ProbeScopeView {
+PB_ScopeView {
 	var <server;
 	var <view;
 	var <scopeView;
@@ -495,12 +495,16 @@ ProbeScope {
 		^super.new.prInit(server, busIndex, numChannels, theme, rate, style, bufSize);
 	}
 
+	*view { |parent, bounds, server, busIndex=0, numChannels=2, theme=\graphite, rate=\audio, style=\overlay, bufSize=4096, showToolbar=false|
+		^PB_ScopeView(server ?? { Server.default }, parent, bounds, busIndex, numChannels, theme, rate, style, bufSize, showToolbar);
+	}
+
 	prInit { |server, busIndex, numChannels, theme, rate, style, bufSize|
 		var s = server ?? { Server.default };
 		var w = 520, h = 300;
 
 		window = Window(s.name ++ " Scope — Probe", Rect(120, 200, w, h));
-		scopeView = ProbeScopeView(s, window, Rect(0, 0, w, h), busIndex, numChannels, theme, rate, style, bufSize, showToolbar: true);
+		scopeView = PB_ScopeView(s, window, Rect(0, 0, w, h), busIndex, numChannels, theme, rate, style, bufSize, showToolbar: true);
 		window.view.background = scopeView.theme.background;
 
 		window.view.onResize = { |v|

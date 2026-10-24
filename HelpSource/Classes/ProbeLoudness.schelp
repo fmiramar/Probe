@@ -1,7 +1,7 @@
 TITLE:: ProbeLoudness
 summary:: ITU-R BS.1770-4 / EBU R128 real-time loudness meter
 categories:: GUI>Visuals
-related:: Classes/Probe, Classes/ProbeLoudnessView, Classes/ProbeMeter, Classes/ProbeLoudnessSource
+related:: Classes/Probe, Classes/ProbeMeter
 
 DESCRIPTION::
 ProbeLoudness provides an ITU-R BS.1770-4 and EBU R128 compliant real-time loudness meter.
@@ -44,13 +44,43 @@ Target reference loudness in LUFS (default -23.0, or -14.0).
 ARGUMENT:: updateFreq
 Measurement update rate in Hz (default 10 Hz).
 
+METHOD:: view
+Embed the loudness meter into a custom parent link::Classes/View:: or link::Classes/Window::.
+
+ARGUMENT:: parent
+Parent view or window.
+
+ARGUMENT:: bounds
+Dimensions and position as link::Classes/Rect::.
+
+ARGUMENT:: server
+Target link::Classes/Server::.
+
+ARGUMENT:: busType
+Bus category to monitor.
+
+ARGUMENT:: busIndex
+Audio bus index.
+
+ARGUMENT:: numChannels
+Channel count.
+
+ARGUMENT:: theme
+Visual theme.
+
+ARGUMENT:: targetLUFS
+Target reference loudness in LUFS.
+
+ARGUMENT:: updateFreq
+Refresh frequency in Hz.
+
 INSTANCEMETHODS::
 
 METHOD:: window
 Returns the underlying link::Classes/Window::.
 
 METHOD:: loudnessView
-Returns the underlying link::Classes/ProbeLoudnessView::.
+Returns the underlying PB_LoudnessView composite view.
 
 METHOD:: theme
 Update active theme dynamically.

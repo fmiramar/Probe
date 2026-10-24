@@ -21,21 +21,21 @@ s.waitForBoot({
 	// s.scope;       // Standard Stethoscope
 	// s.freqscope;   // Standard FreqScope
 
-	// 2. Probe High-Performance Server Shortcuts
+	// 2. Probe High-Performance Server Shortcuts (*Pb)
 	// A. Laboratory Compact Server Meter (Vertical channel strips, dB ticks)
-	~meter = s.meter2(2, 2, theme: \graphite, density: \compact);
+	~meter = s.meterPb(2, 2, theme: \graphite, density: \compact);
 
 	// B. Precision Oscilloscope (Hardware phosphor style, triggered waveform)
-	~scope = s.scope2(0, 2, theme: \phosphor, style: \overlay);
+	~scope = s.scopePb(0, 2, theme: \phosphor, style: \overlay);
 
 	// C. High-Resolution Spectrum Analyzer (Dual linear/log scale)
-	~spectrum = s.freqscope2(0, fftSize: 2048, theme: \ice, dbRange: 96.0);
+	~spectrum = s.freqscopePb(0, fftSize: 2048, theme: \ice, dbRange: 96.0);
 
 	// D. 3D Waterfall Display
-	~waterfall = s.waterfall(0, fftSize: 64, theme: \amber, numLines: 48);
+	~waterfall = s.waterfallPb(0, fftSize: 64, theme: \amber, numLines: 48);
 
 	// E. Master Instrumentation Dashboard (All-in-one laboratory console)
-	// ~dashboard = s.dashboard(2, 2, theme: \graphite);
+	// ~dashboard = s.dashboardPb(2, 2, theme: \graphite);
 
 	"All shortcuts launched cleanly. Call ~cleanup.value when finished.".postln;
 

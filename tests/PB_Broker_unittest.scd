@@ -59,7 +59,7 @@ s.waitForBoot({
 	assert.value(sourceA.consumerCount == 0, "Source consumerCount is 0");
 
 	// 5. Backwards-compatibility
-	assert.value(SCVMeasurementBroker.default === ProbeBroker.default, "SCVMeasurementBroker.default === ProbeBroker.default");
+	assert.value(SCVMeasurementBroker.default === PB_Broker.default, "SCVMeasurementBroker.default === PB_Broker.default");
 
 	// Summary
 	("--------------------------------------------------").postln;

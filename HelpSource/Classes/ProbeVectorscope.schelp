@@ -1,7 +1,7 @@
 TITLE:: ProbeVectorscope
 summary:: Real-time stereo vectorscope and phase correlation meter
 categories:: GUI>Visuals
-related:: Classes/Probe, Classes/ProbeVectorscopeView, Classes/ProbeScope, Classes/ProbeDashboard
+related:: Classes/Probe, Classes/ProbeScope, Classes/ProbeDashboard
 
 DESCRIPTION::
 ProbeVectorscope provides a real-time stereo Lissajous vectorscope and phase correlation meter.
@@ -33,13 +33,34 @@ Theme name symbol (e.g. code::\graphite::) or link::Classes/ProbeTheme:: instanc
 ARGUMENT:: updateFreq
 Telemetry update rate in Hz (default 15 Hz).
 
+METHOD:: view
+Embed the vectorscope into a custom parent link::Classes/View:: or link::Classes/Window::.
+
+ARGUMENT:: parent
+Parent view or window.
+
+ARGUMENT:: bounds
+Dimensions and position as link::Classes/Rect::.
+
+ARGUMENT:: server
+Target link::Classes/Server::.
+
+ARGUMENT:: busIndex
+Audio bus offset.
+
+ARGUMENT:: theme
+Visual theme.
+
+ARGUMENT:: updateFreq
+Telemetry update rate in Hz.
+
 INSTANCEMETHODS::
 
 METHOD:: window
 Returns the underlying link::Classes/Window::.
 
 METHOD:: vectorscopeView
-Returns the underlying link::Classes/ProbeVectorscopeView::.
+Returns the underlying PB_VectorscopeView composite view.
 
 METHOD:: theme
 Update active theme dynamically across the vectorscope display.

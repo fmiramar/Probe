@@ -2,10 +2,10 @@
     ProbeWaterfall.sc
     Probe — 2.5D Stacked Line Waterfall Spectrum
     Isometric 2.5D stacked line history, bounded line memory, theme gradient shading,
-    dynamic window resizing, and shared measurement broker integration (shares ProbeSpectrumSource with Spectrogram).
+    dynamic window resizing, and shared measurement broker integration (shares PB_SpectrumSource with Spectrogram).
 */
 
-ProbeWaterfallView {
+PB_WaterfallView {
 	var <server;
 	var <view;
 	var <userView;
@@ -179,12 +179,16 @@ ProbeWaterfall {
 		^super.new.prInit(server, busIndex, numBands, theme, updateFreq, numLines);
 	}
 
+	*view { |parent, bounds, server, busIndex=0, numBands=64, theme=\graphite, updateFreq=20, numLines=48|
+		^PB_WaterfallView(server ?? { Server.default }, parent, bounds, busIndex, numBands, theme, updateFreq, numLines);
+	}
+
 	prInit { |server, busIndex, numBands, theme, updateFreq, numLines|
 		var s = server ?? { Server.default };
 		var w = 460, h = 280;
 
 		window = Window(s.name ++ " Waterfall — Probe", Rect(320, 260, w, h));
-		waterfallView = ProbeWaterfallView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq, numLines);
+		waterfallView = PB_WaterfallView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq, numLines);
 
 		window.view.onResize = { |v|
 			if (v.notNil and: { v.isClosed.not } and: { v.bounds.notNil } and: { waterfallView.notNil } and: { waterfallView.isClosed.not }) {

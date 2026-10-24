@@ -6,7 +6,7 @@
 
 Probe {
 	*version {
-		^"0.3.0";
+		^"0.4.0";
 	}
 
 	*meter { |server, numIns, numOuts, theme, density, meterStyle|
@@ -67,7 +67,7 @@ Probe {
 
 	// Broker & Themes
 	*broker {
-		^ProbeBroker.default;
+		^PB_Broker.default;
 	}
 
 	*theme {

@@ -5,7 +5,7 @@
 (
 var testFiles = [
 	"tests/ProbeTheme_unittest.scd",
-	"tests/ProbeBroker_unittest.scd",
+	"tests/PB_Broker_unittest.scd",
 	"tests/ProbeLifecycle_unittest.scd",
 	"tests/ProbeMeter_unittest.scd",
 	"tests/ProbeScope_unittest.scd",
@@ -24,7 +24,7 @@ var suitePassed = 0, suiteFailed = 0;
 var basePath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/";
 
 "========================================================================".postln;
-"             Probe — Master Unit Test Suite Runner (v0.3.0)             ".postln;
+"             Probe — Master Unit Test Suite Runner (v0.4.0)             ".postln;
 "========================================================================".postln;
 
 testFiles.do { |relPath|

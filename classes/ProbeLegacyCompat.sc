@@ -1,33 +1,33 @@
 /*
     ProbeLegacyCompat.sc
-    Probe — Seamless Backward-Compatibility Layer for SCVisuals (v0.3.0)
+    Probe — Seamless Backward-Compatibility Layer for SCVisuals (v0.4.0)
     Allows legacy scripts and projects using SCV* classes to continue functioning
-    identically by subclassing their unified Probe* equivalents.
+    identically by subclassing their unified Probe* and PB_* equivalents.
 */
 
 SCVTheme : ProbeTheme {}
-SCVMeasurementBroker : ProbeBroker {}
-SCVLevelsSource : ProbeLevelsSource {}
-SCVSpectrumSource : ProbeSpectrumSource {}
-SCVLoudnessSource : ProbeLoudnessSource {}
-SCVVectorscopeSource : ProbeVectorscopeSource {}
+SCVMeasurementBroker : PB_Broker {}
+SCVLevelsSource : PB_LevelsSource {}
+SCVSpectrumSource : PB_SpectrumSource {}
+SCVLoudnessSource : PB_LoudnessSource {}
+SCVVectorscopeSource : PB_VectorscopeSource {}
 
-SCVMeterView : ProbeMeterView {}
+SCVMeterView : PB_MeterView {}
 SCVMeter : ProbeMeter {}
 
-SCVScopeView : ProbeScopeView {}
+SCVScopeView : PB_ScopeView {}
 SCVScope : ProbeScope {}
-SCVSpectrumView : ProbeSpectrumView {}
+SCVSpectrumView : PB_SpectrumView {}
 SCVSpectrum : ProbeSpectrum {}
-SCVSpectrogramView : ProbeSpectrogramView {}
+SCVSpectrogramView : PB_SpectrogramView {}
 SCVSpectrogram : ProbeSpectrogram {}
-SCVWaterfallView : ProbeWaterfallView {}
+SCVWaterfallView : PB_WaterfallView {}
 SCVWaterfall : ProbeWaterfall {}
-SCVLoudnessView : ProbeLoudnessView {}
+SCVLoudnessView : PB_LoudnessView {}
 SCVLoudness : ProbeLoudness {}
-SCVVectorscopeView : ProbeVectorscopeView {}
+SCVVectorscopeView : PB_VectorscopeView {}
 SCVVectorscope : ProbeVectorscope {}
-SCVHistoryView : ProbeHistoryView {}
+SCVHistoryView : PB_HistoryView {}
 SCVHistory : ProbeHistory {}
-SCVDashboardView : ProbeDashboardView {}
+SCVDashboardView : PB_DashboardView {}
 SCVDashboard : ProbeDashboard {}

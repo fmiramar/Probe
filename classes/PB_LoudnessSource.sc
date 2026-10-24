@@ -1,11 +1,11 @@
 /*
-    ProbeLoudnessSource.sc
-    Probe — ITU-R BS.1770-4 / EBU R128 Loudness Measurement Source
+    PB_LoudnessSource.sc
+    Probe — ITU-R BS.1770-4 / EBU R128 Loudness Measurement Source (Internal)
     Real-time K-weighting filter, Momentary (400ms), Short-term (3s),
     Integrated gated loudness with relative/absolute gating, and Loudness Range (LRA).
 */
 
-ProbeLoudnessSource {
+PB_LoudnessSource {
 	var <key;
 	var <server;
 	var <busType;
@@ -195,7 +195,7 @@ ProbeLoudnessSource {
 					try {
 						cb.value(momentaryLUFS, shortTermLUFS, integratedLUFS, loudnessRange, maxPeak, this);
 					} { |err|
-						("ProbeLoudnessSource callback error: " ++ err.errorString).warn;
+						("PB_LoudnessSource callback error: " ++ err.errorString).warn;
 					};
 				};
 				nil;

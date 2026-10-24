@@ -22,20 +22,22 @@ s.waitForBoot({
 	// 1. Symbol & Class Verification
 	// ------------------------------------------------------------------------
 	assert.value(\ProbeBandAnalyzer.asClass.notNil, "ProbeBandAnalyzer class exists");
-	assert.value(\ProbeBandAnalyzerView.asClass.notNil, "ProbeBandAnalyzerView class exists");
-	assert.value(\ProbeSpectralSource.asClass.notNil, "ProbeSpectralSource class exists");
+	assert.value(\PB_BandAnalyzerView.asClass.notNil, "PB_BandAnalyzerView class exists");
+	assert.value(\PB_SpectralSource.asClass.notNil, "PB_SpectralSource class exists");
 	assert.value(\ProbeSpectralDashboard.asClass.notNil, "ProbeSpectralDashboard class exists");
-	assert.value(\ProbeSpectralDashboardView.asClass.notNil, "ProbeSpectralDashboardView class exists");
-	assert.value(\ProbeDescriptorsView.asClass.notNil, "ProbeDescriptorsView class exists");
-	assert.value(\ProbePitchTrackerView.asClass.notNil, "ProbePitchTrackerView class exists");
-	assert.value(\ProbeChromagramView.asClass.notNil, "ProbeChromagramView class exists");
-	assert.value(\ProbeSpectralCompareView.asClass.notNil, "ProbeSpectralCompareView class exists");
+	assert.value(\PB_SpectralDashboardView.asClass.notNil, "PB_SpectralDashboardView class exists");
+	assert.value(\PB_DescriptorsView.asClass.notNil, "PB_DescriptorsView class exists");
+	assert.value(\PB_PitchTrackerView.asClass.notNil, "PB_PitchTrackerView class exists");
+	assert.value(\PB_ChromagramView.asClass.notNil, "PB_ChromagramView class exists");
+	assert.value(\PB_SpectralCompareView.asClass.notNil, "PB_SpectralCompareView class exists");
 
 	// ------------------------------------------------------------------------
 	// 2. Server & Probe Entry Point Verification
 	// ------------------------------------------------------------------------
-	assert.value(s.respondsTo(\spectralDashboard), "s responds to .spectralDashboard");
-	assert.value(s.respondsTo(\bandAnalyzer), "s responds to .bandAnalyzer");
+	assert.value(s.respondsTo(\spectralDashboardPb), "s responds to .spectralDashboardPb");
+	assert.value(s.respondsTo(\bandAnalyzerPb), "s responds to .bandAnalyzerPb");
+	assert.value(s.respondsTo(\spectralDashboard), "s responds to legacy .spectralDashboard");
+	assert.value(s.respondsTo(\bandAnalyzer), "s responds to legacy .bandAnalyzer");
 	assert.value(Probe.respondsTo(\spectralDashboard), "Probe responds to *spectralDashboard");
 	assert.value(Probe.respondsTo(\bandAnalyzer), "Probe responds to *bandAnalyzer");
 

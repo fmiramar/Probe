@@ -1,0 +1,86 @@
+TITLE:: ProbeSpectralDashboard
+summary:: Synchronized Multi-Panel Spectral Analysis Console
+categories:: GUI>Visualizers, Live Coding>Telemetry
+
+DESCRIPTION::
+ProbeSpectralDashboard unifies high-resolution FFT spectrum analysis, 16-band ISO octave analysis, real-time spectral descriptors HUD (Centroid, Flatness, Roll-off, Flux/Onsets), pitch and voicing confidence tracking, 12-tone harmonic chromagram, time-frequency density spectrogram, 3D waterfall, and differential A/B spectral comparison into a synchronized, theme-aware laboratory console.
+
+CLASSMETHODS::
+
+METHOD:: new
+Open a new standalone window containing the spectral dashboard.
+argument:: server
+The Server to monitor. Defaults to link::Classes/Server#*default::.
+argument:: busIndex
+The audio bus index to monitor. Default: 0.
+argument:: theme
+A theme name symbol (e.g. \graphite, \phosphor, \ice, \amber, \paper, \monochrome) or link::Classes/ProbeTheme:: instance. Default: \graphite.
+returns:: A new ProbeSpectralDashboard instance.
+
+METHOD:: view
+Embed the spectral dashboard into a custom parent link::Classes/View:: or link::Classes/Window::.
+argument:: parent
+The parent view or window.
+argument:: bounds
+The link::Classes/Rect:: defining position and dimensions.
+argument:: server
+The Server to monitor. Defaults to link::Classes/Server#*default::.
+argument:: busIndex
+The audio bus index to monitor. Default: 0.
+argument:: theme
+A theme name symbol or link::Classes/ProbeTheme:: instance. Default: \graphite.
+returns:: A PB_SpectralDashboardView composite view.
+
+INSTANCEMETHODS::
+
+METHOD:: dashboardView
+returns:: The underlying PB_SpectralDashboardView composite view.
+
+METHOD:: window
+returns:: The link::Classes/Window:: containing the dashboard.
+
+METHOD:: preset
+Set the active layout preset.
+argument:: aPreset
+One of \overview, \pitch, \timeFreq, or \compare.
+
+METHOD:: theme
+Set the active link::Classes/ProbeTheme:: across all sub-panels.
+argument:: aTheme
+A theme name symbol or link::Classes/ProbeTheme:: instance.
+
+METHOD:: fontScale
+Set the font scaling multiplier (e.g. 1.0, 1.25, 1.5).
+argument:: scale
+A Float scale factor.
+
+METHOD:: toggleFreeze
+Toggle live data rendering freeze across all sub-panels.
+
+METHOD:: close
+Close the window and release all broker subscriptions and sub-views.
+
+EXAMPLES::
+
+CODE::
+s.boot;
+
+// Synthesize complex harmonic spectrum
+x = { Saw.ar(110) + Pulse.ar(220, SinOsc.kr(0.5).range(0.1, 0.9)) * 0.2 }.play;
+
+// Open Spectral Dashboard
+d = ProbeSpectralDashboard(s, 0, \graphite);
+
+// Switch presets
+d.preset = \pitch;
+d.preset = \timeFreq;
+d.preset = \compare;
+d.preset = \overview;
+
+// Freeze/unfreeze
+d.toggleFreeze;
+
+// Close
+d.close;
+x.free;
+::

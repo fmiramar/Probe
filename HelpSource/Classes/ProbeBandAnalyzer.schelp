@@ -1,0 +1,72 @@
+TITLE:: ProbeBandAnalyzer
+summary:: 16-Band Calibrated Logarithmic Spectral Band Analyzer
+categories:: GUI>Visualizers, Live Coding>Telemetry
+
+DESCRIPTION::
+ProbeBandAnalyzer displays calibrated ISO octave-band energy (-80 dBFS to 0 dBFS) across 16 fractional frequency bands from 31 Hz to 16 kHz. It features instantaneous peak-hold indicators, smooth decay, segmented level bars, responsive resizing, and broker deduplication.
+
+CLASSMETHODS::
+
+METHOD:: new
+Open a new standalone window containing the band analyzer.
+argument:: server
+The Server to monitor. Defaults to link::Classes/Server#*default::.
+argument:: busIndex
+The audio bus index to monitor. Default: 0.
+argument:: theme
+A theme name symbol (e.g. \graphite, \phosphor, \ice, \amber, \paper, \monochrome) or link::Classes/ProbeTheme:: instance. Default: \graphite.
+returns:: A new ProbeBandAnalyzer instance.
+
+METHOD:: view
+Embed the band analyzer into a custom parent link::Classes/View:: or link::Classes/Window::.
+argument:: parent
+The parent view or window.
+argument:: bounds
+The link::Classes/Rect:: defining position and dimensions.
+argument:: server
+The Server to monitor. Defaults to link::Classes/Server#*default::.
+argument:: busIndex
+The audio bus index to monitor. Default: 0.
+argument:: theme
+A theme name symbol or link::Classes/ProbeTheme:: instance. Default: \graphite.
+returns:: A PB_BandAnalyzerView composite view.
+
+INSTANCEMETHODS::
+
+METHOD:: analyzerView
+returns:: The underlying PB_BandAnalyzerView composite view.
+
+METHOD:: window
+returns:: The link::Classes/Window:: containing the analyzer.
+
+METHOD:: theme
+Get or set the active link::Classes/ProbeTheme::.
+argument:: aTheme
+A theme name symbol or link::Classes/ProbeTheme:: instance.
+
+METHOD:: fontScale
+Get or set the font scaling multiplier (e.g. 1.0, 1.25, 1.5).
+argument:: scale
+A Float scale factor.
+
+METHOD:: close
+Close the analyzer window and release all broker subscriptions.
+
+EXAMPLES::
+
+CODE::
+s.boot;
+
+// Start live synthesis
+x = { Saw.ar(110) + Pulse.ar(440, 0.3) * 0.2 }.play;
+
+// Open Band Analyzer
+b = ProbeBandAnalyzer(s, 0, \phosphor);
+
+// Switch themes dynamically
+b.theme = \ice;
+
+// Close
+b.close;
+x.free;
+::

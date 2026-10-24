@@ -1,13 +1,13 @@
 TITLE:: ProbeDashboard
 summary:: Unified multi-panel audio analysis dashboard
 categories:: GUI>Visuals
-related:: Classes/Probe, Classes/ProbeDashboardView, Classes/ProbeMeter, Classes/ProbeScope, Classes/ProbeSpectrum, Classes/ProbeLoudness, Classes/ProbeVectorscope
+related:: Classes/Probe, Classes/ProbeMeter, Classes/ProbeScope, Classes/ProbeSpectrum, Classes/ProbeLoudness, Classes/ProbeVectorscope
 
 DESCRIPTION::
 ProbeDashboard unifies all core Probe instruments into a synchronized command center.
-It embeds link::Classes/ProbeMeterView::, link::Classes/ProbeScopeView::, link::Classes/ProbeSpectrumView::, link::Classes/ProbeLoudnessView::, and link::Classes/ProbeVectorscopeView:: within a single resizable interface.
+It embeds Level Meter, Oscilloscope, Spectrum Analyzer, Loudness Meter, and Stereo Vectorscope sub-views within a single resizable interface.
 
-All embedded panels subscribe through link::Classes/ProbeBroker::, guaranteeing zero duplicate audio-thread measurement synths.
+All embedded panels subscribe through the internal telemetry broker, guaranteeing zero duplicate audio-thread measurement synths.
 
 list::
 ## strong::Unified Interface::: Simultaneous real-time level metering, waveform oscilloscope, FFT spectrum analyzer, ITU-R BS.1770 loudness, and stereo vectorscope.
@@ -39,13 +39,40 @@ Theme name symbol (e.g. code::\graphite::) or link::Classes/ProbeTheme:: instanc
 ARGUMENT:: targetLUFS
 Target loudness in LUFS (-23.0 broadcast or -14.0 streaming).
 
+METHOD:: view
+Embed the unified dashboard into a custom parent link::Classes/View:: or link::Classes/Window::.
+
+ARGUMENT:: parent
+Parent view or window.
+
+ARGUMENT:: bounds
+Dimensions and position as link::Classes/Rect::.
+
+ARGUMENT:: server
+Target link::Classes/Server::.
+
+ARGUMENT:: numIns
+Input channels count.
+
+ARGUMENT:: numOuts
+Output channels count.
+
+ARGUMENT:: busIndex
+Audio bus index.
+
+ARGUMENT:: theme
+Visual theme.
+
+ARGUMENT:: targetLUFS
+Target loudness in LUFS.
+
 INSTANCEMETHODS::
 
 METHOD:: window
 Returns the underlying link::Classes/Window::.
 
 METHOD:: dashboardView
-Returns the underlying link::Classes/ProbeDashboardView::.
+Returns the underlying PB_DashboardView composite view.
 
 METHOD:: theme
 Change active theme dynamically across the entire dashboard and all embedded panels.

@@ -21,10 +21,10 @@ s.waitForBoot({
 	"--- Testing ProbeMeter & ProbeMeterView ---".postln;
 
 	// 1. Width calculation across channel counts and densities
-	w2 = ProbeMeterView.getWidth(2, 2, \graphite);
-	w8 = ProbeMeterView.getWidth(8, 8, \graphite);
-	w32 = ProbeMeterView.getWidth(16, 16, ProbeTheme.get(\graphite).withDensity(\micro));
-	w64 = ProbeMeterView.getWidth(32, 32, ProbeTheme.get(\graphite).withDensity(\micro));
+	w2 = PB_MeterView.getWidth(2, 2, \graphite);
+	w8 = PB_MeterView.getWidth(8, 8, \graphite);
+	w32 = PB_MeterView.getWidth(16, 16, ProbeTheme.get(\graphite).withDensity(\micro));
+	w64 = PB_MeterView.getWidth(32, 32, ProbeTheme.get(\graphite).withDensity(\micro));
 
 	assert.value(w2 > 100 and: { w2 < 180 }, "2-ch compact width is bounded (" ++ w2 ++ " px)");
 	assert.value(w8 > 300 and: { w8 < 450 }, "8-ch compact width is bounded (" ++ w8 ++ " px)");

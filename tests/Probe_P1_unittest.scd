@@ -39,21 +39,37 @@ s.waitForBoot({
 	assert.value(Probe.respondsTo(\fontScale), "Probe responds to *fontScale");
 
 	// ------------------------------------------------------------------------
-	// 2. Server Class Extensions: Non-Conflicting Shortcuts
+	// 2. Server Class Extensions: Unified *Pb Shortcuts and Legacy Aliases
 	// ------------------------------------------------------------------------
-	assert.value(s.respondsTo(\meter2), "s responds to .meter2");
-	assert.value(s.respondsTo(\scope2), "s responds to .scope2");
-	assert.value(s.respondsTo(\freqscope2), "s responds to .freqscope2");
-	assert.value(s.respondsTo(\spectrum), "s responds to .spectrum");
-	assert.value(s.respondsTo(\spectrum2), "s responds to .spectrum2");
-	assert.value(s.respondsTo(\spectrogram), "s responds to .spectrogram");
-	assert.value(s.respondsTo(\waterfall), "s responds to .waterfall");
-	assert.value(s.respondsTo(\history), "s responds to .history");
-	assert.value(s.respondsTo(\loudness), "s responds to .loudness");
-	assert.value(s.respondsTo(\vectorscope), "s responds to .vectorscope");
-	assert.value(s.respondsTo(\dashboard), "s responds to .dashboard");
-	assert.value(s.respondsTo(\spectralDashboard), "s responds to .spectralDashboard");
-	assert.value(s.respondsTo(\bandAnalyzer), "s responds to .bandAnalyzer");
+	assert.value(s.respondsTo(\meterPb), "s responds to .meterPb");
+	assert.value(s.respondsTo(\scopePb), "s responds to .scopePb");
+	assert.value(s.respondsTo(\freqscopePb), "s responds to .freqscopePb");
+	assert.value(s.respondsTo(\spectrumPb), "s responds to .spectrumPb");
+	assert.value(s.respondsTo(\spectrogramPb), "s responds to .spectrogramPb");
+	assert.value(s.respondsTo(\waterfallPb), "s responds to .waterfallPb");
+	assert.value(s.respondsTo(\historyPb), "s responds to .historyPb");
+	assert.value(s.respondsTo(\loudnessPb), "s responds to .loudnessPb");
+	assert.value(s.respondsTo(\vectorscopePb), "s responds to .vectorscopePb");
+	assert.value(s.respondsTo(\dashboardPb), "s responds to .dashboardPb");
+	assert.value(s.respondsTo(\spectralDashboardPb), "s responds to .spectralDashboardPb");
+	assert.value(s.respondsTo(\bandAnalyzerPb), "s responds to .bandAnalyzerPb");
+	assert.value(s.respondsTo(\inspectorPb), "s responds to .inspectorPb");
+	assert.value(s.respondsTo(\inspectPb), "s responds to .inspectPb");
+
+	// Legacy aliases
+	assert.value(s.respondsTo(\meter2), "s responds to legacy .meter2");
+	assert.value(s.respondsTo(\scope2), "s responds to legacy .scope2");
+	assert.value(s.respondsTo(\freqscope2), "s responds to legacy .freqscope2");
+	assert.value(s.respondsTo(\spectrum), "s responds to legacy .spectrum");
+	assert.value(s.respondsTo(\spectrum2), "s responds to legacy .spectrum2");
+	assert.value(s.respondsTo(\spectrogram), "s responds to legacy .spectrogram");
+	assert.value(s.respondsTo(\waterfall), "s responds to legacy .waterfall");
+	assert.value(s.respondsTo(\history), "s responds to legacy .history");
+	assert.value(s.respondsTo(\loudness), "s responds to legacy .loudness");
+	assert.value(s.respondsTo(\vectorscope), "s responds to legacy .vectorscope");
+	assert.value(s.respondsTo(\dashboard), "s responds to legacy .dashboard");
+	assert.value(s.respondsTo(\spectralDashboard), "s responds to legacy .spectralDashboard");
+	assert.value(s.respondsTo(\bandAnalyzer), "s responds to legacy .bandAnalyzer");
 
 	// ------------------------------------------------------------------------
 	// 3. Core SC Method Invariant: Vanilla Methods Unaltered
@@ -78,27 +94,27 @@ s.waitForBoot({
 	// ------------------------------------------------------------------------
 	// 4. Smoke Instantiation via New Server Shortcuts
 	// ------------------------------------------------------------------------
-	// A. s.meter2
-	meter = s.meter2(2, 2);
-	assert.value(meter.notNil and: { meter.isKindOf(ProbeMeter) }, "s.meter2 creates ProbeMeter instance");
+	// A. s.meterPb
+	meter = s.meterPb(2, 2);
+	assert.value(meter.notNil and: { meter.isKindOf(ProbeMeter) }, "s.meterPb creates ProbeMeter instance");
 	meter.close;
 	0.2.wait;
 
-	// B. s.scope2
-	scope = s.scope2(0, 2);
-	assert.value(scope.notNil and: { scope.isKindOf(ProbeScope) }, "s.scope2 creates ProbeScope instance");
+	// B. s.scopePb
+	scope = s.scopePb(0, 2);
+	assert.value(scope.notNil and: { scope.isKindOf(ProbeScope) }, "s.scopePb creates ProbeScope instance");
 	scope.close;
 	0.2.wait;
 
-	// C. s.freqscope2
-	spec = s.freqscope2(0);
-	assert.value(spec.notNil and: { spec.isKindOf(ProbeSpectrum) }, "s.freqscope2 creates ProbeSpectrum instance");
+	// C. s.freqscopePb
+	spec = s.freqscopePb(0);
+	assert.value(spec.notNil and: { spec.isKindOf(ProbeSpectrum) }, "s.freqscopePb creates ProbeSpectrum instance");
 	spec.close;
 	0.2.wait;
 
-	// D. s.dashboard
-	dash = s.dashboard(2, 2);
-	assert.value(dash.notNil and: { dash.isKindOf(ProbeDashboard) }, "s.dashboard creates ProbeDashboard instance");
+	// D. s.dashboardPb
+	dash = s.dashboardPb(2, 2);
+	assert.value(dash.notNil and: { dash.isKindOf(ProbeDashboard) }, "s.dashboardPb creates ProbeDashboard instance");
 	dash.close;
 	0.5.wait;
 

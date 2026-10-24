@@ -12,12 +12,12 @@
 
 + UGen {
 	trace { |label, mode, theme, options|
-		^ProbeTrace.wrap(this, label, mode, theme, options);
+		^PB_Trace.wrap(this, label, mode, theme, options);
 	}
 }
 
 + Array {
 	trace { |label, mode, theme, options|
-		^ProbeTrace.wrap(this, label, mode, theme, options);
+		^PB_Trace.wrap(this, label, mode, theme, options);
 	}
 }

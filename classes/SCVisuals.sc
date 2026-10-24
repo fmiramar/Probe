@@ -5,7 +5,7 @@
 */
 
 SCVisuals {
-	classvar <version = "0.3.0";
+	classvar <version = "0.4.0";
 
 	*broker {
 		^Probe.broker;

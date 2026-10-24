@@ -6,7 +6,7 @@
     density modes, and measurement broker deduplication.
 */
 
-ProbeMeterView {
+PB_MeterView {
 	classvar <defaultHeight = 230;
 	classvar <dBLow = -80.0;
 
@@ -432,16 +432,20 @@ ProbeMeter {
 		^super.new.prInit(server, numIns, numOuts, theme, density, meterStyle);
 	}
 
+	*view { |parent, bounds, server, numIns, numOuts, theme=\graphite, density=\compact, meterStyle=\continuous|
+		^PB_MeterView(server ?? { Server.default }, parent, bounds, numIns, numOuts, theme, density, meterStyle);
+	}
+
 	prInit { |server, numIns, numOuts, theme, density, meterStyle|
 		var width, s;
 		s = server ?? { Server.default };
 		numIns  = numIns  ?? { s.options.numInputBusChannels };
 		numOuts = numOuts ?? { s.options.numOutputBusChannels };
 
-		width = ProbeMeterView.getWidth(numIns, numOuts, theme);
-		window = Window(s.name ++ " levels (dBFS) — Probe", Rect(100, 200, width, ProbeMeterView.defaultHeight));
+		width = PB_MeterView.getWidth(numIns, numOuts, theme);
+		window = Window(s.name ++ " levels (dBFS) — Probe", Rect(100, 200, width, PB_MeterView.defaultHeight));
 
-		meterView = ProbeMeterView(s, window, 0@0, numIns, numOuts, theme, density, meterStyle);
+		meterView = PB_MeterView(s, window, 0@0, numIns, numOuts, theme, density, meterStyle);
 		window.view.background = meterView.theme.background;
 
 		window.view.onResize = { |v|
@@ -464,7 +468,7 @@ ProbeMeter {
 
 	density_ { |aDensity|
 		meterView.density = aDensity;
-		window.bounds = window.bounds.width_(ProbeMeterView.getWidth(meterView.numIns, meterView.numOuts, meterView.theme));
+		window.bounds = window.bounds.width_(PB_MeterView.getWidth(meterView.numIns, meterView.numOuts, meterView.theme));
 	}
 
 	meterStyle_ { |aStyle|
@@ -477,7 +481,7 @@ ProbeMeter {
 
 	fontScale_ { |aScale|
 		meterView.fontScale = aScale;
-		window.bounds = window.bounds.width_(ProbeMeterView.getWidth(meterView.numIns, meterView.numOuts, meterView.theme));
+		window.bounds = window.bounds.width_(PB_MeterView.getWidth(meterView.numIns, meterView.numOuts, meterView.theme));
 		window.view.background = meterView.theme.background;
 	}
 

@@ -1,7 +1,7 @@
 TITLE:: ProbeScope
 summary:: Modernized oscilloscope wrapping native ScopeView with theme styling
 categories:: GUI>Visuals
-related:: Classes/Probe, Classes/ProbeScopeView, Classes/Stethoscope
+related:: Classes/Probe, Classes/Stethoscope
 
 DESCRIPTION::
 ProbeScope wraps SuperCollider's native ScopeView (powered by ScopeOut2 and shared-memory QcScopeShm) in an elegant, theme-consistent window with an overlaid transparent grid, multi-channel wave colors, and keyboard shortcuts.
@@ -34,13 +34,46 @@ Display mode: code::\overlay:: (superimposed), code::\tracks:: (stacked channels
 ARGUMENT:: bufSize
 Buffer size in frames (default: 4096).
 
+METHOD:: view
+Embed the oscilloscope into a custom parent link::Classes/View:: or link::Classes/Window::.
+
+ARGUMENT:: parent
+Parent view or window.
+
+ARGUMENT:: bounds
+Dimensions and position as link::Classes/Rect::.
+
+ARGUMENT:: server
+Target audio Server.
+
+ARGUMENT:: busIndex
+Audio or control bus index.
+
+ARGUMENT:: numChannels
+Number of channels.
+
+ARGUMENT:: theme
+Visual theme.
+
+ARGUMENT:: rate
+code::\audio:: or code::\control::.
+
+ARGUMENT:: style
+Display style: code::\overlay::, code::\tracks::, or code::\xy::.
+
+ARGUMENT:: bufSize
+Scope buffer size in frames.
+
+ARGUMENT:: showToolbar
+Boolean indicating whether to show top toolbar controls.
+
 INSTANCEMETHODS::
 
 METHOD:: window
 Returns the underlying link::Classes/Window::.
 
 METHOD:: scopeView
-Returns the underlying link::Classes/ProbeScopeView::.
+Returns the underlying PB_ScopeView composite view.
 
 METHOD:: theme
 Changes theme palette dynamically.

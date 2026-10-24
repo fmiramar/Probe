@@ -405,7 +405,42 @@ This document serves as the persistent historical record of all development iter
   6. **Release Packaging (`v0.3.0`):**
      - Version bumped to `0.3.0` in `Probe.quark`, `SCVisuals.quark`, `Probe.sc`, `SCVisuals.sc`, and `README.md`.
      - All 6 examples in `examples/01` - `06` updated to modern `Probe` idiomatic API.
-- **Deliverables:** `classes/Probe*.sc`, `classes/ProbeLegacyCompat.sc`, `HelpSource/Classes/Probe*.schelp`, `tests/Probe*_unittest.scd`, `scripts/verify_*.scd`, Commit pending.
+- **Deliverables:** `classes/Probe*.sc`, `classes/ProbeLegacyCompat.sc`, `HelpSource/Classes/Probe*.schelp`, `tests/Probe*_unittest.scd`, `scripts/verify_*.scd`, Commit `93722a9`.
+
+---
+
+### Iteration 22: Dual-Tier Architecture (`PB_*`), Clean Autocomplete, and Unified Server Ergonomics (`*Pb`) (v0.4.0)
+- **Focus:** Solving SuperCollider IDE autocomplete pollution (reducing `Probe*` autocomplete entries from >40 down to exactly the 14 public instruments); migrating internal composite views, telemetry data sources, and trace window classes to the private `PB_*` namespace; introducing embeddable `Probe*.view(parent, bounds, ...)` factory methods across all visualizers; standardizing server ergonomics from ambiguous numeric and mixed styles (`s.meter2`, `s.scope2`, `s.spectrum2`, `s.spectrogram`, `s.loudness`) to the unified, unambiguous `*Pb` suffix (`s.meterPb`, `s.scopePb`, `s.freqscopePb`, `s.spectrumPb`, `s.spectrogramPb`, `s.waterfallPb`, `s.historyPb`, `s.loudnessPb`, `s.vectorscopePb`, `s.dashboardPb`, `s.spectralDashboardPb`, `s.bandAnalyzerPb`, `s.inspectorPb`, `s.inspectPb`); delivering 100% zero-warning HelpSource documentation on `Cmd+D` for all 14 public instruments; providing 100% backward compatibility.
+- **Key Enhancements Applied:**
+  1. **ADR-001 Documentation & Archeology:**
+     - Created `docs/decisions/ADR-001-Dual-Tier-Namespace-and-Ergonomics.md` providing in-depth analysis of SuperCollider symbol table mechanics, evaluating Alternatives A–D, and formalizing Alternative D.
+  2. **Internal Plumbing Migration (`PB_*`):**
+     - 27 internal classes relocated to `PB_*`:
+       - Telemetry Sources: `PB_Broker`, `PB_LevelsSource`, `PB_SpectrumSource`, `PB_LoudnessSource`, `PB_VectorscopeSource`, `PB_SpectralSource`
+       - Internal Views: `PB_ScopeView`, `PB_SpectrumView`, `PB_SpectrogramView`, `PB_WaterfallView`, `PB_MeterView`, `PB_LoudnessView`, `PB_VectorscopeView`, `PB_HistoryView`, `PB_DashboardView`, `PB_BandAnalyzerView`, `PB_SpectralDashboardView`, `PB_GraphView`
+       - Auxiliary Views: `PB_DescriptorsView`, `PB_PitchTrackerView`, `PB_ChromagramView`, `PB_SpectralCompareView`
+       - Signal Tracing: `PB_Trace`, `PB_TraceScopeWindow`, `PB_TraceHistoryWindow`, `PB_TraceMeterWindow`, `PB_TraceSpectrumWindow`
+     - Clean Autocomplete: SCLang query `Class.allClasses.select { |c| c.name.asString.beginsWith("Probe") }` returns exactly the 14 public instruments:
+       `[Probe, ProbeTheme, ProbeScope, ProbeSpectrum, ProbeSpectrogram, ProbeWaterfall, ProbeMeter, ProbeLoudness, ProbeVectorscope, ProbeBandAnalyzer, ProbeSpectralDashboard, ProbeDashboard, ProbeInspector, ProbeHistory]`.
+  3. **Embeddable GUI View Factory Pattern (`Probe*.view`):**
+     - Added class method `*view` to all 12 visualizer classes (`ProbeScope.view`, `ProbeSpectrum.view`, `ProbeSpectrogram.view`, `ProbeWaterfall.view`, `ProbeMeter.view`, `ProbeLoudness.view`, `ProbeVectorscope.view`, `ProbeHistory.view`, `ProbeDashboard.view`, `ProbeBandAnalyzer.view`, `ProbeSpectralDashboard.view`, `ProbeInspector.view`).
+     - Users can assemble complex custom GUIs without ever referencing internal `PB_*` classes.
+  4. **Unified Server Ergonomics (`*Pb`):**
+     - Replaced disparate conventions with clean `*Pb` suffix on `Server`:
+       `s.meterPb`, `s.scopePb`, `s.freqscopePb`, `s.spectrumPb`, `s.spectrogramPb`, `s.waterfallPb`, `s.historyPb`, `s.loudnessPb`, `s.vectorscopePb`, `s.dashboardPb`, `s.spectralDashboardPb`, `s.bandAnalyzerPb`, `s.inspectorPb`, `s.inspectPb`.
+     - Legacy methods (`s.meter2`, `s.scope2`, `s.freqscope2`, etc.) preserved as zero-cost forwarders.
+  5. **100% Zero-Warning HelpSource Documentation (`Cmd+D`):**
+     - Authored comprehensive `.schelp` reference files for:
+       - `ProbeBandAnalyzer.schelp`
+       - `ProbeSpectralDashboard.schelp`
+       - `ProbeInspector.schelp`
+     - Updated all 11 existing `.schelp` files to remove broken internal links and document `.view` factory methods.
+     - Verified via `scripts/verify_scdoc.scd`: 15/15 documents parse with 0 errors and 0 warnings.
+  6. **Verification & Testing (`v0.4.0`):**
+     - Master test runner (`tests/run_all_tests.scd`): 14/14 suites passed cleanly (100%).
+     - System install verification (`scripts/verify_system_install.scd`): 101/101 assertions passed cleanly (100%).
+     - Version bumped to `0.4.0` in `Probe.quark`, `SCVisuals.quark`, `Probe.sc`, `SCVisuals.sc`, and `README.md`.
+- **Deliverables:** `docs/decisions/ADR-001-Dual-Tier-Namespace-and-Ergonomics.md`, `classes/PB_*.sc`, `classes/Probe*.sc`, `classes/extServerProbe.sc`, `HelpSource/Classes/Probe*.schelp`, `tests/run_all_tests.scd`, `scripts/verify_*.scd`, `README.md`.
 
 ---
 
@@ -413,18 +448,20 @@ This document serves as the persistent historical record of all development iter
 
 | Parameter / Feature | Chosen Design | Rationale | Invariant Status |
 |---|---|---|---|
-| **Suite Name** | `Probe` (`v0.3.0`, unified namespace) | Professional instrumentation terminology; completely replaces internal `SCV` prefix while preserving legacy subclasses in `ProbeLegacyCompat.sc`. | Active Invariant (v0.3.0) |
+| **Suite Name** | `Probe` (`v0.4.0`, dual-tier namespace) | Professional instrumentation terminology; 14 public instruments in `Probe*`, all internal plumbing in `PB_*`. | Active Invariant (v0.4.0) |
+| **IDE Autocomplete** | Exactly 14 `Probe*` Classes | Clean symbol search in IDE without internal views and helper classes polluting autocomplete. | Active Invariant (v0.4.0) |
+| **GUI Embeddability** | `Probe*.view(parent, bounds, ...)` | High-level factory pattern returning embeddable `PB_*View` instances without exposing internal class names. | Active Invariant (v0.4.0) |
 | **Default Font Scale** | `1.25` (125%) | Optimum balance of legibility on modern high-DPI retina displays without overflowing panels. | Active Invariant |
 | **Control Layout** | Tight (28px buttons at 1.25, 4–6px gaps) | Sleek laboratory instrument aesthetic; eliminates bloated dead space. | Active Invariant |
 | **FFT Smoothing** | Raw FFT scan (no PV smoothing) | PV smoothing introduced smearing and edge ripples; raw FFT preserves instant transient response. | Active Invariant |
-| **Telemetry Transport** | `ProbeBroker` Reference-Counted Synths | Prevents duplicate FFT/peak-RMS synths on identical bus monitoring. Legacy alias `SCVMeasurementBroker` retained. | Active Invariant (v0.3.0) |
+| **Telemetry Transport** | `PB_Broker` Reference-Counted Synths | Prevents duplicate FFT/peak-RMS synths on identical bus monitoring. Legacy aliases `SCVMeasurementBroker` and `ProbeBroker` retained. | Active Invariant (v0.4.0) |
 | **Core SC Overrides** | Forbidden (`s.meter`, `s.scope`, `s.freqscope` unchanged) | Strict non-interference with vanilla SuperCollider workflows. | Permanent Invariant |
-| **Server Shortcuts** | `s.meter2`, `s.scope2`, `s.freqscope2`, `s.dashboard`, `s.spectralDashboard`, `s.bandAnalyzer`, `s.inspector` | Non-conflicting ergonomic shortcuts following SuperCollider numbering conventions. | Active Invariant |
+| **Server Shortcuts** | `s.*Pb` (`s.meterPb`, `s.scopePb`, `s.freqscopePb`, `s.spectralDashboardPb`, etc.) | Unified, non-colliding `*Pb` suffix clearly denoting Probe instruments. Legacy forwarders (`s.meter2`, etc.) preserved. | Active Invariant (v0.4.0) |
 | **Signal Tracing** | Transparent `.trace` with Dual Transport | Sample-accurate waveforms for audio rate, low-bandwidth 20 Hz timeline HUD for control rate. | Active Invariant (Phase II) |
 | **Spectral Dashboard** | Persistent 4-Preset Architecture | Instantaneous preset switching (`\overview`, `\pitch`, `\timeFreq`, `\compare`) with zero ScopeBuffer reallocation. | Active Invariant (Phase II) |
 | **Oscilloscope Triggering** | DSP Zero-Crossing Latch Buffer | Guarantees drift-free stationary waveforms for periodic signals without external plugins. | Active Invariant (Phase II) |
 | **Unified FreqScope Modes** | Subview Visibility Switching | Seamless single-window transitions between Line, 16-Band, and Spectrogram modes. | Active Invariant (Phase II) |
 | **DSP Graph Inspector** | Static Topological DAG Parsing | Pure sclang evaluation; renders clear signal flow without server messaging overhead or audio thread interference. | Active Invariant (Phase II) |
-| **Packaging & Compatibility** | Dual-Quark Alias (`Probe` + `SCVisuals`) & `ProbeLegacyCompat.sc` | Seamless migration path ensuring zero broken workflows for existing installations; 22 legacy `SCV*` classes preserved. | Active Invariant (v0.3.0) |
+| **Packaging & Compatibility** | Dual-Quark Alias (`Probe` + `SCVisuals`) & `ProbeLegacyCompat.sc` | Seamless migration path ensuring zero broken workflows for existing installations; 22 legacy `SCV*` classes preserved. | Active Invariant (v0.4.0) |
 
 

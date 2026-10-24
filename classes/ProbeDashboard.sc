@@ -2,11 +2,11 @@
     ProbeDashboard.sc
     Probe — Unified Multi-Panel Audio Analysis Dashboard
     Composes Meter, Oscilloscope, Spectrum, Loudness, and Vectorscope into a single
-    synchronized interface sharing measurement sources via ProbeBroker,
+    synchronized interface sharing measurement sources via PB_Broker,
     with master freeze, global theme propagation, dynamic responsive grid resizing, and broker telemetry.
 */
 
-ProbeDashboardView {
+PB_DashboardView {
 	var <server;
 	var <view;
 	var <meterView, <scopeView, <spectrumView, <loudnessView, <vectorscopeView;
@@ -116,19 +116,19 @@ ProbeDashboardView {
 
 		// 2. Embedded Panels Grid
 		// Panel 1: Multi-Channel Meter (Left)
-		meterView = ProbeMeterView(server, view, Rect(10, topH + 8, meterW, h - topH - 16), numIns, numOuts, theme);
+		meterView = PB_MeterView(server, view, Rect(10, topH + 8, meterW, h - topH - 16), numIns, numOuts, theme);
 
 		// Panel 2: Scope (Mid-Top)
-		scopeView = ProbeScopeView(server, view, Rect(meterW + 18, topH + 8, midW, panelH), busIndex, 2, theme);
+		scopeView = PB_ScopeView(server, view, Rect(meterW + 18, topH + 8, midW, panelH), busIndex, 2, theme);
 
 		// Panel 3: Spectrum (Mid-Bottom)
-		spectrumView = ProbeSpectrumView(server, view, Rect(meterW + 18, topH + 16 + panelH, midW, panelH), busIndex, 2048, theme);
+		spectrumView = PB_SpectrumView(server, view, Rect(meterW + 18, topH + 16 + panelH, midW, panelH), busIndex, 2048, theme);
 
 		// Panel 4: Loudness Meter (Right-Top)
-		loudnessView = ProbeLoudnessView(server, view, Rect(meterW + midW + 26, topH + 8, rightW, panelH), \outputs, busIndex, 2, theme, targetLUFS);
+		loudnessView = PB_LoudnessView(server, view, Rect(meterW + midW + 26, topH + 8, rightW, panelH), \outputs, busIndex, 2, theme, targetLUFS);
 
 		// Panel 5: Vectorscope (Right-Bottom)
-		vectorscopeView = ProbeVectorscopeView(server, view, Rect(meterW + midW + 26, topH + 16 + panelH, rightW, panelH), busIndex, theme);
+		vectorscopeView = PB_VectorscopeView(server, view, Rect(meterW + midW + 26, topH + 16 + panelH, rightW, panelH), busIndex, theme);
 
 		// Master Keyboard Controls
 		view.keyDownAction = { |v, char|
@@ -339,12 +339,16 @@ ProbeDashboard {
 		^super.new.prInit(server, numIns, numOuts, busIndex, theme, targetLUFS);
 	}
 
+	*view { |parent, bounds, server, numIns=2, numOuts=2, busIndex=0, theme=\graphite, targetLUFS=(-23.0)|
+		^PB_DashboardView(server ?? { Server.default }, parent, bounds, numIns, numOuts, busIndex, theme, targetLUFS);
+	}
+
 	prInit { |server, numIns, numOuts, busIndex, theme, targetLUFS|
 		var s = server ?? { Server.default };
 		var w = 1020, h = 600;
 
 		window = Window(s.name ++ " Unified Audio Analysis Dashboard — Probe", Rect(100, 100, w, h));
-		dashboardView = ProbeDashboardView(s, window, Rect(0, 0, w, h), numIns, numOuts, busIndex, theme, targetLUFS);
+		dashboardView = PB_DashboardView(s, window, Rect(0, 0, w, h), numIns, numOuts, busIndex, theme, targetLUFS);
 		window.view.background = dashboardView.theme.background;
 
 		window.view.onResize = { |v|

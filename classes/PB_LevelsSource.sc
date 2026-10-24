@@ -1,11 +1,11 @@
 /*
-    ProbeLevelsSource.sc
-    Probe — Peak & RMS Levels Measurement Source
+    PB_LevelsSource.sc
+    Probe — Peak & RMS Levels Measurement Source (Internal)
     Centralized SendPeakRMS analysis source with consumer reference counting,
     bounded presentation state, and coalesced AppClock notification.
 */
 
-ProbeLevelsSource {
+PB_LevelsSource {
 	var <key;
 	var <server;
 	var <busType;       // \inputs, \outputs, \bus
@@ -117,7 +117,7 @@ ProbeLevelsSource {
 					try {
 						callback.value(peakLevels, rmsLevels, peakHoldLevels, this);
 					} { |err|
-						("ProbeLevelsSource callback error: " ++ err.errorString).warn;
+						("PB_LevelsSource callback error: " ++ err.errorString).warn;
 					};
 				};
 				nil;
@@ -184,6 +184,6 @@ ProbeLevelsSource {
 	}
 
 	printOn { |stream|
-		stream << "ProbeLevelsSource(" << key << ", consumers: " << consumers.size << ", running: " << this.isRunning << ")";
+		stream << "PB_LevelsSource(" << key << ", consumers: " << consumers.size << ", running: " << this.isRunning << ")";
 	}
 }

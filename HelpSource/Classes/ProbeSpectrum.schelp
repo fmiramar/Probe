@@ -1,7 +1,7 @@
 TITLE:: ProbeSpectrum
 summary:: Themed spectrum analyzer wrapping the FreqScope FFT pipeline
 categories:: GUI>Visuals
-related:: Classes/Probe, Classes/ProbeSpectrumView, Classes/FreqScope
+related:: Classes/Probe, Classes/FreqScope
 
 DESCRIPTION::
 ProbeSpectrum provides a modern, theme-consistent real-time spectrum analyzer wrapping the verified FreqScope FFT pipeline (FFT size 2048, hop 0.75, Hann window, PV_MagSmear, phasor ScopeOut2).
@@ -34,13 +34,46 @@ Dynamic range in dB (default: 96 dB).
 ARGUMENT:: smoothing
 FFT smoothing mode: code::\none::, code::\low::, code::\med::, or code::\high::.
 
+METHOD:: view
+Embed the spectrum analyzer into a custom parent link::Classes/View:: or link::Classes/Window::.
+
+ARGUMENT:: parent
+Parent view or window.
+
+ARGUMENT:: bounds
+Dimensions and position as link::Classes/Rect::.
+
+ARGUMENT:: server
+Target audio Server.
+
+ARGUMENT:: busIndex
+Audio bus to analyze.
+
+ARGUMENT:: fftSize
+FFT frame size.
+
+ARGUMENT:: theme
+Visual theme.
+
+ARGUMENT:: freqMode
+code::\logarithmic:: or code::\linear::.
+
+ARGUMENT:: dbRange
+Dynamic range in dB.
+
+ARGUMENT:: smoothing
+FFT smoothing mode.
+
+ARGUMENT:: showToolbar
+Boolean indicating whether to show top toolbar controls.
+
 INSTANCEMETHODS::
 
 METHOD:: window
 Returns the underlying link::Classes/Window::.
 
 METHOD:: spectrumView
-Returns the underlying link::Classes/ProbeSpectrumView::.
+Returns the underlying PB_SpectrumView composite view.
 
 METHOD:: theme
 Changes theme palette dynamically.

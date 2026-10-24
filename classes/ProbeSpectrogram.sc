@@ -5,7 +5,7 @@
     frequency axis markings, dynamic window resizing, freeze/clear controls, and shared measurement broker integration.
 */
 
-ProbeSpectrogramView {
+PB_SpectrogramView {
 	var <server;
 	var <view;
 	var <userView;
@@ -224,12 +224,16 @@ ProbeSpectrogram {
 		^super.new.prInit(server, busIndex, numBands, theme, updateFreq);
 	}
 
+	*view { |parent, bounds, server, busIndex=0, numBands=64, theme=\graphite, updateFreq=20|
+		^PB_SpectrogramView(server ?? { Server.default }, parent, bounds, busIndex, numBands, theme, updateFreq);
+	}
+
 	prInit { |server, busIndex, numBands, theme, updateFreq|
 		var s = server ?? { Server.default };
 		var w = 460, h = 240;
 
 		window = Window(s.name ++ " Spectrogram — Probe", Rect(300, 280, w, h));
-		spectrogramView = ProbeSpectrogramView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq);
+		spectrogramView = PB_SpectrogramView(s, window, Rect(0, 0, w, h), busIndex, numBands, theme, updateFreq);
 		window.view.background = spectrogramView.theme.background;
 
 		window.view.onResize = { |v|

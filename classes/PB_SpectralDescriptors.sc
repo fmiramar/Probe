@@ -1,6 +1,6 @@
 /*
-    ProbeSpectralDescriptors.sc
-    Probe — Advanced Spectral Analysis Descriptor Views
+    PB_SpectralDescriptors.sc
+    Probe — Advanced Spectral Analysis Descriptor Views (Internal)
     Modular, high-performance visualizers for:
     1. Spectral Descriptors (Centroid, Flatness, Roll-off, Flux/Onsets)
     2. Pitch & Voicing Confidence Tracker
@@ -9,7 +9,7 @@
     5. Spectral Comparison & Reference Hold (A/B Difference)
 */
 
-ProbeDescriptorsView {
+PB_DescriptorsView {
 	var <server, <busIndex, <theme;
 	var <view, <userView;
 	var <source;
@@ -112,7 +112,7 @@ ProbeDescriptorsView {
 	}
 }
 
-ProbePitchTrackerView {
+PB_PitchTrackerView {
 	var <server, <busIndex, <theme;
 	var <view, <userView;
 	var <source;
@@ -210,7 +210,7 @@ ProbePitchTrackerView {
 	}
 }
 
-ProbeChromagramView {
+PB_ChromagramView {
 	classvar <notes = #["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 	var <server, <busIndex, <theme;
 	var <view, <userView;
@@ -298,7 +298,7 @@ ProbeChromagramView {
 	}
 }
 
-ProbeSpectralCompareView {
+PB_SpectralCompareView {
 	var <server, <busIndex, <theme;
 	var <view, <userView;
 	var <source;

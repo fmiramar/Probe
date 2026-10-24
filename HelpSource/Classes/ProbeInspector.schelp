@@ -1,0 +1,58 @@
+TITLE:: ProbeInspector
+summary:: Static DSP Graph (DAG) Signal Flow Visualizer
+categories:: GUI>Visualizers, SynthDef
+
+DESCRIPTION::
+ProbeInspector renders an interactive topological signal-flow Directed Acyclic Graph (DAG) for any compiled SynthDef or audio Function. It orders UGens in topological dependency layers (Control UGens -> internal DSP arithmetic and filters -> Out UGens), distinguishes signal rates with color-coded bezier routing wires, and enables interactive node inspection.
+
+CLASSMETHODS::
+
+METHOD:: new
+Open a new standalone window inspecting a SynthDef or audio Function.
+argument:: synthDef
+A link::Classes/SynthDef:: instance, or a link::Classes/Function:: returning a UGen graph.
+argument:: theme
+A theme name symbol (e.g. \graphite, \phosphor, \ice, \amber, \paper, \monochrome) or link::Classes/ProbeTheme:: instance. Default: \graphite.
+returns:: A new ProbeInspector instance.
+
+METHOD:: view
+Embed the graph inspector into a custom parent link::Classes/View:: or link::Classes/Window::.
+argument:: parent
+The parent view or window.
+argument:: bounds
+The link::Classes/Rect:: defining position and dimensions.
+argument:: synthDef
+A link::Classes/SynthDef:: or audio link::Classes/Function::.
+argument:: theme
+A theme name symbol or link::Classes/ProbeTheme:: instance. Default: \graphite.
+returns:: A PB_GraphView composite view.
+
+INSTANCEMETHODS::
+
+METHOD:: graphView
+returns:: The underlying PB_GraphView composite view.
+
+METHOD:: window
+returns:: The link::Classes/Window:: containing the inspector.
+
+METHOD:: close
+Close the inspector window.
+
+EXAMPLES::
+
+CODE::
+// Inspect an audio Function directly:
+ProbeInspector({
+    var sig = Saw.ar(MouseX.kr(100, 2000, \exponential));
+    var filt = RLPF.ar(sig, 800, 0.2);
+    Out.ar(0, filt * 0.2);
+});
+
+// Inspect a named SynthDef:
+SynthDef(\testSynth, { |freq=440, amp=0.1|
+    var osc = SinOsc.ar(freq) * amp;
+    Out.ar(0, osc ! 2);
+}).add;
+
+ProbeInspector(SynthDescLib.global[\testSynth].def, \ice);
+::

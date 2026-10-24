@@ -1,11 +1,11 @@
 /*
-    ProbeSpectralSource.sc
-    Probe — High-Performance Shared Spectral Telemetry Source
+    PB_SpectralSource.sc
+    Probe — High-Performance Shared Spectral Telemetry Source (Internal)
     Computes spectral descriptors (Centroid, Flatness, Roll-off, Flux/Onsets, Pitch, Chroma, and Bands)
     in a single reference-counted analysis synth per monitored bus, eliminating duplicate FFT chains.
 */
 
-ProbeSpectralSource {
+PB_SpectralSource {
 	var <server;
 	var <busIndex;
 	var <updateFreq;

@@ -1,13 +1,13 @@
 TITLE:: ProbeHistory
 summary:: Real-time rolling timeline chart of Peak, RMS, and Crest Factor
 categories:: GUI>Visuals
-related:: Classes/Probe, Classes/ProbeHistoryView, Classes/ProbeMeter, Classes/ProbeLevelsSource
+related:: Classes/Probe, Classes/ProbeMeter
 
 DESCRIPTION::
 ProbeHistory renders a multi-channel rolling timeline chart tracking Peak level, RMS energy, and Crest Factor headroom over time.
 
 list::
-## Subscribes to shared link::Classes/ProbeLevelsSource:: via link::Classes/ProbeBroker::
+## Subscribes to shared measurement sources via the internal telemetry broker.
 ## Shaded Crest Factor area between RMS contour and Peak envelope
 ## Multi-channel stacked lane layout with calibrated dB grid lines (0, -6, -18, -36 dB)
 ## Bounded ring-buffer history memory (default 200 points)
@@ -40,13 +40,43 @@ Update frequency in Hz (default 20 Hz).
 ARGUMENT:: maxPoints
 Maximum number of historical timeline points (default 200).
 
+METHOD:: view
+Embed the rolling history chart into a custom parent link::Classes/View:: or link::Classes/Window::.
+
+ARGUMENT:: parent
+Parent view or window.
+
+ARGUMENT:: bounds
+Dimensions and position as link::Classes/Rect::.
+
+ARGUMENT:: server
+Target link::Classes/Server::.
+
+ARGUMENT:: busType
+Bus category: code::\outputs::, code::\inputs::, or code::\bus::.
+
+ARGUMENT:: busIndex
+Audio bus offset.
+
+ARGUMENT:: numChannels
+Number of channels.
+
+ARGUMENT:: theme
+Visual theme.
+
+ARGUMENT:: updateFreq
+Refresh frequency in Hz.
+
+ARGUMENT:: maxPoints
+Maximum points in ring buffer.
+
 INSTANCEMETHODS::
 
 METHOD:: window
 Returns the underlying link::Classes/Window::.
 
 METHOD:: historyView
-Returns the underlying link::Classes/ProbeHistoryView::.
+Returns the underlying PB_HistoryView composite view.
 
 METHOD:: theme
 Update active theme dynamically.

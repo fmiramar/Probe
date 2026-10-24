@@ -1,7 +1,7 @@
 TITLE:: ProbeMeter
 summary:: Compact, vertical real-time server level meter
 categories:: GUI>Visuals
-related:: Classes/Probe, Classes/ProbeMeterView, Classes/ServerMeter
+related:: Classes/Probe, Classes/ServerMeter
 
 DESCRIPTION::
 ProbeMeter provides a compact, modernized vertical level meter for SuperCollider audio servers. It preserves the classic separated Input and Output channel strip arrangement while incorporating:
@@ -38,13 +38,40 @@ Density preset: code::\micro::, code::\compact::, or code::\extended::.
 ARGUMENT:: meterStyle
 Meter display style: code::\continuous:: or code::\led::.
 
+METHOD:: view
+Embed the meter into a custom parent link::Classes/View:: or link::Classes/Window::.
+
+ARGUMENT:: parent
+Parent view or window.
+
+ARGUMENT:: bounds
+Dimensions and position as link::Classes/Rect::.
+
+ARGUMENT:: server
+Target link::Classes/Server::.
+
+ARGUMENT:: numIns
+Number of input channels.
+
+ARGUMENT:: numOuts
+Number of output channels.
+
+ARGUMENT:: theme
+Visual theme.
+
+ARGUMENT:: density
+Density preset: code::\micro::, code::\compact::, or code::\extended::.
+
+ARGUMENT:: meterStyle
+Meter style: code::\continuous:: or code::\led::.
+
 INSTANCEMETHODS::
 
 METHOD:: window
 Returns the underlying link::Classes/Window::.
 
 METHOD:: meterView
-Returns the underlying link::Classes/ProbeMeterView::.
+Returns the underlying PB_MeterView composite view.
 
 METHOD:: theme
 Changes the active theme dynamically without restarting analysis synths.

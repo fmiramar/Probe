@@ -231,11 +231,13 @@ s.boot;
 // 1. Play test audio
 x = { Saw.ar([110, 220]) * 0.2 }.play;
 
-// 2. Open instruments via Probe facade or Server shortcuts
+// 2. Open instruments via Probe facade or Server *Pb shortcuts
 Probe.scope(s, 0, 2);
 Probe.spectrum(s, 0);
-s.spectralDashboard(0);
-s.inspector({ |freq=440| RLPF.ar(Saw.ar(freq), 1200, 0.2) });
+s.meterPb;
+s.scopePb(0, 2);
+s.spectralDashboardPb(0);
+s.inspectorPb({ |freq=440| RLPF.ar(Saw.ar(freq), 1200, 0.2) });
 
 // 3. Transparent Signal Tracing
 y = { SinOsc.ar(440, 0, 0.1).trace(\sineWave) }.play;

@@ -33,14 +33,14 @@ s.waitForBoot {
 	assert.value(testDef.notNil, "SynthDef compiles successfully");
 	assert.value(testDef.children.size > 0, "SynthDef has compiled children UGens");
 
-	// 2. Instantiate ProbeGraphView in a dummy window
+	// 2. Instantiate PB_GraphView in a dummy window
 	win = Window("Test Graph P5", Rect(50, 50, 700, 400));
-	gView = ProbeGraphView(win, Rect(0, 0, 700, 400), testDef, \graphite);
+	gView = PB_GraphView(win, Rect(0, 0, 700, 400), testDef, \graphite);
 
-	assert.value(gView.notNil, "ProbeGraphView instantiates cleanly");
-	assert.value(gView.children.size == testDef.children.size, "ProbeGraphView extracts all children UGens");
-	assert.value(gView.maxLayer >= 3, "ProbeGraphView computes topological layers (>= 3)");
-	assert.value(gView.layers.size == (gView.maxLayer + 1), "ProbeGraphView layer bins match maxLayer + 1");
+	assert.value(gView.notNil, "PB_GraphView instantiates cleanly");
+	assert.value(gView.children.size == testDef.children.size, "PB_GraphView extracts all children UGens");
+	assert.value(gView.maxLayer >= 3, "PB_GraphView computes topological layers (>= 3)");
+	assert.value(gView.layers.size == (gView.maxLayer + 1), "PB_GraphView layer bins match maxLayer + 1");
 
 	// Check that Out UGen is placed in the deepest/final layer
 	{
@@ -66,12 +66,12 @@ s.waitForBoot {
 
 	// 3. Theme switching
 	gView.theme = \ice;
-	assert.value(gView.theme.name === \ice, "ProbeGraphView updates theme to \\ice");
+	assert.value(gView.theme.name === \ice, "PB_GraphView updates theme to \\ice");
 
 	// 4. Function-to-SynthDef conversion
 	gView.synthDef = { |out=0| Out.ar(out, SinOsc.ar(300)) };
-	assert.value(gView.synthDef.notNil, "ProbeGraphView accepts raw Function and compiles SynthDef");
-	assert.value(gView.children.size > 0, "ProbeGraphView parses Function-compiled children");
+	assert.value(gView.synthDef.notNil, "PB_GraphView accepts raw Function and compiles SynthDef");
+	assert.value(gView.children.size > 0, "PB_GraphView parses Function-compiled children");
 
 	win.close;
 
@@ -79,6 +79,10 @@ s.waitForBoot {
 	inspector = Probe.inspect(testDef);
 	assert.value(inspector.notNil, "Probe.inspect facade instantiates ProbeInspector");
 	assert.value(inspector.graphView.notNil, "ProbeInspector holds valid graphView");
+	inspector.close;
+
+	inspector = s.inspectorPb(testDef);
+	assert.value(inspector.notNil, "s.inspectorPb server shortcut instantiates ProbeInspector");
 	inspector.close;
 
 	inspector = s.inspector(testDef);
@@ -91,6 +95,7 @@ s.waitForBoot {
 	"".postln;
 	("=== Probe P5 Unit Tests Completed: " ++ passed ++ " Passed, " ++ failed ++ " Failed ===").postln;
 
+	s.quit;
 	if (failed == 0) {
 		0.exit;
 	} {

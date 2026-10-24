@@ -21,7 +21,7 @@ s.waitForBoot({
 	// ------------------------------------------------------------------------
 	// 1. Method Existence & Reflection
 	// ------------------------------------------------------------------------
-	assert.value(\ProbeTrace.asClass.notNil, "ProbeTrace class exists in symbol table");
+	assert.value(\PB_Trace.asClass.notNil, "PB_Trace class exists in symbol table");
 	assert.value(UGen.findRespondingMethodFor(\trace).notNil, "UGen responds to .trace");
 	assert.value(Array.findRespondingMethodFor(\trace).notNil, "Array responds to .trace");
 
@@ -68,16 +68,16 @@ s.waitForBoot({
 	synth1 = { SinOsc.ar(440, 0, 0.1).trace(\sineWave) }.play;
 	0.2.wait;
 
-	assert.value(ProbeTrace.activeTraces.size >= 1, "Active trace registered on live { ... .trace }.play");
+	assert.value(PB_Trace.activeTraces.size >= 1, "Active trace registered on live { ... .trace }.play");
 	assert.value(
-		ProbeTrace.activeTraces.any { |t| t.isKindOf(ProbeTraceScopeWindow) and: { t.label == "sineWave" } },
-		"Audio trace automatically launches ProbeTraceScopeWindow with correct label"
+		PB_Trace.activeTraces.any { |t| t.isKindOf(PB_TraceScopeWindow) and: { t.label == "sineWave" } },
+		"Audio trace automatically launches PB_TraceScopeWindow with correct label"
 	);
 
 	synth1.free;
-	ProbeTrace.closeAll;
+	PB_Trace.closeAll;
 	0.2.wait;
-	assert.value(ProbeTrace.activeTraces.size == 0, "ProbeTrace.closeAll frees all active trace windows");
+	assert.value(PB_Trace.activeTraces.size == 0, "PB_Trace.closeAll frees all active trace windows");
 
 	// ------------------------------------------------------------------------
 	// 4. Control Rate Live Tracing & Numerical History Smoke Test
@@ -88,16 +88,16 @@ s.waitForBoot({
 	}.play;
 	0.3.wait;
 
-	assert.value(ProbeTrace.activeTraces.size >= 1, "Control-rate trace registered in activeTraces");
+	assert.value(PB_Trace.activeTraces.size >= 1, "Control-rate trace registered in activeTraces");
 	assert.value(
-		ProbeTrace.activeTraces.any { |t| t.isKindOf(ProbeTraceHistoryWindow) and: { t.label == "cutoffLfo" } },
-		"Control trace automatically launches ProbeTraceHistoryWindow with correct label"
+		PB_Trace.activeTraces.any { |t| t.isKindOf(PB_TraceHistoryWindow) and: { t.label == "cutoffLfo" } },
+		"Control trace automatically launches PB_TraceHistoryWindow with correct label"
 	);
 
 	synth2.free;
-	ProbeTrace.closeAll;
+	PB_Trace.closeAll;
 	0.2.wait;
-	assert.value(ProbeTrace.activeTraces.size == 0, "All control trace windows closed cleanly");
+	assert.value(PB_Trace.activeTraces.size == 0, "All control trace windows closed cleanly");
 
 	// ------------------------------------------------------------------------
 	// 5. Multiple Named Taps Coexistence Test
@@ -109,9 +109,9 @@ s.waitForBoot({
 	}.play;
 	0.3.wait;
 
-	assert.value(ProbeTrace.activeTraces.size == 2, "Multiple named taps create distinct trace windows (size == 2)");
+	assert.value(PB_Trace.activeTraces.size == 2, "Multiple named taps create distinct trace windows (size == 2)");
 	assert.value(
-		ProbeTrace.activeTraces.collect(_.label).asSet == Set["beforeFilter", "afterFilter"],
+		PB_Trace.activeTraces.collect(_.label).asSet == Set["beforeFilter", "afterFilter"],
 		"Both named taps co-exist with their respective distinct labels"
 	);
 
@@ -122,7 +122,7 @@ s.waitForBoot({
 	// ------------------------------------------------------------------------
 	CmdPeriod.run;
 	0.2.wait;
-	assert.value(ProbeTrace.activeTraces.size == 0, "CmdPeriod cleanly closes all trace windows and releases resources");
+	assert.value(PB_Trace.activeTraces.size == 0, "CmdPeriod cleanly closes all trace windows and releases resources");
 
 	"------------------------------------------------------------------------".postln;
 	("Probe Phase II P2 Test Results: " ++ passed ++ " passed, " ++ failed ++ " failed.").postln;

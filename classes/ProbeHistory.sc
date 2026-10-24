@@ -1,11 +1,11 @@
 /*
     ProbeHistory.sc
     Probe — Real-Time Peak, RMS & Crest Factor Rolling Timeline History
-    Rolling multi-channel level history subscribed to ProbeLevelsSource via broker,
+    Rolling multi-channel level history subscribed to PB_LevelsSource via broker,
     visualizing Peak curves, RMS contours, shaded Crest Factor headroom, dynamic window resizing, and theme contrast.
 */
 
-ProbeHistoryView {
+PB_HistoryView {
 	var <server;
 	var <view;
 	var <userView, <axisView;
@@ -269,12 +269,16 @@ ProbeHistory {
 		^super.new.prInit(server, busType, busIndex, numChannels, theme, updateFreq, maxPoints);
 	}
 
+	*view { |parent, bounds, server, busType=\outputs, busIndex=0, numChannels=2, theme=\graphite, updateFreq=20, maxPoints=200|
+		^PB_HistoryView(server ?? { Server.default }, parent, bounds, busType, busIndex, numChannels, theme, updateFreq, maxPoints);
+	}
+
 	prInit { |server, busType, busIndex, numChannels, theme, updateFreq, maxPoints|
 		var s = server ?? { Server.default };
 		var w = 520, h = 260;
 
 		window = Window(s.name ++ " Level History — Probe", Rect(320, 240, w, h));
-		historyView = ProbeHistoryView(s, window, Rect(0, 0, w, h), busType, busIndex, numChannels, theme, updateFreq, maxPoints);
+		historyView = PB_HistoryView(s, window, Rect(0, 0, w, h), busType, busIndex, numChannels, theme, updateFreq, maxPoints);
 		window.view.background = historyView.theme.background;
 
 		window.view.onResize = { |v|
