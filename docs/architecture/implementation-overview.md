@@ -67,3 +67,27 @@ Every instrument is directly accessible from the `Server` instance using the non
 - `s.inspectorPb` / `s.inspectPb`: Static DSP graph inspector
 
 Core SuperCollider methods (`s.meter`, `s.scope`, `s.freqscope`) remain 100% untouched, ensuring zero breaking changes for existing vanilla workflows.
+
+---
+
+## 4. Visualizer Lineup & Architecture Matrix
+
+| Instrument | Description | Embeddable View Factory | Backend Transport |
+|---|---|---|---|
+| **`s.meterPb`** / `Probe.meter` | Compact vertical server meter (inputs/outputs, dB ruler, peak/RMS, peak-hold) | `ProbeMeter.view(parent, bounds)` | `SendPeakRMS` via `PB_LevelsSource` |
+| **`s.scopePb`** / `Probe.scope` | Oscilloscope with calibrated ms/dBFS axes, stationary trigger edge lock (`\rising`, `\falling`), tracks/overlay/XY | `ProbeScope.view(parent, bounds)` | `ScopeView` / `ScopeOut2` + DSP circular latch buffer |
+| **`s.freqscopePb`** / `Probe.spectrum` | Unified FFT spectrum analyzer with 3 modes (Line, 16-Band Analyzer, Spectrogram) and interactive cursor | `ProbeSpectrum.view(parent, bounds)` | Precision FreqScope FFT pipeline |
+| **`s.spectralDashboardPb`** / `Probe.spectralDashboard` | 4-preset command center (Overview, Pitch, Time-Frequency, Compare) with 16-band analyzer, chroma, and descriptors | `ProbeSpectralDashboard.view(parent, bounds)` | `PB_SpectralSource` & `PB_Broker` |
+| **`s.bandAnalyzerPb`** / `Probe.bandAnalyzer` | 16-band ISO 1/3-octave band analyzer with peak indicators and RMS bars | `ProbeBandAnalyzer.view(parent, bounds)` | `PB_SpectralSource` filterbank |
+| **`s.inspectorPb`** / `Probe.inspect` | Static topological signal-flow Directed Acyclic Graph (DAG) inspector with rate coloring and bezier routing | `ProbeInspector.view(parent, bounds)` | Static SCLang DAG compilation (`PB_GraphView`) |
+| **`.trace`** | Transparent runtime in-graph signal tracing for audio rate (Scope) and control rate (20 Hz Timeline HUD) | Integrated HUD | Dual transport: `ScopeOut2` / `SendReply.kr` (`PB_Trace`) |
+| **`s.spectrogramPb`** / `Probe.spectrogram` | 2D scrolling time–frequency spectrogram with circular ring-buffer blit | `ProbeSpectrogram.view(parent, bounds)` | 64-band logarithmic `SendReply.kr` |
+| **`s.waterfallPb`** / `Probe.waterfall` | 2.5D isometric stacked-line spectral history with depth-cued color shading | `ProbeWaterfall.view(parent, bounds)` | Shared `PB_SpectrumSource` |
+| **`s.historyPb`** / `Probe.history` | Rolling peak, RMS, and shaded crest factor timeline history chart | `ProbeHistory.view(parent, bounds)` | Shared `PB_LevelsSource` |
+| **`s.loudnessPb`** / `Probe.loudness` | ITU-R BS.1770-4 / EBU R128 loudness meter (M, S, I, LRA, -23 / -14 LUFS targets) | `ProbeLoudness.view(parent, bounds)` | Two-stage K-weighting biquads (`PB_LoudnessSource`) |
+| **`s.vectorscopePb`** / `Probe.vectorscope` | Stereo Lissajous X/Y display with Mid/Side polar graticule and phase correlation | `ProbeVectorscope.view(parent, bounds)` | `ScopeOut2` + Correlation UGen |
+| **`s.dashboardPb`** / `Probe.dashboard` | Unified 5-panel command center with global theme propagation and master freeze | `ProbeDashboard.view(parent, bounds)` | `PB_Broker` |
+
+> [!NOTE]
+> Server shorthand methods (`s.meterPb`, `s.scopePb`, `s.freqscopePb`, `s.dashboardPb`, etc.) provide direct access to all instruments directly from the server instance. Legacy shorthand forwarders (`s.meter2`, `s.scope2`, `s.freqscope2`) remain supported.
+

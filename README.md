@@ -14,38 +14,7 @@ A cohesive, laboratory-grade, **lightweight** family of real-time audio analysis
 
 `Probe` prioritizes audio-thread safety (`scsynth`), predictable resource lifecycle, centralized analysis sharing, and pristine IDE autocomplete ergonomics—with zero mandatory C++ compilation, zero external binary dependencies, and zero modifications to stock SuperCollider files.
 
----
-
-## Clean IDE Autocomplete: Dual-Tier Architecture
-
-To prevent polluting the SuperCollider IDE autocomplete search space, Probe implements a strict **Dual-Tier Hierarchy** ([ADR-001](docs/decisions/ADR-001-Dual-Tier-Namespace-and-Ergonomics.md)):
-
-- **Tier 1 (`Probe*`)**: Exactly **14 public, high-level classes** appear when typing `Probe` in the IDE.
-- **Tier 2 (`PB_*`)**: All internal plumbing, telemetry sources, and embeddable composite view classes use the private `PB_*` prefix (`PB_Broker`, `PB_LevelsSource`, `PB_SpectrumSource`, `PB_ScopeView`, etc.).
-- **Embeddable View Factory**: Every visualizer exposes an embeddable GUI constructor via `Probe*.view(parent, bounds, ...)` so user code never needs to reference internal `PB_*View` classes.
-
----
-
-## Visualizer Lineup
-
-| Instrument | Description | Embeddable View Factory | Backend Transport |
-|---|---|---|---|
-| **`s.meterPb`** / `Probe.meter` | Compact vertical server meter (inputs/outputs, dB ruler, peak/RMS, peak-hold) | `ProbeMeter.view(parent, bounds)` | `SendPeakRMS` via `PB_LevelsSource` |
-| **`s.scopePb`** / `Probe.scope` | Oscilloscope with calibrated ms/dBFS axes, stationary trigger edge lock (`\rising`, `\falling`), tracks/overlay/XY | `ProbeScope.view(parent, bounds)` | `ScopeView` / `ScopeOut2` + DSP circular latch buffer |
-| **`s.freqscopePb`** / `Probe.spectrum` | Unified FFT spectrum analyzer with 3 modes (Line, 16-Band Analyzer, Spectrogram) and interactive cursor | `ProbeSpectrum.view(parent, bounds)` | Precision FreqScope FFT pipeline |
-| **`s.spectralDashboardPb`** / `Probe.spectralDashboard` | 4-preset command center (Overview, Pitch, Time-Frequency, Compare) with 16-band analyzer, chroma, and descriptors | `ProbeSpectralDashboard.view(parent, bounds)` | `PB_SpectralSource` & `PB_Broker` |
-| **`s.bandAnalyzerPb`** / `Probe.bandAnalyzer` | 16-band ISO 1/3-octave band analyzer with peak indicators and RMS bars | `ProbeBandAnalyzer.view(parent, bounds)` | `PB_SpectralSource` filterbank |
-| **`s.inspectorPb`** / `Probe.inspect` | Static topological signal-flow Directed Acyclic Graph (DAG) inspector with rate coloring and bezier routing | `ProbeInspector.view(parent, bounds)` | Static SCLang DAG compilation (`PB_GraphView`) |
-| **`.trace`** | Transparent runtime in-graph signal tracing for audio rate (Scope) and control rate (20 Hz Timeline HUD) | Integrated HUD | Dual transport: `ScopeOut2` / `SendReply.kr` (`PB_Trace`) |
-| **`s.spectrogramPb`** / `Probe.spectrogram` | 2D scrolling time–frequency spectrogram with circular ring-buffer blit | `ProbeSpectrogram.view(parent, bounds)` | 64-band logarithmic `SendReply.kr` |
-| **`s.waterfallPb`** / `Probe.waterfall` | 2.5D isometric stacked-line spectral history with depth-cued color shading | `ProbeWaterfall.view(parent, bounds)` | Shared `PB_SpectrumSource` |
-| **`s.historyPb`** / `Probe.history` | Rolling peak, RMS, and shaded crest factor timeline history chart | `ProbeHistory.view(parent, bounds)` | Shared `PB_LevelsSource` |
-| **`s.loudnessPb`** / `Probe.loudness` | ITU-R BS.1770-4 / EBU R128 loudness meter (M, S, I, LRA, -23 / -14 LUFS targets) | `ProbeLoudness.view(parent, bounds)` | Two-stage K-weighting biquads (`PB_LoudnessSource`) |
-| **`s.vectorscopePb`** / `Probe.vectorscope` | Stereo Lissajous X/Y display with Mid/Side polar graticule and phase correlation | `ProbeVectorscope.view(parent, bounds)` | `ScopeOut2` + Correlation UGen |
-| **`s.dashboardPb`** / `Probe.dashboard` | Unified 5-panel command center with global theme propagation and master freeze | `ProbeDashboard.view(parent, bounds)` | `PB_Broker` |
-
-> [!NOTE]
-> Server shorthand methods (`s.meterPb`, `s.scopePb`, `s.freqscopePb`, `s.dashboardPb`, etc.) provide direct access to all instruments directly from the server instance. Legacy shorthand forwarders (`s.meter2`, `s.scope2`, `s.freqscope2`) remain supported.
+For full architectural details, see the [Implementation Architecture & Dual-Tier Design](docs/architecture/implementation-overview.md).
 
 ---
 
