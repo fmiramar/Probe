@@ -526,6 +526,32 @@ This document serves as the persistent historical record of all development iter
 
 ---
 
+### Iteration 26: Probe Visuals and Representation Suite Guide & Embeddable GUI Architecture
+- **Context & User Request:**
+  Created a comprehensive, laboratory-grade guide for the entire suite titled **"Probe Visuals and Representation Suite"**. Included an executive summary table with hyperlinks to all 14 classes, verified working SuperCollider code examples for every instrument, detailed `.trace` in-graph signal tracing workflows (filters, analytic UGens, modulators), and an embeddable GUI integration guide (`Probe*.view(parent, bounds, ...)`).
+- **Deliverables Created:**
+  1. **SuperCollider SCDoc Guide (`HelpSource/Guides/ProbeVisualsAndRepresentationSuite.schelp`):**
+     - Fully indexed and integrated into SuperCollider's native help system (`Cmd+D`).
+     - Contains clickable `link::Classes/...::` references, categorized navigation, copy-pasteable executable blocks, and formatted tables.
+  2. **Repository Markdown Reference (`docs/Probe_Visuals_and_Representation_Suite.md`):**
+     - Complete reference guide formatted in GitHub Flavored Markdown with clickable file links to class source files and architecture decision records.
+  3. **In-Graph Signal Tracing (`.trace`) Coverage:**
+     - Filters: `RLPF` cutoff LFO vs raw vs filtered, `MoogFF` saturation and envelope resonance, `BPF` sweep in `\spectrum` mode.
+     - Analytic UGens: `Pitch.kr` pitch tracking and confidence flag, `Amplitude.kr` and `PeakFollower.kr` dynamic envelope tracking in timeline HUD, `SpecCentroid.kr` and `SpecFlatness.kr` spectral analytics, `Hilbert.ar` quadrature phase analysis in oscilloscope.
+  4. **GUI Embedding Architecture (`Probe*.view`):**
+     - Example A: Complete Synthesizer Channel Strip combining native SC `Slider`, `Knob`, `Button`, `NumberBox` with embedded `ProbeMeter.view` and `ProbeScope.view`.
+     - Example B: Multi-instrument mastering and quality control console combining `ProbeLoudness.view`, `ProbeVectorscope.view`, and `ProbeBandAnalyzer.view`.
+     - Example C: Direct embedding alongside standard SuperCollider GUI windows (e.g. `ServerMeterView`).
+  5. **Ergonomic Aliases Added:**
+     - Added `mode` / `mode_` aliases to `PB_SpectrumView` and `ProbeSpectrum` alongside `viewMode` for seamless mode switching (`~spec.mode = \line`, `~spec.mode = \bands`).
+  6. **Verification:**
+     - Verified all 16 SCDoc files (15 classes + 1 guide) with `scripts/verify_scdoc.scd`.
+     - Tested all guide code snippets directly in `sclang`.
+     - Executed full 14-suite master test runner (`tests/run_all_tests.scd`).
+- **Deliverables:** `HelpSource/Guides/ProbeVisualsAndRepresentationSuite.schelp`, `docs/Probe_Visuals_and_Representation_Suite.md`, `classes/ProbeSpectrum.sc`, `scripts/verify_scdoc.scd`, `docs/PROJECT_ITERATION_LOG.md`.
+
+---
+
 ## Decision Matrix & Invariant Log
 
 | Parameter / Feature | Chosen Design | Rationale | Invariant Status |

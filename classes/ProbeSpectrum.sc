@@ -339,6 +339,14 @@ PB_SpectrumView {
 			};
 	}
 
+	mode {
+		^viewMode;
+	}
+
+	mode_ { |newMode|
+		this.viewMode = newMode;
+	}
+
 	smoothing_ { |smoothVal|
 		smoothing = smoothVal;
 	}
@@ -550,7 +558,19 @@ ProbeSpectrum {
 		window.view.background = spectrumView.theme.background;
 	}
 
+	viewMode {
+		^spectrumView.viewMode;
+	}
+
 	viewMode_ { |aMode|
+		spectrumView.viewMode = aMode;
+	}
+
+	mode {
+		^spectrumView.viewMode;
+	}
+
+	mode_ { |aMode|
 		spectrumView.viewMode = aMode;
 	}
 

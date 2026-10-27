@@ -1,0 +1,618 @@
+title:: Probe Visuals and Representation Suite
+summary:: Comprehensive Guide, Reference, and Embeddable GUI Architecture for the Probe Visualization Suite
+categories:: GUI>Visualizers, Diagnostics
+related:: Classes/Probe, Classes/ProbeScope, Classes/ProbeSpectrum, Classes/ProbeSpectrogram, Classes/ProbeWaterfall, Classes/ProbeMeter, Classes/ProbeLoudness, Classes/ProbeVectorscope, Classes/ProbeBandAnalyzer, Classes/ProbeSpectralDashboard, Classes/ProbeDashboard, Classes/ProbeInspector, Classes/ProbeHistory, Classes/ProbeTheme
+
+section:: Overview
+
+The strong::Probe Visuals and Representation Suite:: (v0.4.0) is a cohesive, laboratory-grade family of real-time audio visualization, measurement, and signal instrumentation tools for SuperCollider.
+
+Designed from first principles for audio-thread safety, predictable lifecycle reclamation, and zero IDE autocomplete clutter, Probe delivers professional studio visualizers without mandatory C++ compilation or changes to stock SuperCollider files.
+
+All visualizers operate under a strict strong::Dual-Tier Architecture:::
+list::
+## strong::Tier 1 (Public Instruments)::: Exactly 14 clean, high-level classes prefixed with code::Probe*:: appear in IDE autocompletion (e.g. link::Classes/ProbeScope::, link::Classes/ProbeSpectrum::, link::Classes/ProbeMeter::).
+## strong::Tier 2 (Plumbing & Views)::: All internal telemetry sources, OSC dispatchers, and embeddable composite views reside under the private code::PB_*:: prefix (e.g. code::PB_Broker::, code::PB_LevelsSource::, code::PB_ScopeView::).
+## strong::Embeddable View Factory Pattern::: Every instrument class provides an embeddable view constructor code::Probe*.view(parent, bounds, ...):: that returns a fully configured view suitable for embedding directly into custom windows, layouts, or existing SuperCollider GUIs.
+## strong::Server Ergonomics::: Every instrument is accessible directly from the server object using the unified code::s.*Pb:: extension syntax (e.g. code::s.scopePb::, code::s.meterPb::, code::s.freqscopePb::, code::s.dashboardPb::), preserving vanilla methods (code::s.meter::, code::s.scope::) completely untouched.
+::
+
+section:: Suite Summary & Hyperlinked Instrument Directory
+
+The table below summarizes the 14 instruments comprising the Probe suite:
+
+table::
+## strong::Instrument:: || strong::Description:: || strong::Server / Facade Shortcut:: || strong::Embeddable Factory Method:: || strong::Backend Telemetry Transport::
+## link::Classes/Probe:: || Suite facade, versioning, broker status, and server shortcuts || code::s.scopePb::, code::s.meterPb::, etc. || N/A || Centralized Broker & Factory
+## link::Classes/ProbeScope:: || Oscilloscope with dual-engine (antialiased smooth vector vs native blit), edge triggering (\rising, \falling), \tracks, \overlay, \xy || code::s.scopePb(bus, chans):: || code::ProbeScope.view(parent, bounds):: || Shared-memory ScopeOut2 + RecordBuf ring buffer
+## link::Classes/ProbeSpectrum:: || FFT spectrum analyzer with 3 switchable modes (Line, 16-Band, Spectrogram), dBFS ruler, interactive cursor || code::s.freqscopePb(bus):: / code::s.spectrumPb:: || code::ProbeSpectrum.view(parent, bounds):: || High-resolution FFT pipeline via PB_SpectrumSource
+## link::Classes/ProbeSpectrogram:: || 2D scrolling time-frequency sonogram with dynamic palette mapping and circular history || code::s.spectrogramPb(bus):: || code::ProbeSpectrogram.view(parent, bounds):: || 64-band logarithmic SendReply.kr telemetry
+## link::Classes/ProbeWaterfall:: || 2.5D pseudo-3D isometric stacked-line spectral history with depth-cued color shading || code::s.waterfallPb(bus):: || code::ProbeWaterfall.view(parent, bounds):: || Shared PB_SpectrumSource FFT stream
+## link::Classes/ProbeMeter:: || High-density multichannel level meter with peak, RMS, peak-hold, and calibrated dB ruler || code::s.meterPb(ins, outs):: || code::ProbeMeter.view(parent, bounds):: || SendPeakRMS via PB_LevelsSource
+## link::Classes/ProbeLoudness:: || ITU-R BS.1770-4 / EBU R128 loudness meter (M, S, I, LRA, -23 LUFS / -14 LUFS target markers) || code::s.loudnessPb(bus):: || code::ProbeLoudness.view(parent, bounds):: || Dual-stage K-weighting biquad filterbank
+## link::Classes/ProbeVectorscope:: || Stereo Lissajous X/Y phase display with Mid/Side polar graticule and phase correlation meter || code::s.vectorscopePb(bus):: || code::ProbeVectorscope.view(parent, bounds):: || ScopeOut2 + RecordBuf + Phase Correlation UGen
+## link::Classes/ProbeBandAnalyzer:: || 16-band ISO 1/3-octave band analyzer with adjustable exponential moving-average smoothing filter || code::s.bandAnalyzerPb(bus):: || code::ProbeBandAnalyzer.view(parent, bounds):: || Shared PB_SpectralSource filterbank
+## link::Classes/ProbeSpectralDashboard:: || 4-preset master spectral workstation (\overview, \pitch, \timeFreq, \compare) with descriptors & chroma || code::s.spectralDashboardPb(bus):: || code::ProbeSpectralDashboard.view(parent, bounds):: || PB_SpectralSource & PB_Broker
+## link::Classes/ProbeDashboard:: || Unified 5-panel master command center (Meter, Scope, Spectrum, Spectrogram, Loudness) with global freeze || code::s.dashboardPb:: || code::ProbeDashboard.view(parent, bounds):: || Multi-client PB_Broker subscription
+## link::Classes/ProbeInspector:: || Static topological signal-flow Directed Acyclic Graph (DAG) inspector with rate coloring and bezier routing || code::s.inspectorPb(target):: / code::s.inspectPb:: || code::ProbeInspector.view(parent, bounds):: || Pure SCLang static DAG compilation
+## link::Classes/ProbeHistory:: || Rolling strip-chart timeline recorder for peak, RMS, and crest factor with configurable window duration || code::s.historyPb(bus):: || code::ProbeHistory.view(parent, bounds):: || Shared PB_LevelsSource timeline buffer
+## link::Classes/ProbeTheme:: || Centralized theme management with 5 laboratory palettes (\graphite, \phosphor, \amber, \ice, \puredata) || code::ProbeTheme.current = ...:: || N/A || SCLang Theme Dictionary & Font Scaler
+::
+
+section:: Complete Class Reference & Working Examples
+
+subsection:: 1. Probe (Central Facade & Server Extensions)
+link::Classes/Probe:: provides centralized access to all instruments, broker telemetry monitoring, and server extensions:
+
+code::
+s.boot;
+
+// 1. Open instruments via server extensions
+s.scopePb;
+s.meterPb;
+s.freqscopePb;
+s.dashboardPb;
+
+// 2. Open via class facade
+Probe.scope(s, 0, 2);
+Probe.spectrum(s, 0);
+Probe.loudness(s, 0);
+
+// 3. Inspect shared measurement broker
+Probe.broker.inspect;
+
+// 4. Global theme propagation
+ProbeTheme.current = ProbeTheme.get(\phosphor);
+::
+
+subsection:: 2. ProbeScope (Precision Oscilloscope)
+link::Classes/ProbeScope:: offers dual-engine rendering (strong::\smooth:: hardware antialiased vector drawing vs strong::\native:: C++ blit), edge-triggered stationary sync, zoom, and channel layout styles:
+
+code::
+(
+x = {
+    var sig = [SinOsc.ar(150), Saw.ar(75)] * 0.4;
+    sig;
+}.play;
+
+// Open scope in antialiased smooth mode with tracks style (vertically separated channels)
+~scope = ProbeScope(s, 0, 2, theme: \graphite, engine: \smooth, style: \tracks);
+)
+
+// Interactive controls via code
+~scope.engine = \smooth;      // \smooth or \native
+~scope.lineWidth = 2.2;       // adjust vector line stroke width
+~scope.fill = true;           // enable translucent ribbon fill
+~scope.scopeStyle = \tracks;   // \tracks (separated), \overlay (superimposed), \xy (Lissajous)
+~scope.triggerMode = \rising;  // stationary sync: \free, \rising, \falling
+~scope.xZoom = 2.0;           // zoom horizontal time axis
+~scope.yZoom = 1.5;           // zoom vertical amplitude axis
+~scope.toggleFreeze;          // freeze display (pauses synth capture, preserves waveform)
+~scope.toggleFreeze;          // unfreeze
+
+x.free;
+~scope.close;
+::
+
+subsection:: 3. ProbeSpectrum (Unified FFT Spectrum Analyzer)
+link::Classes/ProbeSpectrum:: integrates 3 switchable visualization modes (Line curve, 16-Band analyzer, and Spectrogram) with an interactive frequency/dB cursor:
+
+code::
+(
+x = {
+    var mod = SinOsc.ar(120, 0, 300);
+    var car = SinOsc.ar(300 + mod) * 0.3;
+    var noise = PinkNoise.ar(0.05);
+    (car + noise).dup;
+}.play;
+
+~spec = ProbeSpectrum(s, 0, fftSize: 2048, theme: \ice);
+)
+
+// Switch visualization modes dynamically
+~spec.mode = \line;         // High-resolution continuous spectral curve
+~spec.mode = \bands;        // 16-band ISO 1/3-octave bar display
+~spec.mode = \spectrogram;  // Scrolling time-frequency sonogram
+
+// Toggle linear vs logarithmic frequency axis
+~spec.freqMode = 1;         // 1 = Logarithmic (20 Hz - 20 kHz), 0 = Linear
+
+x.free;
+~spec.close;
+::
+
+subsection:: 4. ProbeSpectrogram (2D Scrolling Sonogram)
+link::Classes/ProbeSpectrogram:: provides continuous time-frequency history visualization:
+
+code::
+(
+x = {
+    var sweep = SinOsc.ar(XLine.kr(100, 8000, 6).poll(label: \freq)) * 0.2;
+    sweep.dup;
+}.play;
+
+~sonogram = ProbeSpectrogram(s, 0, theme: \amber);
+)
+
+x.free;
+~sonogram.close;
+::
+
+subsection:: 5. ProbeWaterfall (2.5D Isometric Spectral Stack)
+link::Classes/ProbeWaterfall:: creates an isometric stacked-line waterfall display with depth shading:
+
+code::
+(
+x = {
+    var harm = Mix.fill(8, { |i| SinOsc.ar((i + 1) * 110, 0, 0.1 / (i + 1)) });
+    harm.dup;
+}.play;
+
+~waterfall = ProbeWaterfall(s, 0, theme: \phosphor);
+)
+
+x.free;
+~waterfall.close;
+::
+
+subsection:: 6. ProbeMeter (Compact Multichannel Peak/RMS Meter)
+link::Classes/ProbeMeter:: displays real-time peak, RMS, peak-hold, and a calibrated dBFS scale:
+
+code::
+(
+x = {
+    [Dust2.ar(20) * 0.5, BrownNoise.ar(0.1)];
+}.play;
+
+~meter = ProbeMeter(s, numIns: 2, numOuts: 2, theme: \graphite);
+)
+
+x.free;
+~meter.close;
+::
+
+subsection:: 7. ProbeLoudness (ITU-R BS.1770 / EBU R128 Loudness Meter)
+link::Classes/ProbeLoudness:: measures broadcast-standard loudness metrics:
+
+code::
+(
+x = {
+    var env = EnvGen.kr(Env.perc(0.1, 1.5), Dust.kr(1));
+    (PinkNoise.ar(0.2) * env).dup;
+}.play;
+
+// Target: \ebu (-23 LUFS) or \streaming (-14 LUFS)
+~lufs = ProbeLoudness(s, busIndex: 0, theme: \graphite, target: \streaming);
+)
+
+// Query current loudness parameters
+~lufs.reset; // reset integrated LUFS measurement
+x.free;
+~lufs.close;
+::
+
+subsection:: 8. ProbeVectorscope (Stereo Lissajous & Phase Correlation)
+link::Classes/ProbeVectorscope:: renders stereo field distribution and phase alignment:
+
+code::
+(
+x = {
+    var l = SinOsc.ar(200);
+    var r = SinOsc.ar(200, pi * 0.5); // 90 degree phase shift (circular Lissajous)
+    [l, r] * 0.2;
+}.play;
+
+~vec = ProbeVectorscope(s, busIndex: 0, theme: \graphite, engine: \smooth);
+)
+
+~vec.engine = \smooth; // switch between \smooth (vector) and \native
+~vec.lineWidth = 2.5;
+
+x.free;
+~vec.close;
+::
+
+subsection:: 9. ProbeBandAnalyzer (16-Band ISO 1/3-Octave Analyzer)
+link::Classes/ProbeBandAnalyzer:: features an adjustable exponential moving-average smoothing filter:
+
+code::
+(
+x = {
+    Saw.ar([100, 200, 400, 800, 1600], 0.1).sum.dup;
+}.play;
+
+~bands = ProbeBandAnalyzer(s, busIndex: 0, theme: \graphite, smooth: 0.7);
+)
+
+// Adjust smoothing to eliminate transient blinking (0.0 = raw, 0.9 = ultra-smooth)
+~bands.smooth = 0.85;
+
+x.free;
+~bands.close;
+::
+
+subsection:: 10. ProbeSpectralDashboard (4-Preset Spectral Workstation)
+link::Classes/ProbeSpectralDashboard:: integrates multiple analysis tools into 4 synchronized presets:
+
+code::
+(
+x = {
+    var freq = LFNoise0.kr(4).exprange(150, 1200);
+    Pulse.ar(freq, 0.5, 0.2).dup;
+}.play;
+
+~sdash = ProbeSpectralDashboard(s, busIndex: 0, theme: \graphite);
+)
+
+// Select presets programmatically:
+~sdash.preset = \overview;   // FFT + 16-Bands + Descriptors
+~sdash.preset = \pitch;      // Pitch tracker + Chromagram + FFT
+~sdash.preset = \timeFreq;   // Spectrogram + 16-Band Analyzer
+~sdash.preset = \compare;    // Dual-channel spectral comparison
+
+x.free;
+~sdash.close;
+::
+
+subsection:: 11. ProbeDashboard (5-Panel Master Command Center)
+link::Classes/ProbeDashboard:: consolidates Meter, Scope, Spectrum, Spectrogram, and Loudness into a single window:
+
+code::
+s.dashboardPb(theme: \graphite);
+::
+
+subsection:: 12. ProbeInspector (Static Signal-Flow DAG Inspector)
+link::Classes/ProbeInspector:: parses a SynthDef or running Synth into an interactive signal flow graph:
+
+code::
+(
+SynthDef(\mySynth, { |out=0, freq=440, gate=1|
+    var osc = Saw.ar(freq);
+    var env = EnvGen.kr(Env.adsr(0.01, 0.2, 0.7, 0.5), gate);
+    var filt = MoogFF.ar(osc, freq * 2, 2.5);
+    Out.ar(out, (filt * env).dup);
+}).add;
+)
+
+// Inspect SynthDef directly without running any audio
+ProbeInspector(\mySynth, theme: \graphite);
+::
+
+subsection:: 13. ProbeHistory (Strip-Chart Timeline Recorder)
+link::Classes/ProbeHistory:: logs audio dynamics over time:
+
+code::
+(
+x = {
+    var lfo = LFNoise2.kr(1).exprange(0.01, 0.5);
+    (PinkNoise.ar(lfo)).dup;
+}.play;
+
+~hist = ProbeHistory(s, busIndex: 0, numChannels: 2, duration: 10, theme: \graphite);
+)
+
+x.free;
+~hist.close;
+::
+
+subsection:: 14. ProbeTheme (Laboratory Aesthetics & Scaling)
+link::Classes/ProbeTheme:: manages palettes and responsive font scaling:
+
+code::
+// Available themes: \graphite, \phosphor, \amber, \ice, \puredata
+ProbeTheme.current = ProbeTheme.get(\puredata);
+
+// Adjust font scale globally (1.0 = standard, 1.25 = default Retina, 1.5 = high visibility)
+ProbeTheme.current = ProbeTheme.current.withFontScale(1.3);
+::
+
+section:: In-Graph Signal Tracing (.trace)
+
+The code::.trace:: extension method (defined on link::Classes/UGen:: and link::Classes/Array::) allows instantaneous, zero-latency visual inspection of arbitrary internal nodes in a synthesis graph without altering signal flow, phase, or audio output.
+
+subsection:: Syntax & Parameters
+code::
+aUGen.trace(label, mode, theme, options)
+anArray.trace(label, mode, theme, options)
+::
+list::
+## strong::label::: Optional String or Symbol for the window title and HUD readout.
+## strong::mode::: Visualization mode:
+list::
+### code::\scope::: (default for audio-rate signals) High-speed oscilloscope using private bus and ScopeOut2.
+### code::\history::: (default for control-rate signals) Numerical rolling HUD tracking values at 20 Hz.
+### code::\spectrum::: FFT spectrum analyzer attached directly to the internal signal.
+### code::\meter::: Vertical peak/RMS level meter.
+::
+## strong::theme::: Optional visual theme symbol (e.g. code::\graphite::, code::\phosphor::, code::\amber::, code::\ice::, code::\puredata::).
+## strong::options::: Event dictionary for fine-tuning, e.g. code::(updateFreq: 30)::.
+::
+
+subsection:: Examples for Filters
+Tracing filter cutoff modulation, pre-filter vs post-filter waveforms, and resonance:
+
+code::
+// 1. Resonant Lowpass Filter: Pre vs Post Filter & Cutoff Modulation
+(
+x = {
+    var lfo = SinOsc.kr(0.5).exprange(150, 3500).trace("Cutoff LFO", \history);
+    var raw = Saw.ar(110, 0.2).trace("Raw Saw Wave", \scope);
+    var filtered = RLPF.ar(raw, lfo, 0.1).trace("RLPF Output", \scope);
+    filtered.dup;
+}.play;
+)
+x.free;
+
+// 2. Ladder Filter (MoogFF) Saturation & Resonance
+(
+x = {
+    var osc = Pulse.ar(65, 0.3, 0.25).trace("Oscillator", \scope);
+    var env = EnvGen.kr(Env.perc(0.05, 1.2), Dust.kr(1)).trace("Filter Env", \history);
+    var cutoff = (env * 4000) + 100;
+    var moog = MoogFF.ar(osc, cutoff, 3.2).trace("MoogFF Output", \scope, theme: \amber);
+    moog.dup;
+}.play;
+)
+x.free;
+
+// 3. Bandpass Resonance Sweep Traced via FFT Spectrum
+(
+x = {
+    var sweep = SinOsc.kr(0.2).exprange(300, 5000).trace("Sweep Hz", \history);
+    var noise = WhiteNoise.ar(0.15);
+    var bpf = BPF.ar(noise, sweep, 0.08).trace("Resonant Peak", \spectrum, theme: \phosphor);
+    bpf.dup;
+}.play;
+)
+x.free;
+::
+
+subsection:: Examples for Analytic UGens
+Tracing pitch trackers, envelope followers, spectral analyzers, and quadrature signals:
+
+code::
+// 1. Pitch Follower (Pitch.kr) Analysis
+(
+x = {
+    var in = SinOsc.ar(LFNoise0.kr(2).exprange(200, 800), 0, 0.2);
+    var pitchData = Pitch.kr(in);
+    var freq = pitchData[0];
+    var hasFreq = pitchData[1];
+    
+    // Trace audio signal in scope, detected frequency in timeline HUD
+    in.trace("Audio In", \scope);
+    freq.trace("Tracked Hz", \history);
+    hasFreq.trace("Pitch Confidence (0/1)", \history);
+    
+    in.dup;
+}.play;
+)
+x.free;
+
+// 2. Dynamic Envelope Follower (Amplitude.kr & PeakFollower.kr)
+(
+x = {
+    var audio = Dust2.ar(8) * LFNoise1.kr(2).range(0.1, 0.8);
+    var env = Amplitude.kr(audio, attackTime: 0.01, releaseTime: 0.1).trace("RMS Envelope", \history);
+    var peak = PeakFollower.kr(audio, 0.999).trace("Peak Hold", \history);
+    audio.dup;
+}.play;
+)
+x.free;
+
+// 3. Spectral Feature Analytics (SpecCentroid & SpecFlatness)
+(
+x = {
+    var sig = Saw.ar(XLine.kr(100, 3000, 5), 0.2);
+    var chain = FFT(LocalBuf(2048), sig);
+    var centroid = SpecCentroid.kr(chain).trace("Spectral Centroid (Hz)", \history);
+    var flatness = SpecFlatness.kr(chain).trace("Spectral Flatness", \history);
+    sig.dup;
+}.play;
+)
+x.free;
+
+// 4. Analytic Signal & Hilbert Transform (Quadrature 90-degree Phase Shift)
+(
+x = {
+    var sig = SinOsc.ar(220, 0, 0.3);
+    var quadrature = Hilbert.ar(sig); // [real, imag]
+    quadrature.trace("Hilbert Quadrature", \scope, theme: \ice);
+    quadrature;
+}.play;
+)
+x.free;
+::
+
+subsection:: Examples for Modulation & Spatialization
+code::
+// 1. FM Synthesis Carrier and Modulator Traces
+(
+x = {
+    var mod = SinOsc.ar(110, 0, 400).trace("Modulator", \scope);
+    var car = SinOsc.ar(220 + mod, 0, 0.2).trace("FM Carrier", \scope);
+    car.dup;
+}.play;
+)
+x.free;
+
+// 2. Stereo Panning & Spatial Rotation
+(
+x = {
+    var sig = Pulse.ar(150, 0.5, 0.2);
+    var panLfo = SinOsc.kr(0.4).trace("Pan Position", \history);
+    var stereo = Pan2.ar(sig, panLfo).trace("Stereo Output", \scope);
+    stereo;
+}.play;
+)
+x.free;
+::
+
+section:: Embedding Probe Visualizers into Custom GUIs & Default SC GUI
+
+Every instrument in the Probe suite provides an embeddable view factory constructor:
+code::
+Probe<Instrument>.view(parent, bounds, server, ...)
+::
+This returns the underlying embeddable view (a subclass of code::View::) which can be placed directly inside any custom code::Window::, code::CompositeView::, code::ScrollView::, code::VLayout::, or code::HLayout:: alongside stock SuperCollider widgets (code::Slider::, code::Knob::, code::Button::, code::NumberBox::, etc.).
+
+subsection:: Example A: Complete Synthesizer Control Panel with Embedded Scope & Meter
+This example demonstrates a complete synthesizer GUI window containing native SuperCollider sliders and buttons alongside embedded Probe visualizers:
+
+code::
+(
+s.waitForBoot({
+    var win, synth, freqSlider, resSlider, gateBtn;
+    var scopeView, meterView;
+    var synthDef;
+
+    // 1. Define interactive synth
+    synthDef = SynthDef(\probeGuiDemo, { |out=0, freq=220, res=0.2, gate=1|
+        var osc = Mix([Saw.ar(freq * [0.99, 1.01]), Pulse.ar(freq * 0.5, 0.3)]) * 0.2;
+        var env = EnvGen.kr(Env.adsr(0.02, 0.3, 0.6, 0.8), gate, doneAction: 0);
+        var filt = RLPF.ar(osc, (freq * 4).clip(60, 16000), res);
+        Out.ar(out, (filt * env).dup);
+    }).add;
+
+    s.sync;
+
+    // 2. Create custom parent Window
+    win = Window("Synth Channel Strip — Probe Embedded GUI", Rect(150, 150, 720, 380));
+    win.view.background = Color.gray(0.12);
+
+    // 3. Embed Probe Meter (left column)
+    meterView = ProbeMeter.view(win, Rect(15, 20, 70, 340), s, numIns: 0, numOuts: 2, theme: \graphite);
+
+    // 4. Embed Probe Scope (center antialiased oscilloscope)
+    scopeView = ProbeScope.view(win, Rect(100, 20, 360, 220), s, busIndex: 0, numChannels: 2,
+        theme: \graphite, engine: \smooth, style: \tracks);
+
+    // 5. Native SuperCollider Controls (right column & bottom)
+    // Frequency Slider
+    StaticText(win, Rect(480, 20, 120, 20))
+        .string_("Cutoff / Freq")
+        .stringColor_(Color.white)
+        .font_(Font("Helvetica", 11, true));
+
+    freqSlider = Slider(win, Rect(480, 45, 210, 24))
+        .value_(0.3)
+        .action_({ |sl|
+            var f = sl.value.linexp(0, 1, 60, 1200);
+            if (synth.notNil) { synth.set(\freq, f) };
+        });
+
+    // Resonance Slider
+    StaticText(win, Rect(480, 85, 120, 20))
+        .string_("Filter Resonance")
+        .stringColor_(Color.white)
+        .font_(Font("Helvetica", 11, true));
+
+    resSlider = Slider(win, Rect(480, 110, 210, 24))
+        .value_(0.5)
+        .action_({ |sl|
+            var r = sl.value.linlin(0, 1, 0.05, 0.95);
+            if (synth.notNil) { synth.set(\res, r) };
+        });
+
+    // Gate Toggle Button
+    gateBtn = Button(win, Rect(480, 160, 100, 32))
+        .states_([["Note ON", Color.white, Color.gray(0.25)], ["Note OFF", Color.black, Color.green(0.8)]])
+        .action_({ |btn|
+            if (btn.value == 1) {
+                synth = Synth(\probeGuiDemo, [\freq, freqSlider.value.linexp(0, 1, 60, 1200), \res, resSlider.value.linlin(0, 1, 0.05, 0.95)]);
+            } {
+                if (synth.notNil) { synth.set(\gate, 0); synth = nil; };
+            };
+        });
+
+    // Theme Selector Menu for embedded views
+    PopUpMenu(win, Rect(480, 210, 130, 24))
+        .items_(["Graphite", "Phosphor", "Amber", "Ice", "PureData"])
+        .action_({ |menu|
+            var thName = [\graphite, \phosphor, \amber, \ice, \puredata][menu.value];
+            var newTheme = ProbeTheme.get(thName);
+            meterView.theme = newTheme;
+            scopeView.theme = newTheme;
+        });
+
+    // Cleanup on window close
+    win.onClose = {
+        if (synth.notNil) { synth.free };
+        meterView.stop;
+        scopeView.stop;
+    };
+
+    win.front;
+});
+)
+::
+
+subsection:: Example B: Mastering Monitoring Console (Loudness + Vectorscope + Band Analyzer)
+This example demonstrates a multi-instrument mastering panel combining loudness, stereo phase, and ISO 1/3-octave frequency distribution in a single window using SuperCollider's layout managers:
+
+code::
+(
+s.waitForBoot({
+    var win, lufsView, vecView, bandView;
+    var sound;
+
+    // Test stereo signal
+    sound = {
+        var bass = SinOsc.ar(55) * 0.4;
+        var lead = Saw.ar([220, 222]) * 0.15;
+        var noise = PinkNoise.ar(0.05);
+        (bass + lead + noise);
+    }.play;
+
+    win = Window("Mastering & Quality Control Console", Rect(100, 100, 840, 360));
+    win.view.background = Color.gray(0.1);
+
+    // Embed instruments side-by-side using exact Rect bounds
+    lufsView = ProbeLoudness.view(win, Rect(15, 15, 200, 330), s, busIndex: 0, theme: \graphite, target: \streaming);
+    vecView  = ProbeVectorscope.view(win, Rect(225, 15, 260, 330), s, busIndex: 0, theme: \graphite, engine: \smooth);
+    bandView = ProbeBandAnalyzer.view(win, Rect(495, 15, 330, 330), s, busIndex: 0, theme: \graphite, smooth: 0.7);
+
+    win.onClose = {
+        sound.free;
+        lufsView.stop;
+        vecView.stop;
+        bandView.stop;
+    };
+
+    win.front;
+});
+)
+::
+
+subsection:: Example C: Embedding Alongside Default SuperCollider GUI Windows
+You can embed any Probe view into standard SuperCollider container views, such as alongside a code::ServerMeterView:: or inside a custom status panel:
+
+code::
+(
+s.waitForBoot({
+    var win = Window("Server Status & Precision Scope", Rect(200, 200, 520, 280));
+    var meter, scope;
+
+    // Embed Probe antialiased oscilloscope
+    scope = ProbeScope.view(win, Rect(10, 10, 360, 250), s, busIndex: 0, numChannels: 2, theme: \phosphor, engine: \smooth);
+
+    // Embed stock ServerMeterView alongside ProbeScope
+    meter = ServerMeterView(s, win, Rect(380, 10, 130, 250), 2, 2);
+
+    win.onClose = {
+        scope.stop;
+    };
+
+    win.front;
+});
+)
+::
+
+section:: Key Invariants & Best Practices
+
+numberedlist::
+## strong::Audio-Thread Safety::: None of the Probe visualizers allocate memory or execute blocking system calls on the real-time audio thread. Shared-memory ScopeBuffers and circular RecordBuf allocations execute on the server command thread.
+## strong::Resource Reclamation::: Always call code::view.stop:: or close parent windows when finished. Probe views register with code::ServerTree:: and code::ServerQuit:: to automatically clean up synthetic resources upon server reboot or cmd-period.
+## strong::Smooth vs Native Engine Selection::: Use strong::\smooth:: (default) for pristine, sub-pixel antialiased waveforms with configurable thickness on Retina displays. Use strong::\native:: when zero SCLang vector draw overhead is required on low-powered machines.
+## strong::Zero Core SC Overrides::: Probe never alters code::s.meter::, code::s.scope::, or code::s.freqscope::. Use code::s.*Pb:: or the high-level class constructors.
+::

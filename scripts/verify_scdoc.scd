@@ -20,7 +20,8 @@ docsToVerify = [
 	"Classes/ProbeDashboard",
 	"Classes/ProbeInspector",
 	"Classes/ProbeHistory",
-	"Classes/SCVisuals"
+	"Classes/SCVisuals",
+	"Guides/ProbeVisualsAndRepresentationSuite"
 ];
 
 hasError = false;
