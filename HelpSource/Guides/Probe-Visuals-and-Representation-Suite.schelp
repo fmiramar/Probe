@@ -28,28 +28,6 @@ note::
 For complete details on the underlying dual-tier architecture and internal plumbing, see the Implementation Architecture guide in the project repository.
 ::
 
-section:: Suite Summary & Hyperlinked Instrument Directory
-
-The table below summarizes the 14 instruments comprising the Probe suite:
-
-table::
-## strong::Instrument:: || strong::Description:: || strong::Server / Facade Shortcut:: || strong::Embeddable Factory Method:: || strong::Backend Telemetry Transport::
-## link::Classes/Probe:: || Suite facade, versioning, broker status, and server shortcuts || code::s.scopePb::, code::s.meterPb::, etc. || N/A || Centralized Broker & Factory
-## link::Classes/ProbeScope:: || Oscilloscope with dual-engine (antialiased smooth vector vs native blit), edge triggering (\rising, \falling), \tracks, \overlay, \xy || code::s.scopePb(bus, chans):: || code::ProbeScope.view(parent, bounds):: || Shared-memory ScopeOut2 + RecordBuf ring buffer
-## link::Classes/ProbeSpectrum:: || FFT spectrum analyzer with 3 switchable modes (Line, 16-Band, Spectrogram), dBFS ruler, interactive cursor || code::s.freqscopePb(bus):: / code::s.spectrumPb:: || code::ProbeSpectrum.view(parent, bounds):: || High-resolution FFT pipeline via PB_SpectrumSource
-## link::Classes/ProbeSpectrogram:: || 2D scrolling time-frequency sonogram with dynamic palette mapping and circular history || code::s.spectrogramPb(bus):: || code::ProbeSpectrogram.view(parent, bounds):: || 64-band logarithmic SendReply.kr telemetry
-## link::Classes/ProbeWaterfall:: || 2.5D pseudo-3D isometric stacked-line spectral history with depth-cued color shading || code::s.waterfallPb(bus):: || code::ProbeWaterfall.view(parent, bounds):: || Shared PB_SpectrumSource FFT stream
-## link::Classes/ProbeMeter:: || High-density multichannel level meter with peak, RMS, peak-hold, and calibrated dB ruler || code::s.meterPb(ins, outs):: || code::ProbeMeter.view(parent, bounds):: || SendPeakRMS via PB_LevelsSource
-## link::Classes/ProbeLoudness:: || ITU-R BS.1770-4 / EBU R128 loudness meter (M, S, I, LRA, -23 LUFS / -14 LUFS target markers) || code::s.loudnessPb(bus):: || code::ProbeLoudness.view(parent, bounds):: || Dual-stage K-weighting biquad filterbank
-## link::Classes/ProbeVectorscope:: || Stereo Lissajous X/Y phase display with Mid/Side polar graticule and phase correlation meter || code::s.vectorscopePb(bus):: || code::ProbeVectorscope.view(parent, bounds):: || ScopeOut2 + RecordBuf + Phase Correlation UGen
-## link::Classes/ProbeBandAnalyzer:: || 16-band ISO 1/3-octave band analyzer with adjustable exponential moving-average smoothing filter || code::s.bandAnalyzerPb(bus):: || code::ProbeBandAnalyzer.view(parent, bounds):: || Shared PB_SpectralSource filterbank
-## link::Classes/ProbeSpectralDashboard:: || 4-preset master spectral workstation (\overview, \pitch, \timeFreq, \compare) with descriptors & chroma || code::s.spectralDashboardPb(bus):: || code::ProbeSpectralDashboard.view(parent, bounds):: || PB_SpectralSource & PB_Broker
-## link::Classes/ProbeDashboard:: || Unified 5-panel master command center (Meter, Scope, Spectrum, Spectrogram, Loudness) with global freeze || code::s.dashboardPb:: || code::ProbeDashboard.view(parent, bounds):: || Multi-client PB_Broker subscription
-## link::Classes/ProbeInspector:: || Static topological signal-flow Directed Acyclic Graph (DAG) inspector with rate coloring and bezier routing || code::s.inspectorPb(target):: / code::s.inspectPb:: || code::ProbeInspector.view(parent, bounds):: || Pure SCLang static DAG compilation
-## link::Classes/ProbeHistory:: || Rolling strip-chart timeline recorder for peak, RMS, and crest factor with configurable window duration || code::s.historyPb(bus):: || code::ProbeHistory.view(parent, bounds):: || Shared PB_LevelsSource timeline buffer
-## link::Classes/ProbeTheme:: || Centralized theme management with 5 laboratory palettes (\graphite, \phosphor, \amber, \ice, \puredata) || code::ProbeTheme.current = ...:: || N/A || SCLang Theme Dictionary & Font Scaler
-::
-
 section:: Complete Class Reference & Working Examples
 
 subsection:: 1. Probe (Central Facade & Server Extensions)
