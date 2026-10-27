@@ -1,4 +1,8 @@
-# Probe Visuals and Representation Suite
+# Probe - Visuals and Representation Suite
+
+<p align="center">
+  <img src="assets/Logo.png" alt="Probe - Visuals and Representation Suite" width="100%">
+</p>
 
 A comprehensive architectural reference, class catalog, in-graph signal tracing manual, and GUI embedding guide for the **Probe Visuals and Representation Suite** (`Probe` v0.4.0) in SuperCollider.
 

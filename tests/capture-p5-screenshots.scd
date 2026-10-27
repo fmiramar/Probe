@@ -16,9 +16,9 @@ s.waitForBoot({
 	}.play;
 
 	{
-		spec = SCVisuals.spectrogram(s, 0, 64, \graphite, 25);
-		water = SCVisuals.waterfall(s, 0, 64, \graphite, 25, 48);
-		hist = SCVisuals.history(s, \outputs, 0, 2, \graphite, 25, 200);
+		spec = Probe.spectrogram(s, 0, 64, \graphite, 25);
+		water = Probe.waterfall(s, 0, 64, \graphite, 25, 48);
+		hist = Probe.history(s, \outputs, 0, 2, \graphite, 25, 200);
 
 		// Allow frames to accumulate
 		3.0.wait;

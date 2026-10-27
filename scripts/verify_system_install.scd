@@ -76,38 +76,7 @@ assert.value(
 	assert.value(cls.notNil, "Internal plumbing class available: " ++ cls.asString);
 };
 
-// 3. SCVisuals Backwards-Compatible Classes
-[
-	SCVisuals,
-	SCVTheme,
-	SCVMeasurementBroker,
-	SCVLevelsSource,
-	SCVSpectrumSource,
-	SCVLoudnessSource,
-	SCVVectorscopeSource,
-	SCVMeter,
-	SCVMeterView,
-	SCVScope,
-	SCVScopeView,
-	SCVSpectrum,
-	SCVSpectrumView,
-	SCVSpectrogram,
-	SCVSpectrogramView,
-	SCVWaterfall,
-	SCVWaterfallView,
-	SCVHistory,
-	SCVHistoryView,
-	SCVLoudness,
-	SCVLoudnessView,
-	SCVVectorscope,
-	SCVVectorscopeView,
-	SCVDashboard,
-	SCVDashboardView
-].do { |cls|
-	assert.value(cls.notNil, "Backwards-compatible class available: " ++ cls.asString);
-};
-
-// 4. Server *Pb Unified Ergonomic Methods
+// 3. Server *Pb Unified Ergonomic Methods
 assert.value(Server.findMethod(\meterPb).notNil, "Server:meterPb extension registered");
 assert.value(Server.findMethod(\scopePb).notNil, "Server:scopePb extension registered");
 assert.value(Server.findMethod(\freqscopePb).notNil, "Server:freqscopePb extension registered");
@@ -151,7 +120,6 @@ assert.value(UGen.findMethod(\trace).notNil, "UGen:trace extension registered");
 
 // 8. Versioning & Theme Integrity
 assert.value(Probe.version == "0.4.0", "Probe.version is 0.4.0");
-assert.value(SCVisuals.version == "0.4.0", "SCVisuals.version is 0.4.0");
 assert.value(Probe.theme.name === \graphite, "Probe default theme is \\graphite");
 assert.value(ProbeTheme.get(\puredata).notNil, "ProbeTheme puredata palette registered");
 assert.value(ProbeTheme.get(\puredata).background.red == 1.0, "puredata background is pure white (#FFFFFF)");

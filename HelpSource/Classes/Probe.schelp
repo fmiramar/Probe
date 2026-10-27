@@ -1,7 +1,7 @@
 TITLE:: Probe
 summary:: Real-time audio visualization, instrumentation, and signal tracing suite for SuperCollider
 categories:: GUI>Visuals
-related:: Classes/SCVisuals, Classes/ProbeSpectralDashboard, Classes/ProbeBandAnalyzer, Classes/ProbeInspector
+related:: Guides/Probe-Visuals-and-Representation-Suite, Classes/ProbeSpectralDashboard, Classes/ProbeBandAnalyzer, Classes/ProbeInspector
 
 DESCRIPTION::
 Probe is a professional, high-performance real-time audio visualization and instrumentation suite for SuperCollider.

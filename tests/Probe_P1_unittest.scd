@@ -119,13 +119,6 @@ s.waitForBoot({
 	0.5.wait;
 
 	// ------------------------------------------------------------------------
-	// 5. Backwards Compatibility with SCVisuals
-	// ------------------------------------------------------------------------
-	assert.value(SCVisuals.respondsTo(\dashboard), "SCVisuals.dashboard remains fully operational");
-	assert.value(SCVisuals.theme.notNil, "SCVisuals.theme returns active theme");
-	assert.value(SCVisuals.fontScale == Probe.fontScale, "SCVisuals.fontScale matches Probe.fontScale");
-
-	// ------------------------------------------------------------------------
 	// Summary
 	// ------------------------------------------------------------------------
 	("------------------------------------------------------------------------").postln;

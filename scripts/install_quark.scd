@@ -1,6 +1,6 @@
 // scripts/install_quark.scd
 var qPath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals";
-"Installing SCVisuals Quark...".postln;
+"Installing Probe Quark...".postln;
 Quarks.install(qPath);
 "Quark installed into SuperCollider configuration.".postln;
 "Active Quarks: ".post;

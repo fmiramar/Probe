@@ -19,7 +19,7 @@ s.waitForBoot({
 
 	{
 		// 1. Capture Vectorscope
-		vec = SCVisuals.vectorscope(s, 0, \graphite, 15);
+		vec = Probe.vectorscope(s, 0, \graphite, 15);
 		2.5.wait;
 		Image.fromWindow(vec.window).write(outDir ++ "scvvectorscope-live.png");
 		("Saved: " ++ outDir ++ "scvvectorscope-live.png").postln;
@@ -27,7 +27,7 @@ s.waitForBoot({
 		0.5.wait;
 
 		// 2. Capture Unified Dashboard
-		dash = SCVisuals.dashboard(s, numIns: 2, numOuts: 2, busIndex: 0, theme: \graphite, targetLUFS: -23.0);
+		dash = Probe.dashboard(s, numIns: 2, numOuts: 2, busIndex: 0, theme: \graphite, targetLUFS: -23.0);
 		3.0.wait;
 		Image.fromWindow(dash.window).write(outDir ++ "scvdashboard-live.png");
 		("Saved: " ++ outDir ++ "scvdashboard-live.png").postln;

@@ -1,4 +1,4 @@
-title:: Probe Visuals and Representation Suite
+title:: Probe - Visuals and Representation Suite
 summary:: Comprehensive Guide, Reference, and Embeddable GUI Architecture for the Probe Visualization Suite
 categories:: GUI>Visualizers, Diagnostics
 related:: Classes/Probe, Classes/ProbeScope, Classes/ProbeSpectrum, Classes/ProbeSpectrogram, Classes/ProbeWaterfall, Classes/ProbeMeter, Classes/ProbeLoudness, Classes/ProbeVectorscope, Classes/ProbeBandAnalyzer, Classes/ProbeSpectralDashboard, Classes/ProbeDashboard, Classes/ProbeInspector, Classes/ProbeHistory, Classes/ProbeTheme

@@ -16,7 +16,7 @@ s.waitForBoot({
 	}.play;
 
 	{
-		loud = SCVisuals.loudness(s, \outputs, 0, 2, \graphite, -23.0, 15);
+		loud = Probe.loudness(s, \outputs, 0, 2, \graphite, -23.0, 15);
 
 		// Allow audio to accumulate in momentary and short-term windows
 		3.5.wait;

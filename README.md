@@ -1,9 +1,14 @@
-# Probe
+<p align="center">
+  <img src="assets/Logo.png" alt="Probe - Visuals and Representation Suite" width="100%">
+</p>
+
+# Probe - Visuals and Representation Suite
 
 [![SuperCollider](https://img.shields.io/badge/SuperCollider-3.11+-orange.svg)](https://supercollider.github.io/)
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 [![Unit Tests](https://img.shields.io/badge/Tests-14%20Suites%20Passed-brightgreen.svg)](tests/)
 [![Architecture](https://img.shields.io/badge/Namespace-Dual--Tier%20PB_*%20Hierarchy-success.svg)](docs/decisions/ADR-001-Dual-Tier-Namespace-and-Ergonomics.md)
+[![Guide](https://img.shields.io/badge/Documentation-Comprehensive%20Guide-blue.svg)](docs/Probe-Visuals-and-Representation-Suite.md)
 
 A cohesive, laboratory-grade, **lightweight** family of real-time audio analysis, visualization, and signal instrumentation tools for SuperCollider.
 
@@ -40,7 +45,7 @@ To prevent polluting the SuperCollider IDE autocomplete search space, Probe impl
 | **`s.dashboardPb`** / `Probe.dashboard` | Unified 5-panel command center with global theme propagation and master freeze | `ProbeDashboard.view(parent, bounds)` | `PB_Broker` |
 
 > [!NOTE]
-> For backwards compatibility, legacy shorthand methods (`s.meter2`, `s.scope2`, `s.freqscope2`, etc.) and the `SCVisuals` facade remain fully functional as aliases forwarding to the new `*Pb` methods.
+> Server shorthand methods (`s.meterPb`, `s.scopePb`, `s.freqscopePb`, `s.dashboardPb`, etc.) provide direct access to all instruments directly from the server instance. Legacy shorthand forwarders (`s.meter2`, `s.scope2`, `s.freqscope2`) remain supported.
 
 ---
 
@@ -183,7 +188,9 @@ thisProcess.recompile;
 
 ---
 
-## Documentation
+## Documentation & Guides
+
+The comprehensive **[Probe - Visuals and Representation Suite Guide](docs/Probe-Visuals-and-Representation-Suite.md)** covers in-depth class references, in-graph `.trace` workflows for filters and analytic UGens, and GUI embedding architecture.
 
 Full class documentation is integrated directly into the SuperCollider Help browser (`Cmd+D`):
 
@@ -192,6 +199,9 @@ Probe.help;
 ProbeScope.help;
 ProbeSpectralDashboard.help;
 ProbeInspector.help;
+
+// Open the comprehensive Suite Guide
+"Probe - Visuals and Representation Suite".help;
 ```
 
 ---

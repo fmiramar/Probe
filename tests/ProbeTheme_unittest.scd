@@ -73,10 +73,6 @@ assert.value(ProbeTheme.get(\graphite).meterWidth == 16, "Compact meter width is
 	assert.value(detailed.targetFPS == 40, "detailed targetFPS is 40");
 }.value;
 
-// 6. Backwards compatibility with SCVTheme
-assert.value(SCVTheme.get(\graphite).notNil, "SCVTheme.get returns non-nil theme");
-assert.value(SCVTheme.current.name === \graphite, "SCVTheme.current matches ProbeTheme.current");
-
 // Summary
 ("--------------------------------------------------").postln;
 ("ProbeTheme Tests: " ++ passed ++ " passed, " ++ failed ++ " failed.").postln;

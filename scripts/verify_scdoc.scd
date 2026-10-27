@@ -20,8 +20,7 @@ docsToVerify = [
 	"Classes/ProbeDashboard",
 	"Classes/ProbeInspector",
 	"Classes/ProbeHistory",
-	"Classes/SCVisuals",
-	"Guides/ProbeVisualsAndRepresentationSuite"
+	"Guides/Probe-Visuals-and-Representation-Suite"
 ];
 
 hasError = false;
@@ -47,7 +46,7 @@ if (hasError) {
 	"ERROR: One or more SCDoc documents failed verification!".postln;
 	1.exit;
 } {
-	"All 15 SCDoc documents verified and parsed successfully with zero errors!".postln;
+	"All 15 Probe SCDoc documents verified and parsed successfully with zero errors!".postln;
 	0.exit;
 };
 )
