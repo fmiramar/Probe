@@ -3,7 +3,7 @@ Date: 2026-10-17 03:38:59
 
 ## 1. Class Name Collision Audit
 - `Probe`: **AVAILABLE** (Zero collisions)
-- `SCVisuals`: **COLLISION** (Defined in: /Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/classes/SCVisuals.sc)
+- `SCVisuals`: **COLLISION** (Defined in: /Users/fmmac/Desktop/SC New Visulations servers/Probe/classes/SCVisuals.sc)
 - `Analyzer`: **AVAILABLE** (Zero collisions)
 - `Bench`: **AVAILABLE** (Zero collisions)
 - `Telemetry`: **AVAILABLE** (Zero collisions)

@@ -6,7 +6,7 @@
 (
 s.waitForBoot({
 	var results = Dictionary.new;
-	var outFile = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/benchmarks/phase2-p2-transport/results.md";
+	var outFile = "/Users/fmmac/Desktop/SC New Visulations servers/Probe/benchmarks/phase2-p2-transport/results.md";
 	var logStr = "";
 	var report = { |str|
 		str.postln;

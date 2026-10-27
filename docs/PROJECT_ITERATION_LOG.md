@@ -2,7 +2,7 @@
 
 **Project:** Probe (formerly developed under the working name `SCVisuals`)  
 **Target Environment:** SuperCollider 3.14+ (macOS, Linux, Windows)  
-**Repository Path:** `/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals`  
+**Repository Path:** `/Users/fmmac/Desktop/SC New Visulations servers/Probe`  
 **Last Updated:** 2026-10-24  
 
 ---

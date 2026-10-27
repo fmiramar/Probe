@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-17  
 **Auditor:** Agentic Evaluation Assistant  
-**Repository Path:** `/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals`  
+**Repository Path:** `/Users/fmmac/Desktop/SC New Visulations servers/Probe`  
 **Git Branch:** `phase2/probe-enhancements`  
 **Baseline Git Tag:** `v1-baseline` (Commit `bb4d83d`)  
 **SuperCollider Version:** SuperCollider 3.14.1 (Built from official release)  
@@ -49,7 +49,7 @@ The system environment was audited via `sclang_conf.yaml` and directory scans:
 - **Old SCVisuals installations in Application Support:**
   - `~/Library/Application Support/SuperCollider/Help/Classes/SCVisuals.html` has been removed.
   - No duplicate class files exist in `Extensions/` or `downloaded-quarks/`.
-  - `sclang_conf.yaml` directly includes `/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals`.
+  - `sclang_conf.yaml` directly includes `/Users/fmmac/Desktop/SC New Visulations servers/Probe`.
 
 ---
 

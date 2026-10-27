@@ -48,16 +48,16 @@ SCVisuals/
 ### Public APIs Introduced
 
 1. **`SCVisuals.scope(server, busIndex, numChannels, theme, rate, style, bufSize)`**:
-   - Creates and returns a themed [`SCVScope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVScope.sc) window.
-   - Embeddable widget: [`SCVScopeView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVScope.sc).
+   - Creates and returns a themed [`SCVScope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVScope.sc) window.
+   - Embeddable widget: [`SCVScopeView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVScope.sc).
 2. **`SCVScope` Methods**:
    - `.scopeStyle = \overlay / \tracks / \xy`
    - `.yZoom = float`, `.xZoom = float`, `.cycle = frames`
    - `.theme = aTheme`
    - Keyboard shortcuts: `s` (cycle style), `+`/`-` (zoom), `Space` (freeze/resume).
 3. **`SCVisuals.spectrum(server, busIndex, fftSize, theme, freqMode, dbRange)`**:
-   - Creates and returns a themed [`SCVSpectrum`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVSpectrum.sc) window.
-   - Embeddable widget: [`SCVSpectrumView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVSpectrum.sc).
+   - Creates and returns a themed [`SCVSpectrum`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVSpectrum.sc) window.
+   - Embeddable widget: [`SCVSpectrumView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVSpectrum.sc).
 4. **`SCVSpectrum` Methods**:
    - `.freqMode = \logarithmic / \linear`
    - `.dbRange = 48 / 72 / 96 / 120`
@@ -68,7 +68,7 @@ SCVisuals/
 
 ## 3. Runnable Demonstrations
 
-- **[03-scope-spectrum.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/examples/03-scope-spectrum.scd)**: Runs active harmonic synthesizer audio and launches both `SCVScope` and `SCVSpectrum` side-by-side with an interactive controller allowing live theme switches, style toggles, frequency mode switches, and synchronized freeze/resume.
+- **[03-scope-spectrum.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/examples/03-scope-spectrum.scd)**: Runs active harmonic synthesizer audio and launches both `SCVScope` and `SCVSpectrum` side-by-side with an interactive controller allowing live theme switches, style toggles, frequency mode switches, and synchronized freeze/resume.
 
 ---
 
@@ -86,7 +86,7 @@ All automated unit tests passed 100%:
 
 ## 5. Performance vs Matching Built-in Reference (Gate G3 Verification)
 
-Measured empirically via [side-by-side.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/benchmarks/side-by-side.scd) and saved in [side-by-side.csv](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/benchmarks/results/side-by-side.csv) on macOS arm64 (48 kHz, block size 512, stereo harmonic audio signal):
+Measured empirically via [side-by-side.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/benchmarks/side-by-side.scd) and saved in [side-by-side.csv](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/benchmarks/results/side-by-side.csv) on macOS arm64 (48 kHz, block size 512, stereo harmonic audio signal):
 
 | Experimental Condition | Audio Server `avgCPU` (%) | Audio Server `peakCPU` (%) | Synths | UGens | Efficiency Comparison |
 |---|---|---|---|---|---|

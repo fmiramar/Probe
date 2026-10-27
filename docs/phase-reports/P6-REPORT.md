@@ -58,7 +58,7 @@ SCVisuals/
 
 ## 3. Gate G6 Numerical Validation
 
-- Test Script: [`tests/SCVLoudness_unittest.scd`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/tests/SCVLoudness_unittest.scd)
+- Test Script: [`tests/SCVLoudness_unittest.scd`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/tests/SCVLoudness_unittest.scd)
 - Result: **15/15 passed, 0 failed**
 - Verification highlights:
   - **Calibrated -23.0 LUFS 1 kHz Stereo Sine**:
@@ -74,7 +74,7 @@ SCVisuals/
 
 ## 4. Visual Review
 
-![SCVLoudness Live Screenshot](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/scvloudness-live.png)
+![SCVLoudness Live Screenshot](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/scvloudness-live.png)
 
 ---
 

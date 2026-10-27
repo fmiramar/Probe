@@ -6,7 +6,7 @@
 s.waitForBoot({
 	var testSig, results = List.new;
 	var runMeasure, cleanup;
-	var csvPath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/benchmarks/baseline.csv";
+	var csvPath = "/Users/fmmac/Desktop/SC New Visulations servers/Probe/benchmarks/baseline.csv";
 	var csvFile;
 
 	"Starting SCVisuals P0 Baseline Profiling Benchmark...".postln;

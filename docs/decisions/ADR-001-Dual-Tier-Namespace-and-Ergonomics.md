@@ -17,7 +17,7 @@ SuperCollider's language implementation (SCLang) and its Qt IDE enforce specific
 
 ### Symptoms in Probe v0.3.0
 - **Autocomplete Pollution:** Over 40 classes prefixed with `Probe` appeared in the autocomplete menu upon typing `Probe` (including internal views like `ProbeScopeView`, `ProbeChromagramView`, telemetry sources like `ProbeLevelsSource`, and trace window managers). Users could not easily find the primary instruments.
-- **Missing Documentation on Cmd+D:** Instruments developed in Phase II ([`ProbeSpectralDashboard`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeSpectralDashboard.sc), [`ProbeBandAnalyzer`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeBandAnalyzer.sc), [`ProbeInspector`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeInspector.sc)) were documented under class methods in [`HelpSource/Classes/Probe.schelp`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/HelpSource/Classes/Probe.schelp), causing `Cmd+D` on their direct class symbols to show "Undocumented Class".
+- **Missing Documentation on Cmd+D:** Instruments developed in Phase II ([`ProbeSpectralDashboard`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/ProbeSpectralDashboard.sc), [`ProbeBandAnalyzer`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/ProbeBandAnalyzer.sc), [`ProbeInspector`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/ProbeInspector.sc)) were documented under class methods in [`HelpSource/Classes/Probe.schelp`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/HelpSource/Classes/Probe.schelp), causing `Cmd+D` on their direct class symbols to show "Undocumented Class".
 - **Ergonomic Inconsistencies on Server Extensions:** Server convenience methods used confusing numeric suffixes (`s.meter2`, `s.scope2`, `s.freqscope2`, `s.spectrum2`) while other instruments used bare names (`s.spectrogram`, `s.loudness`, `s.dashboard`, `s.spectralDashboard`), cluttering the `Server` namespace and obscuring their relationship to the Probe suite.
 
 ---
@@ -88,7 +88,7 @@ Replace confusing numeric suffixes (`2`) and bare names with the unified, expres
 
 ### Decision 3.5: Comprehensive SCDoc Coverage & Private Tagging
 - Create dedicated `.schelp` files for `ProbeSpectralDashboard`, `ProbeBandAnalyzer`, and `ProbeInspector`.
-- Update [`HelpSource/Classes/Probe.schelp`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/HelpSource/Classes/Probe.schelp) to document all new `s.*Pb` methods.
+- Update [`HelpSource/Classes/Probe.schelp`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/HelpSource/Classes/Probe.schelp) to document all new `s.*Pb` methods.
 - Mark all internal `PB_*` classes with `PRIVATE::` or keep HelpSource strictly scoped to the 14 public instruments, preventing internal classes from indexing into the SCDoc search system.
 
 ---
@@ -98,4 +98,4 @@ Replace confusing numeric suffixes (`2`) and bare names with the unified, expres
 2. **Centralized Transport:** `PB_Broker` continues reference-counting analysis synths per bus.
 3. **Core SC Non-Interference:** `s.meter`, `s.scope`, `s.freqscope` remain completely untouched.
 4. **Default Font Scale:** Maintained at `1.25` across all visualizers.
-5. **Backwards Compatibility:** Legacy `SCV*` classes remain functional in [`classes/ProbeLegacyCompat.sc`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeLegacyCompat.sc).
+5. **Backwards Compatibility:** Legacy `SCV*` classes remain functional in [`classes/ProbeLegacyCompat.sc`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/ProbeLegacyCompat.sc).

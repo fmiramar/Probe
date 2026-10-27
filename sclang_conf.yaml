@@ -1,0 +1,8 @@
+includePaths:
+    -   /Users/fmmac/Library/Application Support/SuperCollider/downloaded-quarks/SafetyNet
+    -   /Applications/SuperCollider.app/Contents/Resources/SCClassLibrary
+    -   /Users/fmmac/Desktop/SC New Visulations servers/Probe
+excludePaths:
+    []
+postInlineWarnings: false
+excludeDefaultPaths: false

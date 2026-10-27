@@ -4,7 +4,7 @@
 (
 s.waitForBoot({
 	var spec, water, hist, testSig;
-	var outDir = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/docs/screenshots/";
+	var outDir = "/Users/fmmac/Desktop/SC New Visulations servers/Probe/docs/screenshots/";
 
 	"Generating live audio for P5 screenshots...".postln;
 

@@ -6,7 +6,7 @@
 s.waitForBoot({
 	var testSig, results = List.new;
 	var runMeasure;
-	var csvPath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/benchmarks/results/spectral-transport.csv";
+	var csvPath = "/Users/fmmac/Desktop/SC New Visulations servers/Probe/benchmarks/results/spectral-transport.csv";
 	var csvFile;
 
 	"Starting SCVisuals P4 Spectral Transport Benchmark...".postln;

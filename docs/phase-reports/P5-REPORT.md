@@ -47,18 +47,18 @@ SCVisuals/
 ### Public APIs Introduced
 
 1. **`SCVisuals.spectrogram(server, busIndex, numBands, theme, updateFreq)`**:
-   - Creates and returns a themed [`SCVSpectrogram`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVSpectrogram.sc) window.
-   - Embeddable widget: [`SCVSpectrogramView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVSpectrogram.sc).
+   - Creates and returns a themed [`SCVSpectrogram`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVSpectrogram.sc) window.
+   - Embeddable widget: [`SCVSpectrogramView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVSpectrogram.sc).
    - Features: Preallocated 2D raster `Image`, circular ring-buffer blit via `Pen.drawImage`, 256-entry palette color lookup table (LUT), frequency axis markings (40 Hz to 18 kHz), freeze (`Space`) and clear (`c`) actions.
 
 2. **`SCVisuals.waterfall(server, busIndex, numBands, theme, updateFreq, numLines)`**:
-   - Creates and returns a themed [`SCVWaterfall`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVWaterfall.sc) window.
-   - Embeddable widget: [`SCVWaterfallView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVWaterfall.sc).
+   - Creates and returns a themed [`SCVWaterfall`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVWaterfall.sc) window.
+   - Embeddable widget: [`SCVWaterfallView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVWaterfall.sc).
    - Features: 2.5D isometric stacked historical traces (default 48 lines), depth-cued color shading blending from background subtext to foreground signal/warning tones, freeze (`Space`).
 
 3. **`SCVisuals.history(server, busType, busIndex, numChannels, theme, updateFreq, maxPoints)`**:
-   - Creates and returns a themed [`SCVHistory`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVHistory.sc) window.
-   - Embeddable widget: [`SCVHistoryView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVHistory.sc).
+   - Creates and returns a themed [`SCVHistory`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVHistory.sc) window.
+   - Embeddable widget: [`SCVHistoryView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVHistory.sc).
    - Features: Multi-channel stacked lane layout, calibrated dB grid lines (0, -6, -18, -36, -72 dB), bright Peak envelope, solid RMS contour, semi-transparent shaded Crest Factor headroom fill between RMS and Peak.
 
 4. **Shared Measurement Broker Integration**:
@@ -69,7 +69,7 @@ SCVisuals/
 
 ## 3. Unit Test Verification
 
-- Test Script: [`tests/SCVSpectrogram_unittest.scd`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/tests/SCVSpectrogram_unittest.scd)
+- Test Script: [`tests/SCVSpectrogram_unittest.scd`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/tests/SCVSpectrogram_unittest.scd)
 - Result: **26/26 passed, 0 failed**
 - Covered tests:
   - Instantiation and preallocation for `SCVSpectrogramView`, `SCVWaterfallView`, and `SCVHistoryView`.
@@ -85,13 +85,13 @@ SCVisuals/
 ## 4. Visual Review
 
 ### Spectrogram
-![SCVSpectrogram Live Screenshot](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/scvspectrogram-live.png)
+![SCVSpectrogram Live Screenshot](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/scvspectrogram-live.png)
 
 ### Waterfall (2.5D)
-![SCVWaterfall Live Screenshot](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/scvwaterfall-live.png)
+![SCVWaterfall Live Screenshot](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/scvwaterfall-live.png)
 
 ### Level History (Peak / RMS / Crest Factor)
-![SCVHistory Live Screenshot](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/scvhistory-live.png)
+![SCVHistory Live Screenshot](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/scvhistory-live.png)
 
 ---
 

@@ -60,7 +60,7 @@ SCVisuals/
 
 ## 3. Runnable Demonstrations
 
-- **[02-meter.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/examples/02-meter.scd)**: Runs active stereo test audio and launches `SCVMeter` alongside a dedicated control panel allowing live switching between all 6 themes, 3 densities, continuous/LED styling, and interactive peak-hold reset.
+- **[02-meter.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/examples/02-meter.scd)**: Runs active stereo test audio and launches `SCVMeter` alongside a dedicated control panel allowing live switching between all 6 themes, 3 densities, continuous/LED styling, and interactive peak-hold reset.
 
 ---
 
@@ -114,7 +114,7 @@ Measured against stock `ServerMeter` under identical conditions (macOS arm64, 48
 ## 8. Gate G2 Evaluation & Questions Needing User Approval
 
 All Gate G2 requirements have been met and validated:
-- [x] Visual review of all six palettes captured ([meter-graphite.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/meter-graphite.png), [meter-phosphor.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/meter-phosphor.png), [meter-ice.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/meter-ice.png), [meter-amber.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/meter-amber.png), [meter-paper.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/meter-paper.png), [meter-monochrome.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/meter-monochrome.png)).
+- [x] Visual review of all six palettes captured ([meter-graphite.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/meter-graphite.png), [meter-phosphor.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/meter-phosphor.png), [meter-ice.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/meter-ice.png), [meter-amber.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/meter-amber.png), [meter-paper.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/meter-paper.png), [meter-monochrome.png](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/meter-monochrome.png)).
 - [x] Vertical compact layout recognizable (~230 px height, inputs/outputs separated).
 - [x] Zero clipping false-positives under controlled test signals.
 - [x] Zero DSP regression vs stock `ServerMeter`.

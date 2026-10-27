@@ -9,7 +9,7 @@
 
 ## 1. Context & Problem Statement
 
-Users of Probe on macOS Retina displays and modern high-DPI monitors observed that waveform traces on [`ProbeScope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeScope.sc) and Lissajous curves on [`ProbeVectorscope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeVectorscope.sc) appeared excessively thin ("hairlines") and visibly pixelated with jagged staircase artifacts.
+Users of Probe on macOS Retina displays and modern high-DPI monitors observed that waveform traces on [`ProbeScope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/ProbeScope.sc) and Lissajous curves on [`ProbeVectorscope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/ProbeVectorscope.sc) appeared excessively thin ("hairlines") and visibly pixelated with jagged staircase artifacts.
 
 ### Root-Cause Analysis in SuperCollider Core C++
 An inspection of SuperCollider's core C++ Qt widget sources (`QcScopeShm.cpp` and `QcScope.cpp`) revealed the underlying causes:
@@ -32,7 +32,7 @@ An inspection of SuperCollider's core C++ Qt widget sources (`QcScopeShm.cpp` an
 
 ## 3. Decision: Alternative B (Dual-Engine Mode with Smooth Default)
 
-We selected **Alternative B**, establishing a dual-engine architecture across both [`ProbeScope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeScope.sc) and [`ProbeVectorscope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeVectorscope.sc):
+We selected **Alternative B**, establishing a dual-engine architecture across both [`ProbeScope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/ProbeScope.sc) and [`ProbeVectorscope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/ProbeVectorscope.sc):
 
 ### 3.1. Engine Specification
 - **`\smooth` (Default):**

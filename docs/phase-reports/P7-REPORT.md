@@ -46,16 +46,16 @@ SCVisuals/
 ### Components Introduced
 
 1. **`SCVisuals.vectorscope(server, busIndex, theme, updateFreq)`**:
-   - Embeddable widget: [`SCVVectorscopeView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVVectorscope.sc).
+   - Embeddable widget: [`SCVVectorscopeView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVVectorscope.sc).
    - Features: Audio-rate hardware-accelerated Lissajous X/Y plotting (`ScopeView` style 2), 45-degree rotated Mid/Side polar graticule overlay with concentric amplitude rings, stereo phase correlation gauge ($[-1.0, +1.0]$) with out-of-phase warning indication, and Left/Right stereo balance readout.
 2. **`SCVisuals.dashboard(server, numIns, numOuts, busIndex, theme, targetLUFS)`**:
-   - Embeddable widget: [`SCVDashboardView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVDashboard.sc).
+   - Embeddable widget: [`SCVDashboardView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVDashboard.sc).
    - Features: Composes 5 distinct visualizer panels into a unified synchronized interface:
-     - Panel 1: Multi-Channel ServerMeter ([`SCVMeterView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVMeter.sc))
-     - Panel 2: Waveform Oscilloscope ([`SCVScopeView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVScope.sc))
-     - Panel 3: FFT Spectrum Analyzer ([`SCVSpectrumView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVSpectrum.sc))
-     - Panel 4: ITU-R BS.1770 Loudness Meter ([`SCVLoudnessView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVLoudness.sc))
-     - Panel 5: Stereo Vectorscope ([`SCVVectorscopeView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/SCVVectorscope.sc))
+     - Panel 1: Multi-Channel ServerMeter ([`SCVMeterView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVMeter.sc))
+     - Panel 2: Waveform Oscilloscope ([`SCVScopeView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVScope.sc))
+     - Panel 3: FFT Spectrum Analyzer ([`SCVSpectrumView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVSpectrum.sc))
+     - Panel 4: ITU-R BS.1770 Loudness Meter ([`SCVLoudnessView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVLoudness.sc))
+     - Panel 5: Stereo Vectorscope ([`SCVVectorscopeView`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/classes/SCVVectorscope.sc))
    - Global Theme Propagation: Dynamically updates all 5 embedded views when theme changes in the top bar.
    - Master Freeze: Synchronous freeze/unfreeze across all 5 panels.
    - Broker Telemetry: Live readout of active broker measurement sources and active subscribers.
@@ -64,7 +64,7 @@ SCVisuals/
 
 ## 3. Unit Test Verification (Gate G7)
 
-- Test Script: [`tests/SCVDashboard_unittest.scd`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/tests/SCVDashboard_unittest.scd)
+- Test Script: [`tests/SCVDashboard_unittest.scd`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/tests/SCVDashboard_unittest.scd)
 - Result: **24/24 passed, 0 failed**
 - Verification highlights:
   - **In-Phase Mono Correlation**: Measured **$+1.00$** ($\ge +0.90$, PASS).
@@ -79,10 +79,10 @@ SCVisuals/
 ## 4. Visual Review
 
 ### Stereo Vectorscope (Lissajous & Phase Correlation)
-![SCVVectorscope Live](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/scvvectorscope-live.png)
+![SCVVectorscope Live](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/scvvectorscope-live.png)
 
 ### Unified Audio Analysis Dashboard (All 5 Panels Running)
-![SCVDashboard Live](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/screenshots/scvdashboard-live.png)
+![SCVDashboard Live](/Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/screenshots/scvdashboard-live.png)
 
 ---
 

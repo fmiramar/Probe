@@ -21,7 +21,7 @@ var testFiles = [
 ];
 
 var suitePassed = 0, suiteFailed = 0;
-var basePath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/";
+var basePath = "/Users/fmmac/Desktop/SC New Visulations servers/Probe/";
 
 "========================================================================".postln;
 "             Probe — Master Unit Test Suite Runner (v0.4.0)             ".postln;

@@ -6,7 +6,7 @@
 s.waitForBoot({
 	var testSig, results = List.new;
 	var runMeasure;
-	var csvPath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/benchmarks/results/side-by-side.csv";
+	var csvPath = "/Users/fmmac/Desktop/SC New Visulations servers/Probe/benchmarks/results/side-by-side.csv";
 	var csvFile;
 
 	"Starting SCVisuals Gate G3 Verification: Side-by-Side Benchmarking...".postln;

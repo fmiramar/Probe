@@ -13,7 +13,7 @@ s.waitForBoot({
 	var source1, source2;
 	var consumer1 = \consumer_win1;
 	var consumer2 = \consumer_win2;
-	var csvPath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/benchmarks/results/two-subscribers.csv";
+	var csvPath = "/Users/fmmac/Desktop/SC New Visulations servers/Probe/benchmarks/results/two-subscribers.csv";
 	var csvFile;
 
 	"Starting SCVisuals Gate G1 Verification: Two Subscribers...".postln;

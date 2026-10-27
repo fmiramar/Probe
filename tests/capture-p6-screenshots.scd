@@ -4,7 +4,7 @@
 (
 s.waitForBoot({
 	var loud, testSig;
-	var outPath = "/Users/fmmac/Desktop/SC New Visulations servers/SCVisuals/docs/screenshots/scvloudness-live.png";
+	var outPath = "/Users/fmmac/Desktop/SC New Visulations servers/Probe/docs/screenshots/scvloudness-live.png";
 
 	"Generating live audio for P6 loudness screenshot...".postln;
 

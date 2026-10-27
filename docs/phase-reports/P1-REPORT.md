@@ -72,8 +72,8 @@ SCVisuals/
 
 ## 3. Runnable Demonstrations
 
-- **[01-theme-gallery.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/examples/01-theme-gallery.scd)**: Interactive visual gallery showcasing all six palettes with live preview cards (mini dB scale, level bars, mini scope traces, and color swatch indicators) and live switching between micro, compact, and extended densities.
-- **[two-subscribers.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/benchmarks/two-subscribers.scd)**: Automated live verification demonstrating shared broker allocation across two subscribers.
+- **[01-theme-gallery.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/examples/01-theme-gallery.scd)**: Interactive visual gallery showcasing all six palettes with live preview cards (mini dB scale, level bars, mini scope traces, and color swatch indicators) and live switching between micro, compact, and extended densities.
+- **[two-subscribers.scd](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/benchmarks/two-subscribers.scd)**: Automated live verification demonstrating shared broker allocation across two subscribers.
 
 ---
 

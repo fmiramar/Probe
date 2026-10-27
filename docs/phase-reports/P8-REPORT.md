@@ -113,15 +113,15 @@ SCVisuals/
 
 | Gate | Phase | Description | Status | Verification Reference |
 |---|---|---|---|---|
-| **Gate G0** | P0 | Baseline Profiling & Source Audits | **PASSED** | [`P0-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/phase-reports/P0-REPORT.md) |
-| **Gate G1** | P1 | Quark Skeleton, Theme Engine, Broker | **PASSED** | [`P1-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/phase-reports/P1-REPORT.md) (90 tests) |
-| **Gate G2** | P2 | ServerMeter v1 — Vertical Multi-Channel Meter | **PASSED** | [`P2-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/phase-reports/P2-REPORT.md) (21 tests) |
-| **Gate G3** | P3 | Stethoscope & FreqScope Wrappers | **PASSED** | [`P3-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/phase-reports/P3-REPORT.md) (42 tests) |
-| **Gate G4** | P4 | Spectral Transport Feasibility Study | **PASSED (GO)** | [`ADR-001-spectral-transport.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/architecture/ADR-001-spectral-transport.md) |
-| **Gate G5** | P5 | Spectrogram, Waterfall & History Suite | **PASSED** | [`P5-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/phase-reports/P5-REPORT.md) (26 tests) |
-| **Gate G6** | P6 | ITU-R BS.1770 / EBU R128 Loudness Meter | **PASSED** | [`P6-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/phase-reports/P6-REPORT.md) (15 tests) |
-| **Gate G7** | P7 | Stereo Vectorscope & Unified Dashboard | **PASSED** | [`P7-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/phase-reports/P7-REPORT.md) (24 tests) |
-| **Gate G8** | P8 | Final Polish, Documentation & Release Sign-Off | **PASSED** | [`run_all_tests.scd`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/tests/run_all_tests.scd) (218 tests) |
+| **Gate G0** | P0 | Baseline Profiling & Source Audits | **PASSED** | [`P0-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/phase-reports/P0-REPORT.md) |
+| **Gate G1** | P1 | Quark Skeleton, Theme Engine, Broker | **PASSED** | [`P1-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/phase-reports/P1-REPORT.md) (90 tests) |
+| **Gate G2** | P2 | ServerMeter v1 — Vertical Multi-Channel Meter | **PASSED** | [`P2-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/phase-reports/P2-REPORT.md) (21 tests) |
+| **Gate G3** | P3 | Stethoscope & FreqScope Wrappers | **PASSED** | [`P3-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/phase-reports/P3-REPORT.md) (42 tests) |
+| **Gate G4** | P4 | Spectral Transport Feasibility Study | **PASSED (GO)** | [`ADR-001-spectral-transport.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/architecture/ADR-001-spectral-transport.md) |
+| **Gate G5** | P5 | Spectrogram, Waterfall & History Suite | **PASSED** | [`P5-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/phase-reports/P5-REPORT.md) (26 tests) |
+| **Gate G6** | P6 | ITU-R BS.1770 / EBU R128 Loudness Meter | **PASSED** | [`P6-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/phase-reports/P6-REPORT.md) (15 tests) |
+| **Gate G7** | P7 | Stereo Vectorscope & Unified Dashboard | **PASSED** | [`P7-REPORT.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/phase-reports/P7-REPORT.md) (24 tests) |
+| **Gate G8** | P8 | Final Polish, Documentation & Release Sign-Off | **PASSED** | [`run_all_tests.scd`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/tests/run_all_tests.scd) (218 tests) |
 
 ---
 
@@ -136,4 +136,4 @@ SCVisuals/
 
 ## 5. Final Release Sign-Off
 
-The `SCVisuals` Quark has met and exceeded all implementation specifications established in [`SCVisuals_Agentic_Implementation_Plan.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals_Agentic_Implementation_Plan.md). The codebase is verified, stable, documented, and ready for immediate deployment in SuperCollider.
+The `SCVisuals` Quark has met and exceeded all implementation specifications established in [`SCVisuals_Agentic_Implementation_Plan.md`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe_Agentic_Implementation_Plan.md). The codebase is verified, stable, documented, and ready for immediate deployment in SuperCollider.

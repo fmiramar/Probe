@@ -31,7 +31,7 @@
 ## 3. Architecture Decision Record
 
 Full rationale and measurements are published in:
-👉 [ADR-001: Spectral-Frame Transport](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/architecture/ADR-001-spectral-transport.md)
+👉 [ADR-001: Spectral-Frame Transport](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/Probe/docs/architecture/ADR-001-spectral-transport.md)
 
 ---
 
