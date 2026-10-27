@@ -8,21 +8,27 @@ A comprehensive architectural reference, class catalog, in-graph signal tracing 
 
 ---
 
-## 1. Executive Summary & Instrument Directory
+## 1. Overview & Visual Representations
 
-The **Probe Visuals and Representation Suite** provides a laboratory-grade, modular, audio-thread safe family of real-time audio visualization, measurement, and signal instrumentation tools for SuperCollider.
+The **Probe - Visuals and Representation Suite** provides a focused collection of 14 visualizers and measurement instruments for SuperCollider. Each class generates a distinct visual representation of sound and synthesis signals:
 
-### Core Architectural Invariants
-1. **Dual-Tier Namespace ([ADR-001](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/decisions/ADR-001-Dual-Tier-Namespace-and-Ergonomics.md)):**
-   - **Tier 1 (`Probe*`):** Exactly **14 clean public classes** appear when typing `Probe` in the SuperCollider IDE.
-   - **Tier 2 (`PB_*`):** All telemetry brokers, background DSP sources, and composite views are strictly sequestered behind the private `PB_*` prefix.
-2. **Dual-Engine Rendering ([ADR-002](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/docs/decisions/ADR-002-Dual-Engine-Smooth-Antialiased-Rendering.md)):**
-   - High-resolution hardware-accelerated vector drawing with SuperCollider's `Pen` (`\smooth`, default) eliminates 1-pixel Retina hairline blur and Bresenham staircase artifacts.
-   - Zero-SCLang native C++ `ScopeView` blit (`\native`) available as a toggleable fallback.
-3. **Embeddable View Factory Pattern:**
-   - Every instrument provides a unified `Probe*.view(parent, bounds, ...)` constructor that returns a standard SuperCollider `View` (subclass of `CompositeView`), enabling direct embedding into custom synthesizer interfaces, DAW-like mixers, or default SC windows without touching private classes.
-4. **Non-Invasive Server Ergonomics:**
-   - Visualizers attach directly to `Server` via the non-colliding `s.*Pb` methods (`s.scopePb`, `s.meterPb`, `s.freqscopePb`, `s.dashboardPb`). Core SuperCollider methods (`s.meter`, `s.scope`, `s.freqscope`) remain 100% unaltered.
+- **[`Probe`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/Probe.sc):** Central suite coordinator and server extension dispatcher (`s.*Pb`) managing global visualizers and broker telemetry.
+- **[`ProbeScope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeScope.sc):** **Oscilloscope** — Renders audio waveforms in real time with stationary zero-crossing trigger stabilization, multi-channel track separation, zoom, and hardware-antialiased vector lines.
+- **[`ProbeSpectrum`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeSpectrum.sc):** **FFT Spectrum Analyzer** — Displays real-time frequency distribution across a continuous calibrated dBFS curve with an interactive measurement cursor.
+- **[`ProbeSpectrogram`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeSpectrogram.sc):** **2D Sonogram** — Plots a scrolling time–frequency waterfall mapping frequency bands to color intensities.
+- **[`ProbeWaterfall`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeWaterfall.sc):** **2.5D Isometric Stack** — Visualizes evolving spectral history through stacked isometric frequency traces with depth-cued shading.
+- **[`ProbeMeter`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeMeter.sc):** **Level Meter** — Displays vertical peak and RMS energy bars with calibrated dB rulers, peak-hold indicators, and multichannel monitoring.
+- **[`ProbeLoudness`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeLoudness.sc):** **Loudness Meter** — Visualizes ITU-R BS.1770-4 / EBU R128 broadcast loudness (Momentary, Short-Term, Integrated, and Loudness Range).
+- **[`ProbeVectorscope`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeVectorscope.sc):** **Stereo Vectorscope** — Renders stereo sound field distribution as an X/Y Lissajous orbit with Mid/Side polar graticule and phase correlation (-1 to +1).
+- **[`ProbeBandAnalyzer`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeBandAnalyzer.sc):** **ISO 1/3-Octave Analyzer** — Displays a 16-band bar spectrum equipped with exponential lag smoothing to eliminate visual flicker.
+- **[`ProbeSpectralDashboard`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeSpectralDashboard.sc):** **Spectral Workstation** — Consolidates FFT curves, chromagrams, pitch tracking, and spectral descriptors into 4 synchronized presets.
+- **[`ProbeDashboard`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeDashboard.sc):** **5-Panel Master Console** — Hosts Meter, Scope, Spectrum, Spectrogram, and Loudness simultaneously with global freeze and theme controls.
+- **[`ProbeInspector`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeInspector.sc):** **Signal-Flow DAG Inspector** — Renders an interactive topological graph of any SynthDef showing unit generator connections, rate color-coding, and bezier paths.
+- **[`ProbeHistory`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeHistory.sc):** **Strip-Chart Recorder** — Logs rolling dynamics over time, plotting peak, RMS, and crest factor dynamics.
+- **[`ProbeTheme`](file:///Users/fmmac/Desktop/SC%20New%20Visulations%20servers/SCVisuals/classes/ProbeTheme.sc):** **Theme & Palette Engine** — Coordinates laboratory color schemes (`\graphite`, `\phosphor`, `\amber`, `\ice`, `\puredata`) and typography scaling across all running views.
+
+> [!NOTE]
+> For complete details on the underlying dual-tier architecture, internal `PB_*` telemetry plumbing, and lifecycle design, refer to the [Implementation Architecture & Overview](architecture/implementation-overview.md).
 
 ---
 

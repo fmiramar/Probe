@@ -5,16 +5,27 @@ related:: Classes/Probe, Classes/ProbeScope, Classes/ProbeSpectrum, Classes/Prob
 
 section:: Overview
 
-The strong::Probe Visuals and Representation Suite:: (v0.4.0) is a cohesive, laboratory-grade family of real-time audio visualization, measurement, and signal instrumentation tools for SuperCollider.
+The strong::Probe - Visuals and Representation Suite:: provides a focused collection of 14 visualizers and measurement instruments for SuperCollider. Each class generates a distinct visual representation of sound and synthesis signals:
 
-Designed from first principles for audio-thread safety, predictable lifecycle reclamation, and zero IDE autocomplete clutter, Probe delivers professional studio visualizers without mandatory C++ compilation or changes to stock SuperCollider files.
+definitionList::
+## link::Classes/Probe:: || Central suite coordinator and server extension dispatcher (code::s.*Pb::) managing global visualizers and broker telemetry.
+## link::Classes/ProbeScope:: || strong::Oscilloscope::: Renders audio waveforms in real time with stationary zero-crossing trigger stabilization, multi-channel track separation, zoom, and hardware-antialiased vector lines.
+## link::Classes/ProbeSpectrum:: || strong::FFT Spectrum Analyzer::: Displays real-time frequency distribution across a continuous calibrated dBFS curve with an interactive measurement cursor.
+## link::Classes/ProbeSpectrogram:: || strong::2D Sonogram::: Plots a scrolling time–frequency waterfall mapping frequency bands to color intensities.
+## link::Classes/ProbeWaterfall:: || strong::2.5D Isometric Stack::: Visualizes evolving spectral history through stacked isometric frequency traces with depth-cued shading.
+## link::Classes/ProbeMeter:: || strong::Level Meter::: Displays vertical peak and RMS energy bars with calibrated dB rulers, peak-hold indicators, and multichannel monitoring.
+## link::Classes/ProbeLoudness:: || strong::Loudness Meter::: Visualizes ITU-R BS.1770-4 / EBU R128 broadcast loudness (Momentary, Short-Term, Integrated, and Loudness Range).
+## link::Classes/ProbeVectorscope:: || strong::Stereo Vectorscope::: Renders stereo sound field distribution as an X/Y Lissajous orbit with Mid/Side polar graticule and phase correlation (-1 to +1).
+## link::Classes/ProbeBandAnalyzer:: || strong::ISO 1/3-Octave Analyzer::: Displays a 16-band bar spectrum equipped with exponential lag smoothing to eliminate visual flicker.
+## link::Classes/ProbeSpectralDashboard:: || strong::Spectral Workstation::: Consolidates FFT curves, chromagrams, pitch tracking, and spectral descriptors into 4 synchronized presets.
+## link::Classes/ProbeDashboard:: || strong::5-Panel Master Console::: Hosts Meter, Scope, Spectrum, Spectrogram, and Loudness simultaneously with global freeze and theme controls.
+## link::Classes/ProbeInspector:: || strong::Signal-Flow DAG Inspector::: Renders an interactive topological graph of any SynthDef showing unit generator connections, rate color-coding, and bezier paths.
+## link::Classes/ProbeHistory:: || strong::Strip-Chart Recorder::: Logs rolling dynamics over time, plotting peak, RMS, and crest factor dynamics.
+## link::Classes/ProbeTheme:: || strong::Theme & Palette Engine::: Coordinates laboratory color schemes (\graphite, \phosphor, \amber, \ice, \puredata) and typography scaling across all running views.
+::
 
-All visualizers operate under a strict strong::Dual-Tier Architecture:::
-list::
-## strong::Tier 1 (Public Instruments)::: Exactly 14 clean, high-level classes prefixed with code::Probe*:: appear in IDE autocompletion (e.g. link::Classes/ProbeScope::, link::Classes/ProbeSpectrum::, link::Classes/ProbeMeter::).
-## strong::Tier 2 (Plumbing & Views)::: All internal telemetry sources, OSC dispatchers, and embeddable composite views reside under the private code::PB_*:: prefix (e.g. code::PB_Broker::, code::PB_LevelsSource::, code::PB_ScopeView::).
-## strong::Embeddable View Factory Pattern::: Every instrument class provides an embeddable view constructor code::Probe*.view(parent, bounds, ...):: that returns a fully configured view suitable for embedding directly into custom windows, layouts, or existing SuperCollider GUIs.
-## strong::Server Ergonomics::: Every instrument is accessible directly from the server object using the unified code::s.*Pb:: extension syntax (e.g. code::s.scopePb::, code::s.meterPb::, code::s.freqscopePb::, code::s.dashboardPb::), preserving vanilla methods (code::s.meter::, code::s.scope::) completely untouched.
+note::
+For complete details on the underlying dual-tier architecture and internal plumbing, see the Implementation Architecture guide in the project repository.
 ::
 
 section:: Suite Summary & Hyperlinked Instrument Directory
