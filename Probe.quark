@@ -3,6 +3,7 @@
 	summary: "High-performance real-time audio visualization & instrumentation suite for SuperCollider.",
 	version: "0.4.0",
 	schelp: "Probe",
+	url: "https://github.com/fmiramar/Probe",
 	license: "GPL-3.0-or-later",
 	copyright: "2026 Probe Contributors",
 	isCompatible: { Main.versionAtLeast(3, 11) }

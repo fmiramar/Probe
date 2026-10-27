@@ -173,7 +173,10 @@ All instruments support dynamic font scaling (`1.0` to `2.0`, default `1.25`) an
 ## Installation & Testing
 
 ```supercollider
-// Install Quark
+// Install Quark via GitHub
+Quarks.install("https://github.com/fmiramar/Probe");
+
+// Or install from local path
 Quarks.install("~/Desktop/SC New Visulations servers/Probe");
 
 // Recompile Class Library
